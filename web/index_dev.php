@@ -13,6 +13,7 @@ if (isset($_SERVER['HTTP_CLIENT_IP'])
 }
 
 require_once __DIR__.'/../vendor/autoload.php';
+ini_set('display_errors', 1);
 
 Debug::enable();
 
