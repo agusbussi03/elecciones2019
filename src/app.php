@@ -21,7 +21,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array (
             'driver'    => 'pdo_mysql',
             'host'      => 'localhost',
-            'dbname'    => 'zonas',
+            'dbname'    => 'elecciones',
             'user'      => 'root',
             'password'  => 'root',
             'charset'   => 'utf8mb4',
