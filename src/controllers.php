@@ -9,12 +9,23 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 //Request::setTrustedProxies(array('127.0.0.1'));
 
 $app->get('/', function () use ($app) {
-  $zonas=$app['db']->fetchAll('SELECT * FROM zonas');
-  //print_r($zonas);
+    $zonas=$app['db']->fetchAll('SELECT * FROM zonas');
+    require 'Mesa.php';
+    $mesa=new Elecciones\Common\Mesa('1');
+    echo $mesa->getId();
     return $app['twig']->render('index.html.twig', array());
 })
 ->bind('homepage')
 ;
+
+$app->get('/flot', function () use ($app) {
+    $name = 'morris-data.js';
+    $fp = fopen($name, 'r');
+    header("Content-Type: application/javascript");
+    header("Content-Length: " . filesize($name));
+    fpassthru($fp);
+    exit;
+});
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {
