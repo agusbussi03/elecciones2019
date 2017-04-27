@@ -33,71 +33,120 @@
                             <tbody>
                                 {% set mascara=mesa.getmascara() %}
                                 {% for item in mascara.0 %}
-                                <tr class="odd gradeX">
-                                    <td>{{ item.pspar }} - {{ item.parnombre }}</td>
-                                    <td>{{ item.pslista }} - {{ item.nombre }}</td>
-                                    <td>{% if item.psgob=='R' %}
-                                        <button type="button" class="btn btn-info btn-circle">
-                                            <i class="fa fa-check"></i>
-                                        </button>
-                                        {% endif %}
-                                    </td>
-                                    <td>{% if item.psdip=='R' %}
-                                        <button type="button" class="btn btn-info btn-circle">
-                                            <i class="fa fa-check"></i>
-                                        </button>
-                                        {% endif %}
-                                    </td>
-                                    <td>{% if item.pssen=='R' %}
-                                        <button type="button" class="btn btn-info btn-circle">
-                                            <i class="fa fa-check"></i>
-                                        </button>
-                                        {% endif %}
-                                    </td>
-                                    <td>{% if item.psint=='R' %}
-                                        <button type="button" class="btn btn-info btn-circle">
-                                            <i class="fa fa-check"></i>
-                                        </button>
-                                        {% endif %}
-                                    </td>
-                                    <td>{% if item.pscon=='R' %}
-                                        <button type="button" class="btn btn-info btn-circle">
-                                            <i class="fa fa-check"></i>
-                                        </button>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                           
-                            </tbody>
-                        </table>
-                        <!-- /.table-responsive -->
+                                    <tr class="odd gradeX">
+                                        <td>{{ item.pspar }} - {{ item.parnombre }}</td>
+                                        <td>{{ item.pslista }} - {{ item.nombre }}</td>
 
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <!-- /.row -->
-    </div>
-    <!-- /#wrapper -->
-    
-    
+                                        <td>
+                                            {% if item.psgob=='R' %}
+                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                {% if filtros[0][0][''][item.pspar][item.pslista]['G'] is defined %} 
+                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                {%endif%}
+                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="G,0,0,0,{{item.pspar}},{{item.pslista}}">
+                                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        
+                                        <td>
+                                            {% if item.psdip=='R' %}
+                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                {% if filtros[0][0][''][item.pspar][item.pslista]['D'] is defined %} 
+                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                {%endif%}
+                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="D,0,0,0,{{item.pspar}},{{item.pslista}}">
+                                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        
+                                        <td>
+                                            {% if item.pssen=='R' %}
+                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                {% if filtros[item.sec][0][''][item.pspar][item.pslista]['S'] is defined %} 
+                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                {%endif%}
+                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="S,{{item.sec}},0,0,{{item.pspar}},{{item.pslista}}">
+                                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                                
+             
+                                          <td>
+                                            {% if item.psint=='R' %}
+                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                {% if filtros[item.sec][item.cirnro][item.cirlet][item.pspar][item.pslista]['I'] is defined %} 
+                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                {%endif%}
+                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="I,{{item.sec}},{{item.cirnro}},{{item.cirlet}},{{item.pspar}},{{item.pslista}}">
+                                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>                                              
+                                                
+                                          <td>
+                                            {% if item.pscon=='R' %}
+                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                {% if filtros[item.sec][item.cirnro][item.cirlet][item.pspar][item.pslista]['C'] is defined %} 
+                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                {%endif%}
+                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="C,{{item.sec}},{{item.cirnro}},{{item.cirlet}},{{item.pspar}},{{item.pslista}}">
+                                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td> 
+                                                    </tr>
+                                                    {% endfor %}
 
-{% endblock %}    
+                                                    </tbody>
+                                                </table>
+                                                <!-- /.table-responsive -->
 
-{% block final %}
-     <!-- DataTables JavaScript -->
-    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
-    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
-    <script>
-   
-    </script>
-    
-    
-{% endblock %}
+                                            </div>
+                                            <!-- /.panel-body -->
+                                        </div>
+                                        <!-- /.panel -->
+                                    </div>
+                                    <!-- /.col-lg-12 -->
+                                </div>
+                                <!-- /.row -->
+                            </div>
+                            <!-- /#wrapper -->
 
- 
+
+
+                            {% endblock %}    
+
+                                {% block final %}
+                                    <!-- DataTables JavaScript -->
+                                    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+                                    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+                                    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+                                    <script>
+                                        $(".btn-circle").click(function () {
+                                            if (this.value == 1) {
+                                                $.post("{{ path('filtro',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                    // validar retorno
+                                                });
+                                                this.value = 0;
+                                                $(this).attr("class", 'btn btn-warning btn-circle');
+                                                $(this).children().attr("class", "fa fa-times");
+                                            } else {
+                                                $.post("{{ path('filtro',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                    //validar retorno
+                                                });
+                                                this.value = 1;
+                                                $(this).attr("class", 'btn btn-info btn-circle');
+                                                $(this).children().attr("class", "fa fa-check");
+                                            }
+                                        });
+                                    </script>
+
+
+                                {% endblock %}
+
+
