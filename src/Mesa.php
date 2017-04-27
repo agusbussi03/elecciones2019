@@ -1,43 +1,62 @@
 <?php
-namespace Elecciones\Common;
+
 /**
  * @author Pablo Bussi <pbussi@gmail.com>
  * @since 2.0
  */
-class Mesa
-{
-   
-    private $tipo = '';
+class Mesa {
+
+    private $nro = '';
     private $sec = 0;
     private $cirnro = 0;
     private $cirlet = '';
+    private $electo = '';
     private $app;
 
-    function __construct($tipo, $sec, $cirnro, $cirlet, $app) {
+    function __construct($nro, $app) {
         $this->app = $app;
-        $this->tipo = $tipo;
-        $this->sec = $sec;
-        $this->cirnro = $cirnro;
-        $this->cirlet = $cirlet;
+        $this->nro = $nro;
+        $datos = $this->app['db']->fetchAssoc("SELECT * from mesas where mes=$this->nro");
+
+        $this->electo = $datos['electo'];
+        $this->sec = $datos['sec'];
+        $this->cirnro = $datos['cirnro'];
+        $this->cirlet = $datos['cirlet'];
     }
 
-    function getFiltros() {
-        switch ($this->tipo) {
-            case 'G': $sql = "SELECT distinct pspar,parnombre,pslista,nombre FROM `actapartido` WHERE psgob='R'";
-                break;
-            case 'D': $sql = "SELECT distinct pspar,parnombre,pslista,nombre FROM `actapartido` WHERE psdip='R'";
-                break;
-            case 'S': $sql = "SELECT distinct pspar,parnombre,pslista,nombre FROM `actapartido` WHERE pssen='R' and sec=".$this->sec;
-                break;
-            case 'I': $sql = "SELECT distinct pspar,parnombre,pslista,nombre FROM `actapartido` WHERE pssen='R' and sec=$this->sec and cirnro=$this->cirnro and cirlet='$this->cirlet'";
-                break;
-            case 'C': $sql = "SELECT distinct pspar,parnombre,pslista,nombre FROM `actapartido` WHERE pssen='R' and sec=$this->sec and cirnro=$this->cirnro and cirlet='$this->cirlet'";
-                break;
-        }
-        $disponibles = $this->app['db']->fetchAll($sql);
-        $filtros = $this->app['db']->fetchAll("SELECT * FROM `filtros` WHERE tipo='$this->tipo'"
-                . " and sec='$this->sec' and cirnro='$this->cirnro' and cirlet='$this->cirlet'");
-        return array('disponibles' => $disponibles, 'filtros' => $filtros);
+    function getnro() {
+        return $this->nro;
+    }
+
+    function getSec() {
+        return $this->sec;
+    }
+
+    function getCirnro() {
+        return $this->cirnro;
+    }
+
+    function getCirlet() {
+        return $this->cirlet;
+    }
+
+    function getElecto() {
+        return $this->electo;
+    }
+
+    function getApp() {
+        return $this->app;
+    }
+
+        
+    
+    
+    function getMascara() {
+        $sql = "SELECT * FROM actapartido WHERE sec=? and cirnro=? and cirlet=?";
+
+        $mascara = $this->app['db']->fetchAll($sql, array($this->sec, $this->cirnro, $this->cirlet));
+        //print_r($mascara);
+        return array($mascara);
     }
 
     function procesar($datos) {
@@ -55,4 +74,3 @@ class Mesa
     }
 
 }
-

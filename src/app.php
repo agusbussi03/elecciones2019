@@ -11,11 +11,7 @@ $app->register(new ServiceControllerServiceProvider());
 $app->register(new AssetServiceProvider());
 $app->register(new TwigServiceProvider());
 $app->register(new HttpFragmentServiceProvider());
-$app['twig'] = $app->extend('twig', function ($twig, $app) {
-    // add custom globals, filters, tags, ...
 
-    return $twig;
-});
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array (
@@ -26,6 +22,10 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
             'password'  => 'root',
             'charset'   => 'utf8mb4',
 )));
+$app['twig'] = $app->extend('twig', function ($twig, $app) {
+    // add custom globals, filters, tags, ...
 
+    return $twig;
+});
 
 return $app;

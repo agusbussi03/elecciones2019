@@ -55,6 +55,15 @@ $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
     return $app['twig']->render('filtrossenador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
 })->bind('filtrossenador');
 
+$app->get('/mesa/{nro}', function ($nro) use ($app) {
+    require 'Mesa.php';
+    $mensaje = "";
+    $mesa = new Mesa($nro, $app);
+    $mesa->getMascara();
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa));
+})->bind('mesa');
+
+
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {
         return;
