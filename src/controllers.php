@@ -57,11 +57,20 @@ $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {
     require 'Mesa.php';
+    require 'Filtros.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
     $mesa->getMascara();
-    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa));
+    $filtroscircuitos= Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa,'filtros'=>$filtroscircuitos));
 })->bind('mesa');
+
+
+$app->post('/filtro/{accion}', function ($accion) use ($app) {
+    require 'Filtros.php';
+    Filtros::$accion($_POST['datos'], $app);
+    return json_encode("OK");
+})->bind('filtro');;
 
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
