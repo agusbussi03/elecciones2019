@@ -34,8 +34,8 @@
                                 {% set mascara=mesa.getmascara() %}
                                 {% for item in mascara.0 %}
                                     <tr class="odd gradeX">
-                                        <td>{{ item.pspar }} - {{ item.parnombre }}</td>
-                                        <td>{{ item.pslista }} - {{ item.nombre }}</td>
+                                        <td><img src="{{ asset('imagenes/partido')}}/{{ item.pspar }}.jpg" height="50px">{{ item.pspar }} - {{ item.parnombre }}</td>
+                                        <td><img src="{{ asset('imagenes/lista')}}/001{{ item.pslista }}.jpg" height="50px">{{ item.pslista }} - {{ item.nombre }}</td>
 
                                         <td>
                                             {% if item.psgob=='R' %}
@@ -48,8 +48,8 @@
                                                 </button>
                                             {% endif %}
                                         </td>
-                                        
-                                        
+
+
                                         <td>
                                             {% if item.psdip=='R' %}
                                                 {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
@@ -61,8 +61,8 @@
                                                 </button>
                                             {% endif %}
                                         </td>
-                                        
-                                        
+
+
                                         <td>
                                             {% if item.pssen=='R' %}
                                                 {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
@@ -74,9 +74,9 @@
                                                 </button>
                                             {% endif %}
                                         </td>
-                                                
-             
-                                          <td>
+
+
+                                        <td>
                                             {% if item.psint=='R' %}
                                                 {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
                                                 {% if filtros[item.sec][item.cirnro][item.cirlet][item.pspar][item.pslista]['I'] is defined %} 
@@ -87,8 +87,8 @@
                                                 </button>
                                             {% endif %}
                                         </td>                                              
-                                                
-                                          <td>
+
+                                        <td>
                                             {% if item.pscon=='R' %}
                                                 {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
                                                 {% if filtros[item.sec][item.cirnro][item.cirlet][item.pspar][item.pslista]['C'] is defined %} 
@@ -99,54 +99,65 @@
                                                 </button>
                                             {% endif %}
                                         </td> 
-                                                    </tr>
-                                                    {% endfor %}
+                                    </tr>
+                                {% endfor %}
 
-                                                    </tbody>
-                                                </table>
-                                                <!-- /.table-responsive -->
+                            </tbody>
+                        </table>
+                        <!-- /.table-responsive -->
 
-                                            </div>
-                                            <!-- /.panel-body -->
-                                        </div>
-                                        <!-- /.panel -->
-                                    </div>
-                                    <!-- /.col-lg-12 -->
-                                </div>
-                                <!-- /.row -->
-                            </div>
-                            <!-- /#wrapper -->
-
-
-
-                            {% endblock %}    
-
-                                {% block final %}
-                                    <!-- DataTables JavaScript -->
-                                    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-                                    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
-                                    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
-                                    <script>
-                                        $(".btn-circle").click(function () {
-                                            if (this.value == 1) {
-                                                $.post("{{ path('filtro',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                                    // validar retorno
-                                                });
-                                                this.value = 0;
-                                                $(this).attr("class", 'btn btn-warning btn-circle');
-                                                $(this).children().attr("class", "fa fa-times");
-                                            } else {
-                                                $.post("{{ path('filtro',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                                    //validar retorno
-                                                });
-                                                this.value = 1;
-                                                $(this).attr("class", 'btn btn-info btn-circle');
-                                                $(this).children().attr("class", "fa fa-check");
-                                            }
-                                        });
-                                    </script>
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /#wrapper -->
 
 
-                                {% endblock %}
+
+{% endblock %}    
+
+{% block final %}
+    <!-- DataTables JavaScript -->
+    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+    <script>
+
+
+        $(window).bind('load', function () {
+            $('img').each(function () {
+                if ((typeof this.naturalWidth != "undefined" &&
+                        this.naturalWidth == 0)
+                        || this.readyState == 'uninitialized') {
+                    $(this).attr('src', '{{asset('imagenes')}}/lol.png');
+                }
+            });
+        });
+        $(".btn-circle").click(function () {
+            if (this.value == 1) {
+                $.post("{{ path('filtro',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                    // validar retorno
+                });
+                this.value = 0;
+                $(this).attr("class", 'btn btn-warning btn-circle');
+                $(this).children().attr("class", "fa fa-times");
+            } else {
+                $.post("{{ path('filtro',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                    //validar retorno
+                });
+                this.value = 1;
+                $(this).attr("class", 'btn btn-info btn-circle');
+                $(this).children().attr("class", "fa fa-check");
+            }
+        });
+    </script>
+
+
+{% endblock %}
 
 
