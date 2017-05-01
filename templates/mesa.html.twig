@@ -14,7 +14,7 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Seccion:{{mesa.sec}} Circuito{{mesa.cirnro}}{{mesa.cirlet}}  Electores:{{mesa.electo}}
+                        Seccion:{{mesa.sec}} Circuito{{mesa.cirnro}}{{mesa.cirlet}}  Electores:{{mesa.electo}} {{configuracion.intermedia}}
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -23,9 +23,11 @@
                                 <tr>
                                     <th>Partido</th>
                                     <th>Lista</th>
-                                    <th>Gobernador</th>
-                                    <th>Diputados</th>
-                                    <th>Senador</th>
+                                        {%if configuracion.intermedia==1%}
+                                        <th>Gobernador</th>
+                                        <th>Diputados</th>
+                                        <th>Senador</th>
+                                        {%endif%}
                                     <th>Intendente</th>
                                     <th>Concejal</th>
                                 </tr>
@@ -33,48 +35,56 @@
                             <tbody>
                                 {% set mascara=mesa.getmascara() %}
                                 {% for item in mascara.0 %}
-                                    <tr class="odd gradeX">
-                                        <td><img src="{{ asset('imagenes/partido')}}/{{ item.pspar }}.jpg" height="50px">{{ item.pspar }} - {{ item.parnombre }}</td>
-                                        <td><img src="{{ asset('imagenes/lista')}}/001{{ item.pslista }}.jpg" height="50px">{{ item.pslista }} - {{ item.nombre }}</td>
-
+                                    <tr class="odd gradeX" id="r_{{item.reng}}">
                                         <td>
-                                            {% if item.psgob=='R' %}
-                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
-                                                {% if filtros[0][0][''][item.pspar][item.pslista]['G'] is defined %} 
-                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
-                                                {%endif%}
-                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="G,0,0,0,{{item.pspar}},{{item.pslista}}">
-                                                    <i class="fa {{clasetilde}} fa-check"></i>
-                                                </button>
-                                            {% endif %}
+                                            <!--a class="thumbnail"-->
+                                            <img src="{{ asset('imagenes/partido')}}/{{ item.pspar }}.jpg" height="50px">
+                                            <!--/a-->
+                                            {{ item.pspar }} - {{ item.parnombre }}
                                         </td>
-
-
                                         <td>
-                                            {% if item.psdip=='R' %}
-                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
-                                                {% if filtros[0][0][''][item.pspar][item.pslista]['D'] is defined %} 
-                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
-                                                {%endif%}
-                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="D,0,0,0,{{item.pspar}},{{item.pslista}}">
-                                                    <i class="fa {{clasetilde}} fa-check"></i>
-                                                </button>
-                                            {% endif %}
+                                            <img src="{{ asset('imagenes/lista')}}/001{{ item.pslista }}.jpg" height="50px">
+                                            {{ item.pslista }} - {{ item.nombre }}
                                         </td>
+                                        {%if configuracion.intermedia==1%}
+                                            <td>
+                                                {% if item.psgob=='R' %}
+                                                    {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                    {% if filtros[0][0][''][item.pspar][item.pslista]['G'] is defined %} 
+                                                        {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                    {%endif%}
+                                                    <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="G,0,0,0,{{item.pspar}},{{item.pslista}}">
+                                                        <i class="fa {{clasetilde}} fa-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
 
 
-                                        <td>
-                                            {% if item.pssen=='R' %}
-                                                {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
-                                                {% if filtros[item.sec][0][''][item.pspar][item.pslista]['S'] is defined %} 
-                                                    {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
-                                                {%endif%}
-                                                <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="S,{{item.sec}},0,0,{{item.pspar}},{{item.pslista}}">
-                                                    <i class="fa {{clasetilde}} fa-check"></i>
-                                                </button>
-                                            {% endif %}
-                                        </td>
+                                            <td>
+                                                {% if item.psdip=='R' %}
+                                                    {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                    {% if filtros[0][0][''][item.pspar][item.pslista]['D'] is defined %} 
+                                                        {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                    {%endif%}
+                                                    <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="D,0,0,0,{{item.pspar}},{{item.pslista}}">
+                                                        <i class="fa {{clasetilde}} fa-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
 
+
+                                            <td>
+                                                {% if item.pssen=='R' %}
+                                                    {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                                    {% if filtros[item.sec][0][''][item.pspar][item.pslista]['S'] is defined %} 
+                                                        {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                                    {%endif%}
+                                                    <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="S,{{item.sec}},0,0,{{item.pspar}},{{item.pslista}}">
+                                                        <i class="fa {{clasetilde}} fa-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
+                                        {%endif%}
 
                                         <td>
                                             {% if item.psint=='R' %}

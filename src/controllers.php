@@ -9,13 +9,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 //Request::setTrustedProxies(array('127.0.0.1'));
 
 $app->get('/', function () use ($app) {
-            //$zonas = $app['db']->fetchAll('SELECT * FROM zonas');
-            //print_r($zonas);
             return $app['twig']->render('index.html.twig', array());
         })
-        ->bind('homepage')
-;
+        ->bind('homepage');
 
+/* * ************** F I L T R O S *********************************** */
 $app->get('/circuitos', function () use ($app) {
     $circuitos = $app['db']->fetchAll('SELECT * FROM circuitos');
     return $app['twig']->render('circuitos.html.twig', array('circuitos' => $circuitos));
@@ -34,14 +32,14 @@ $app->get('/provincia', function () use ($app) {
 $app->get('/filtrosgobernador', function () use ($app) {
     require 'Filtros.php';
     $mensaje = "";
-    $filtros = new Filtros('G',0,0,'', $app);
+    $filtros = new Filtros('G', 0, 0, '', $app);
     $resultado = $filtros->getFiltros();
     return $app['twig']->render('filtrosgobernador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
 })->bind('filtrosgobernador');
 
 $app->post('/filtrosgobernador', function () use ($app) {
     require 'Filtros.php';
-    $filtros = new Filtros('G',0,0,'', $app);
+    $filtros = new Filtros('G', 0, 0, '', $app);
     $mensaje = $filtros->procesar($_POST);
     $resultado = $filtros->getFiltros();
     return $app['twig']->render('filtrosgobernador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
@@ -50,27 +48,67 @@ $app->post('/filtrosgobernador', function () use ($app) {
 $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
     require 'Filtros.php';
     $mensaje = "";
-    $filtros = new Filtros('S',$sec,0,'', $app);
+    $filtros = new Filtros('S', $sec, 0, '', $app);
     $resultado = $filtros->getFiltros();
     return $app['twig']->render('filtrossenador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
 })->bind('filtrossenador');
-
-$app->get('/mesa/{nro}', function ($nro) use ($app) {
-    require 'Mesa.php';
-    require 'Filtros.php';
-    $mensaje = "";
-    $mesa = new Mesa($nro, $app);
-    $mesa->getMascara();
-    $filtroscircuitos= Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
-    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa,'filtros'=>$filtroscircuitos));
-})->bind('mesa');
-
 
 $app->post('/filtro/{accion}', function ($accion) use ($app) {
     require 'Filtros.php';
     Filtros::$accion($_POST['datos'], $app);
     return json_encode("OK");
-})->bind('filtro');;
+})->bind('filtro');
+
+/* * ************** M E S A S *********************************** */
+
+$app->get('/mesa/{nro}', function ($nro) use ($app) {
+    require 'Mesa.php';
+    require 'Filtros.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new Mesa($nro, $app);
+    $mesa->getMascara();
+    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+})->bind('mesa');
+
+
+/* * ************** C O N F I G U  R A C I O N *********************************** */
+
+
+$app->get('/configuracion', function () use ($app) {
+    require 'Configuracion.php';
+    $mensaje = '';
+    $configuracion = new Configuracion($app);
+    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+})->bind('configuracion');
+
+$app->post('/configuracion', function () use ($app) {
+    require 'Configuracion.php';
+    $mensaje = 'Datos almacenados';
+    $configuracion = new Configuracion($app);
+    $configuracion->grabar($_POST);
+    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+});
+
+
+/* * ************** U S U A R I O S *********************************** */
+
+$app->get('/usuarios', function () use ($app) {
+    require 'Usuarios.php';
+    $mensaje = '';
+    $usuarios = Usuarios::getAll($app);
+    return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios, 'mensaje' => $mensaje));
+})->bind('usuarios');
+
+$app->post('/usuario', function () use ($app) {
+    require 'Configuracion.php';
+    $mensaje = 'Datos almacenados';
+    $configuracion = new Configuracion($app);
+    $configuracion->grabar($_POST);
+    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+});
+
 
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {

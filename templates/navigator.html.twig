@@ -7,7 +7,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="index.html">Elecciones 2017</a>
+        <a class="navbar-brand" href="index.html">Gestion de mesas testigos</a>
     </div>
     <!-- /.navbar-header -->
 
@@ -244,9 +244,10 @@
             <ul class="nav" id="side-menu">
                 <li class="sidebar-search">
                     <div class="input-group custom-search-form">
-                        <input type="text" class="form-control" placeholder="Search...">
+                        <input type="text" class="form-control" name="nro" id="nro" placeholder="Busar mesa...">
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">
+                            <button class="btn btn-default" type="button" 
+                                    onclick="window.location.href='{{path('homepage')}}'+'mesa/'+$('#nro').val()">
                                 <i class="fa fa-search"></i>
                             </button>
                         </span>
@@ -277,12 +278,17 @@
                     <!-- /.nav-second-level -->
                 </li>
                 <li>
-                    <a href="tables.html">
+                    <a href="{{path('mesa', {'nro': 1})}}">
                         <i class="fa fa-table fa-fw"></i>
                         Mesas</a>
                 </li>
                 <li>
-                    <a href="forms.html">
+                    <a href="{{path('configuracion')}}">
+                        <i class="fa fa-gear fa-fw"></i>
+                        Configuracion</a>
+                </li>
+                <li>
+                    <a href="{{path('usuarios')}}">
                         <i class="fa fa-user fa-fw"></i>
                         Usuarios</a>
                 </li>
@@ -298,7 +304,7 @@
                         <li>
                             <a href="buttons.html">Distribucion Cargos</a>
                         </li>
-                       
+
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
