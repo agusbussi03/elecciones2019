@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
-session_start();
 $app->get('/', function () use ($app) {
     
             if (!isset($_SESSION['admin']) || $_SESSION['admin']==0) {

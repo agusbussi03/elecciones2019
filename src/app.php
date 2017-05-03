@@ -12,7 +12,6 @@ $app->register(new AssetServiceProvider());
 $app->register(new TwigServiceProvider());
 $app->register(new HttpFragmentServiceProvider());
 
-
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array (
             'driver'    => 'pdo_mysql',
@@ -22,9 +21,10 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
             'password'  => 'root',
             'charset'   => 'utf8mb4',
 )));
+session_start();
 $app['twig'] = $app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
-
+    $twig->addGlobal('session', $_SESSION);
     return $twig;
 });
 
