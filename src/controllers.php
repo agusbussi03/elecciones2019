@@ -7,11 +7,53 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
-
+session_start();
 $app->get('/', function () use ($app) {
+    
+            if (!isset($_SESSION['admin']) || $_SESSION['admin']==0) {
+                return $app->redirect('login');
+            }
             return $app['twig']->render('index.html.twig', array());
         })
         ->bind('homepage');
+
+/* * ************** L O G I N *********************************** */
+
+
+$app->get('/login', function () use ($app) {
+    $mensaje = '';
+    return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
+})->bind('login');
+
+$app->get('/logout', function () use ($app) {
+    $mensaje = 'Ha salido del sistema';
+    session_destroy();
+    return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
+})->bind('logout');
+
+$app->post('/login', function () use ($app) {
+    require 'Usuarios.php';
+    $mensaje = '';
+    $usuario = new Usuarios($app);
+    $resultado = $usuario->getByUsername($_POST['usuario']);
+    if ($resultado != '')
+        $mensaje = $resultado;
+    if ($usuario->getPassword() != md5($_POST['password'])) {
+        $mensaje = "Password incorrecta";
+    }
+
+    if ($mensaje != "")
+        return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
+    else {
+        //$_SESSION['usuario'] = $usuario;
+        $_SESSION['usuario']=$usuario->getUsuario();
+        $_SESSION['admin']=$usuario->getAdmin();
+        $_SESSION['carga']=$usuario->getCarga();
+        $_SESSION['lectura']=$usuario->getLectura();
+        return $app['twig']->render('index.html.twig', array());
+    }
+});
+
 
 /* * ************** F I L T R O S *********************************** */
 $app->get('/circuitos', function () use ($app) {
