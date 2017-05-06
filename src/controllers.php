@@ -8,8 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 $app->get('/', function () use ($app) {
-    
-            if (!isset($_SESSION['admin']) || $_SESSION['admin']==0) {
+            if (!validar('admin')) {
                 return $app->redirect('login');
             }
             return $app['twig']->render('index.html.twig', array());
@@ -45,10 +44,11 @@ $app->post('/login', function () use ($app) {
         return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
     else {
         //$_SESSION['usuario'] = $usuario;
-        $_SESSION['usuario']=$usuario->getUsuario();
-        $_SESSION['admin']=$usuario->getAdmin();
-        $_SESSION['carga']=$usuario->getCarga();
-        $_SESSION['lectura']=$usuario->getLectura();
+        $_SESSION['usuario'] = $usuario->getUsuario();
+        $_SESSION['admin'] = $usuario->getAdmin();
+        $_SESSION['carga'] = $usuario->getCarga();
+        $_SESSION['lectura'] = $usuario->getLectura();
+        $app['twig']->addGlobal('session', $_SESSION);
         return $app['twig']->render('index.html.twig', array());
     }
 });
@@ -56,21 +56,33 @@ $app->post('/login', function () use ($app) {
 
 /* * ************** F I L T R O S *********************************** */
 $app->get('/circuitos', function () use ($app) {
-    $circuitos = $app['db']->fetchAll('SELECT * FROM circuitos');
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    $circuitos = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='M'");
     return $app['twig']->render('circuitos.html.twig', array('circuitos' => $circuitos));
 })->bind('circuitos');
 
 $app->get('/secciones', function () use ($app) {
-    $secciones = $app['db']->fetchAll('SELECT * FROM circuitos');
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    $secciones = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='S'");
     return $app['twig']->render('secciones.html.twig', array('secciones' => $secciones));
 })->bind('secciones');
 
 $app->get('/provincia', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     $provincia = $app['db']->fetchAll('SELECT * FROM circuitos');
     return $app['twig']->render('provincia.html.twig', array('provincia' => $provincia));
 })->bind('provincia');
 
 $app->get('/filtrosgobernador', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Filtros.php';
     $mensaje = "";
     $filtros = new Filtros('G', 0, 0, '', $app);
@@ -79,6 +91,9 @@ $app->get('/filtrosgobernador', function () use ($app) {
 })->bind('filtrosgobernador');
 
 $app->post('/filtrosgobernador', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Filtros.php';
     $filtros = new Filtros('G', 0, 0, '', $app);
     $mensaje = $filtros->procesar($_POST);
@@ -87,6 +102,9 @@ $app->post('/filtrosgobernador', function () use ($app) {
 });
 
 $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Filtros.php';
     $mensaje = "";
     $filtros = new Filtros('S', $sec, 0, '', $app);
@@ -95,6 +113,9 @@ $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
 })->bind('filtrossenador');
 
 $app->post('/filtro/{accion}', function ($accion) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Filtros.php';
     Filtros::$accion($_POST['datos'], $app);
     return json_encode("OK");
@@ -103,6 +124,9 @@ $app->post('/filtro/{accion}', function ($accion) use ($app) {
 /* * ************** M E S A S *********************************** */
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {
+        if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Mesa.php';
     require 'Filtros.php';
     require 'Configuracion.php';
@@ -114,10 +138,47 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
 })->bind('mesa');
 
 
+$app->get('/mesastestigo', function () use ($app) {
+        if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    require 'Mesa.php';
+    $testigos=Mesa::testigos($app);
+    return $app['twig']->render('mesastestigo.html.twig', array('testigos' => $testigos));
+})->bind('mesastestigo');
+
+$app->get('/testigo/{nro}/{accion}', function ($nro,$accion) use ($app) {
+    require 'Mesa.php';
+    require 'Filtros.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new Mesa($nro, $app);
+    $mesa->$accion();
+    $mesa->getMascara();
+    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+})->bind('testigo');
+
+
+$app->get('/mesacarga/{nro}', function ($nro) use ($app) {
+    require 'Mesa.php';
+    require 'Filtros.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new Mesa($nro, $app);
+    $mesa->getMascara();
+    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
+    return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+})->bind('mesacarga');
+
+
 /* * ************** C O N F I G U  R A C I O N *********************************** */
 
 
 $app->get('/configuracion', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Configuracion.php';
     $mensaje = '';
     $configuracion = new Configuracion($app);
@@ -125,6 +186,9 @@ $app->get('/configuracion', function () use ($app) {
 })->bind('configuracion');
 
 $app->post('/configuracion', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Configuracion.php';
     $mensaje = 'Datos almacenados';
     $configuracion = new Configuracion($app);
@@ -136,6 +200,9 @@ $app->post('/configuracion', function () use ($app) {
 /* * ************** U S U A R I O S *********************************** */
 
 $app->get('/usuarios', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Usuarios.php';
     $mensaje = '';
     $usuarios = Usuarios::getAll($app);
@@ -143,6 +210,9 @@ $app->get('/usuarios', function () use ($app) {
 })->bind('usuarios');
 
 $app->post('/usuario', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
     require 'Configuracion.php';
     $mensaje = 'Datos almacenados';
     $configuracion = new Configuracion($app);
@@ -167,3 +237,13 @@ $app->error(function (\Exception $e, Request $request, $code) use ($app) {
 
     return new Response($app['twig']->resolveTemplate($templates)->render(array('code' => $code)), $code);
 });
+
+function validar($rol) {
+    if (!isset($_SESSION['usuario']))
+        return false;
+    if (!isset($_SESSION[$rol]))
+        return false;
+    if ($_SESSION[$rol] == 0)
+        return false;
+    return true;
+}

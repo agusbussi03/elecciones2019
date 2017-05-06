@@ -11,17 +11,21 @@ class Mesa {
     private $cirnro = 0;
     private $cirlet = '';
     private $electo = '';
+    private $testigo = '';
+    private $usuario = '';
     private $app;
 
     function __construct($nro, $app) {
         $this->app = $app;
         $this->nro = $nro;
-        $datos = $this->app['db']->fetchAssoc("SELECT * from mesas where mes=$this->nro");
+        $datos = $this->app['db']->fetchAssoc("SELECT * from mesas where mesa=$this->nro");
 
         $this->electo = $datos['electo'];
         $this->sec = $datos['sec'];
         $this->cirnro = $datos['cirnro'];
         $this->cirlet = $datos['cirlet'];
+        $this->testigo = $datos['testigo'];
+        $this->usuario = $datos['usuario'];
     }
 
     function getnro() {
@@ -48,14 +52,19 @@ class Mesa {
         return $this->app;
     }
 
-        
-    
-    
+    function getTestigo() {
+        return $this->testigo;
+    }
+
+    function getUsuario() {
+        return $this->usuario;
+    }
+
     function getMascara() {
         $sql = "SELECT * FROM actapartido WHERE sec=? and cirnro=? and cirlet=?";
 
         $mascara = $this->app['db']->fetchAll($sql, array($this->sec, $this->cirnro, $this->cirlet));
-        //print_r($mascara);
+//print_r($mascara);
         return array($mascara);
     }
 
@@ -66,11 +75,28 @@ class Mesa {
 
         foreach ($datos as $dato => $valor) {
             $dato = explode("-", $dato);
-            //print_r($dato);
+//print_r($dato);
             $sql = "INSERT INTO filtros VALUES (?,?,?,?,?,?);";
             $this->app['db']->executeQuery($sql, array((int) $this->sec, (int) $this->cirnro, $this->cirlet, (int) $dato[0], (int) $dato[1], $this->tipo));
         }
         return "Datos modificados";
     }
 
+    function setTestigo() {
+        $sql = "UPDATE mesas SET testigo=1 where mesa=$this->nro and tipo=''";
+        $this->app['db']->executeQuery($sql);
+        $this->testigo=1;
+    }
+    
+    function unsetTestigo() {
+        $sql = "UPDATE mesas SET testigo=0 where mesa=$this->nro and tipo=''";
+        $this->app['db']->executeQuery($sql);
+        $this->testigo=0;
+    }
+    
+     static function testigos( $app) {
+        $sql = "SELECT * FROM mesas where testigo=1";
+        $resultado = $app['db']->fetchAll($sql);
+        return $resultado;
+    }
 }

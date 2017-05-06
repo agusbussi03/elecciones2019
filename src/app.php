@@ -22,6 +22,12 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
             'charset'   => 'utf8mb4',
 )));
 session_start();
+if (!isset($_SESSION['usuario'])){
+        $_SESSION['usuario']="";
+        $_SESSION['admin']=0;
+        $_SESSION['carga']=0;
+        $_SESSION['lectura']=0;
+}
 $app['twig'] = $app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
     $twig->addGlobal('session', $_SESSION);
