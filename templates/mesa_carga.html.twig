@@ -7,8 +7,7 @@
             <a class="navbar-brand" href="index.html">Gestion de mesas testigos</a>
         </div>
         <!-- /.navbar-header -->
-
-        <!--ul class="nav navbar-top-links navbar-right">
+        <ul class="nav navbar-top-links navbar-right">
             pbussi
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -16,16 +15,21 @@
                     <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
+                    <li>
+                        <a href="{{ path('mesacarga_elige') }}">
+                            <i class="fa fa-edit fa-fw"></i>
+                            Cargar mesa</a>
+                    </li>
                     <li class="divider"></li>
 
                     <li>
-                        <a href="/elecciones/web/index_dev.php/logout">
+                        <a href="{{ path('logout') }}">
                             <i class="fa fa-sign-out fa-fw"></i>
                             Logout</a>
                     </li>
                 </ul>
             </li>
-        </ul-->
+        </ul>
     </nav>
 
     <div class="row">

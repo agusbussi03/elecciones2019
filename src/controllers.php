@@ -7,13 +7,14 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
+
 $app->get('/', function () use ($app) {
-            if (!validar('admin')) {
-                return $app->redirect('login');
-            }
-            return $app['twig']->render('index.html.twig', array());
-        })
-        ->bind('homepage');
+    require 'Estado.php';
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+})->bind('homepage');
 
 /* * ************** L O G I N *********************************** */
 
@@ -57,7 +58,7 @@ $app->post('/login', function () use ($app) {
 /* * ************** F I L T R O S *********************************** */
 $app->get('/circuitos', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     $circuitos = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='M'");
     return $app['twig']->render('circuitos.html.twig', array('circuitos' => $circuitos));
@@ -65,7 +66,7 @@ $app->get('/circuitos', function () use ($app) {
 
 $app->get('/secciones', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     $secciones = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='S'");
     return $app['twig']->render('secciones.html.twig', array('secciones' => $secciones));
@@ -73,7 +74,7 @@ $app->get('/secciones', function () use ($app) {
 
 $app->get('/provincia', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     $provincia = $app['db']->fetchAll('SELECT * FROM circuitos');
     return $app['twig']->render('provincia.html.twig', array('provincia' => $provincia));
@@ -81,7 +82,7 @@ $app->get('/provincia', function () use ($app) {
 
 $app->get('/filtrosgobernador', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Filtros.php';
     $mensaje = "";
@@ -92,7 +93,7 @@ $app->get('/filtrosgobernador', function () use ($app) {
 
 $app->post('/filtrosgobernador', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Filtros.php';
     $filtros = new Filtros('G', 0, 0, '', $app);
@@ -103,7 +104,7 @@ $app->post('/filtrosgobernador', function () use ($app) {
 
 $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Filtros.php';
     $mensaje = "";
@@ -114,7 +115,7 @@ $app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
 
 $app->post('/filtro/{accion}', function ($accion) use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Filtros.php';
     Filtros::$accion($_POST['datos'], $app);
@@ -125,7 +126,7 @@ $app->post('/filtro/{accion}', function ($accion) use ($app) {
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Mesa.php';
     require 'Filtros.php';
@@ -140,7 +141,7 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
 
 $app->get('/mesastestigo', function () use ($app) {
     if (!validar('admin')) {
-        return $app->redirect('login');
+        return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Mesa.php';
     $testigos = Mesa::testigos($app);
@@ -178,17 +179,20 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
 
 $app->post('/mesacarga/{nro}', function ($nro) use ($app) {
     require 'Mesa.php';
+    require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
     $mesa->actualiza($_POST);
-    $categorias=array();
-    return $app['twig']->render('mesa_carga_elige.html.twig', array( 'categorias' => $categorias, 'mensaje'=>$mensaje));
+    $categorias = array();
+    return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
+    //return $app['twig']->render('mesa_carga_elige.html.twig', array( 'categorias' => $categorias, 'mensaje'=>$mensaje));
 })->bind('mesacarga_p');
 
 $app->get('/mesacarga_elige', function () use ($app) {
+    require 'Configuracion.php';
     $mensaje = "";
     $categorias = array();
-    return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => $mensaje, 'categorias' => $categorias));
+    return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias));
 })->bind('mesacarga_elige');
 
 $app->post('/mesacarga_elige', function () use ($app) {
@@ -202,7 +206,7 @@ $app->post('/mesacarga_elige', function () use ($app) {
         $mensaje = "Mesa no definida como testigo";
     $categorias = array('G', 'DN');
     $mesa->sumavotos();
-    return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
+    return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
 })->bind('mesacarga_elige_p');
 
 /* * ************** C O N F I G U  R A C I O N *********************************** */

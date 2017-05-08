@@ -15,10 +15,15 @@
                     <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
+                    <li>
+                        <a href="{{ path('mesacarga_elige') }}">
+                            <i class="fa fa-edit fa-fw"></i>
+                            Cargar mesa</a>
+                    </li>
                     <li class="divider"></li>
 
                     <li>
-                        <a href="/elecciones/web/index_dev.php/logout">
+                        <a href="{{ path('logout') }}">
                             <i class="fa fa-sign-out fa-fw"></i>
                             Logout</a>
                     </li>
@@ -44,6 +49,7 @@
                     {% endif %}
                     <form id="formu" method="POST">
                         <input class="form-control inputs" id=nro name=nro value="" required type="number" size="3" min="0">
+                        
                         <!--input type="submit" value="Grabar" class="btn btn-primary"-->
                     </form>   
                     {% if categorias %}
@@ -53,21 +59,23 @@
                                 Categorias provinciales
                             </div>
                             <div class="panel-body">
+                                {%if configuracion.intermedia==1%}
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
                                         onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'G'}) }}';">
                                     Gobernador
                                 </button>
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
-                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'D'}) }}';">
+                                        onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'D'}) }}';">
                                     Diputado</button>
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
-                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
+                                        onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
                                     Senador</button>
+                                    {%endif%}
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
-                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'I'}) }}';">
+                                        onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'I'}) }}';">
                                     Intendente</button>
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
-                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'C'}) }}';">
+                                        onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'C'}) }}';">
                                     Concejal</button>
                             </div>
                         </div>

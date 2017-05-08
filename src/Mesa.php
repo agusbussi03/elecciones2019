@@ -62,9 +62,28 @@ class Mesa {
 
     function getMascara() {
         $sql = "SELECT * FROM actapartido WHERE sec=? and cirnro=? and cirlet=?";
-
         $mascara = $this->app['db']->fetchAll($sql, array($this->sec, $this->cirnro, $this->cirlet));
-//print_r($mascara);
+        $blancos = $nulos = $otros = $mascara[0];
+        $blancos['pspar'] = 9997;
+        $blancos['parnombre'] = 'BLANCOS';
+        $blancos['pslista'] = 0;
+        $blancos['nombre'] = '';
+        $nulos['pspar'] = 9998;
+        $nulos['parnombre'] = 'NULOS';
+        $nulos['pslista'] = 0;
+        $nulos['nombre'] = '';
+        $otros['pspar'] = 9999;
+        $otros['parnombre'] = 'OTROS';
+        $otros['pslista'] = 0;
+        $otros['nombre'] = '';
+        $blancos['psgob'] =$nulos['psgob'] =$otros['psgob'] = 'R';
+        $blancos['psdip'] =$nulos['psdip'] =$otros['psdip'] = 'R';
+        $blancos['pssen'] =$nulos['pssen'] =$otros['pssen'] = 'R';
+        $blancos['psint'] =$nulos['psint'] =$otros['psint'] = 'R';
+        $blancos['pscon'] =$nulos['pscon'] =$otros['pscon'] = 'R';
+        $mascara[] = $blancos;
+        $mascara[] = $nulos;
+        $mascara[] = $otros;
         return array($mascara);
     }
 
@@ -89,7 +108,7 @@ class Mesa {
             $sql = "INSERT renglon SELECT ?,'',renglon,sec,cirnro,cirlet,pspar,parnombre,pslista,nombre,0,0,0,0,0,0,sortp,sortl 
                     from actapartido WHERE sec=? and cirnro=? and cirlet=?";
 
-            $this->app['db']->executeQuery($sql, array((int) $this->nro,(int) $this->sec, (int) $this->cirnro, $this->cirlet));
+            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
         }
         return $sumavotos;
     }
@@ -103,7 +122,7 @@ class Mesa {
             $lista = $dato[2];
             $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
 
-            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int)$lista,(int) $this->nro));
+            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->nro));
         }
         return;
     }

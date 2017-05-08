@@ -20,7 +20,7 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li class="divider"></li>
-                
+
                 <li>
                     <a href={{ path('logout') }}>
                         <i class="fa fa-sign-out fa-fw"></i>
@@ -34,15 +34,17 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li class="sidebar-search">
-                    <div class="input-group custom-search-form">
-                        <input type="text" class="form-control" name="nro" id="nro" placeholder="Busar mesa...">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" 
-                                    onclick="window.location.href='{{path('homepage')}}'+'mesa/'+$('#nro').val()">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </span>
-                    </div>
+                    <form role="form" onsubmit="window.location.href = '{{path('homepage')}}' + 'mesa/' + $('#nro').val();return false;" > 
+                        <div class="input-group custom-search-form">
+                            <input type="text" class="form-control" name="nro" id="nro" placeholder="Busar mesa...">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit" 
+                                        onclick="window.location.href = '{{path('homepage')}}' + 'mesa/' + $('#nro').val()">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div> 
+                    </form>
                     <!-- /input-group -->
                 </li>
                 <li>
@@ -72,6 +74,11 @@
                     <a href="{{path('mesastestigo')}}">
                         <i class="fa fa-table fa-fw"></i>
                         Mesas testigo</a>
+                </li>
+                <li>
+                    <a href="{{path('mesacarga_elige')}}">
+                        <i class="fa fa-edit fa-fw"></i>
+                        Cargar mesa</a>
                 </li>
                 <li>
                     <a href="{{path('configuracion')}}">
