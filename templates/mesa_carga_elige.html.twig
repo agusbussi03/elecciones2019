@@ -1,0 +1,103 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Gestion de mesas testigos</a>
+        </div>
+        <!-- /.navbar-header -->
+
+        <ul class="nav navbar-top-links navbar-right">
+            pbussi
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-user fa-fw"></i>
+                    <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                    <li class="divider"></li>
+
+                    <li>
+                        <a href="/elecciones/web/index_dev.php/logout">
+                            <i class="fa fa-sign-out fa-fw"></i>
+                            Logout</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Carga mesa</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% if mensaje %}
+                        <div class="alert alert-success alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            {{mensaje}} 
+                        </div>
+                    {% endif %}
+                    <form id="formu" method="POST">
+                        <input class="form-control inputs" id=nro name=nro value="" required type="number" size="3" min="0">
+                        <!--input type="submit" value="Grabar" class="btn btn-primary"-->
+                    </form>   
+                    {% if categorias %}
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Categorias provinciales
+                            </div>
+                            <div class="panel-body">
+                                <button type="button" class="btn btn-primary btn-lg btn-block"
+                                        onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'G'}) }}';">
+                                    Gobernador
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block"
+                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'D'}) }}';">
+                                    Diputado</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block"
+                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
+                                    Senador</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block"
+                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'I'}) }}';">
+                                    Intendente</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block"
+                                    onclick="window.location.href='{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'C'}) }}';">
+                                    Concejal</button>
+                            </div>
+                        </div>
+
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Categorias provinciales
+                            </div>
+                            <div class="panel-body">
+                                <button type="button" class="btn btn-primary btn-lg btn-block">Diputado Nacional</button>
+                                <button type="button" class="btn btn-primary btn-lg btn-block">Senador Nacional</button>
+                            </div>
+                        </div>
+
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}    
+
+{% block final %}
+    {% if not categorias %}
+        <script>
+            $('#nro').focus();
+        </script>
+    {% endif %}
+
+{% endblock %}
+
+

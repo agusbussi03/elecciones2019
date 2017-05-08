@@ -56,18 +56,18 @@ class Filtros {
 
     static function agregar($datos, $app) {
         $dato = explode(",", $datos);
-        if ($dato[3] == 0)
-            $dato[3] = ''; // Pone vacio la cirlet
+        /*if ($dato[3] == 0)
+            $dato[3] = ''; // Pone vacio la cirlet*/
         $sql = "INSERT INTO filtros VALUES (?,?,?,?,?,?);";
-        //print_r($dato);die;
+        
         $app['db']->executeQuery($sql, array((int) $dato[1], (int) $dato[2], $dato[3], (int) $dato[4], (int) $dato[5], $dato[0]));
         return;
     }
 
     static function quitar($datos, $app) {
         $dato = explode(",", $datos);
-        if ($dato[3] == 0)
-            $dato[3] = ''; // Pone vacio la cirlet
+       /* if ($dato[3] == 0)
+            $dato[3] = ''; // Pone vacio la cirlet*/
         $sql = "DELETE FROM filtros WHERE sec=? and cirnro=? and cirlet=? and pspar=? and pslista=? and tipo=? ;";
         //print_r($dato);die;
         $app['db']->executeQuery($sql, array((int) $dato[1], (int) $dato[2], $dato[3], (int) $dato[4], (int) $dato[5], $dato[0]));
@@ -80,12 +80,14 @@ class Filtros {
         UNION
         SELECT * FROM `filtros` WHERE tipo in ('S') and sec=$sec
         UNION
-        SELECT * FROM `filtros` WHERE tipo in ('C') and sec=$sec and cirnro=$cirnro and cirlet='$cirlet'";
-
+        SELECT * FROM `filtros` WHERE tipo in ('I','C') and sec=$sec and cirnro=$cirnro and cirlet='$cirlet'";
+        //echo $sql;
+        $filtroscircuitos = array();
         $resultado = $app['db']->fetchAll($sql);
-        foreach ($resultado as $item){
-            $filtroscircuitos[$item['sec']][$item['cirnro']][$item['cirlet']][$item['pspar']][$item['pslista']][$item['tipo']]=1;
+        foreach ($resultado as $item) {
+            $filtroscircuitos[$item['sec']][$item['cirnro']][$item['cirlet']][$item['pspar']][$item['pslista']][$item['tipo']] = 1;
         }
+        //print_r($filtroscircuitos);die;
         return $filtroscircuitos;
     }
 

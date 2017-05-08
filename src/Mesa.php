@@ -75,28 +75,55 @@ class Mesa {
 
         foreach ($datos as $dato => $valor) {
             $dato = explode("-", $dato);
-//print_r($dato);
             $sql = "INSERT INTO filtros VALUES (?,?,?,?,?,?);";
             $this->app['db']->executeQuery($sql, array((int) $this->sec, (int) $this->cirnro, $this->cirlet, (int) $dato[0], (int) $dato[1], $this->tipo));
         }
         return "Datos modificados";
     }
 
+    function sumavotos() {
+        $sql = "SELECT count(*),sum(gob),sum(dip),sum(sen),sum(inte),sum(con),sum(mco) from renglon "
+                . "WHERE mesa=?";
+        $sumavotos = $this->app['db']->fetchArray($sql, array((int) $this->nro));
+        if ($sumavotos[0] == 0) {
+            $sql = "INSERT renglon SELECT ?,'',renglon,sec,cirnro,cirlet,pspar,parnombre,pslista,nombre,0,0,0,0,0,0,sortp,sortl 
+                    from actapartido WHERE sec=? and cirnro=? and cirlet=?";
+
+            $this->app['db']->executeQuery($sql, array((int) $this->nro,(int) $this->sec, (int) $this->cirnro, $this->cirlet));
+        }
+        return $sumavotos;
+    }
+
+    function actualiza($votos) {
+        $columnas = array('G' => 'gob', 'D' => 'dip', 'S' => 'sen', 'I' => 'inte', 'C' => 'con');
+        foreach ($votos as $clave => $valor) {
+            $dato = explode(",", $clave);
+            $columna = $columnas[$dato[0]];
+            $partido = $dato[1];
+            $lista = $dato[2];
+            $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
+
+            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int)$lista,(int) $this->nro));
+        }
+        return;
+    }
+
     function setTestigo() {
         $sql = "UPDATE mesas SET testigo=1 where mesa=$this->nro and tipo=''";
         $this->app['db']->executeQuery($sql);
-        $this->testigo=1;
+        $this->testigo = 1;
     }
-    
+
     function unsetTestigo() {
         $sql = "UPDATE mesas SET testigo=0 where mesa=$this->nro and tipo=''";
         $this->app['db']->executeQuery($sql);
-        $this->testigo=0;
+        $this->testigo = 0;
     }
-    
-     static function testigos( $app) {
+
+    static function testigos($app) {
         $sql = "SELECT * FROM mesas where testigo=1";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }
+
 }
