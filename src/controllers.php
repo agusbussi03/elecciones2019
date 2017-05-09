@@ -50,7 +50,7 @@ $app->post('/login', function () use ($app) {
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
         $app['twig']->addGlobal('session', $_SESSION);
-        return $app['twig']->render('index.html.twig', array());
+        return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     }
 });
 
