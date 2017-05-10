@@ -257,6 +257,18 @@ $app->post('/usuario', function () use ($app) {
     return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
 });
 
+/* * ************** L O C A L E S *********************************** */
+
+$app->get('/geolocales', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    $sql = "SELECT * FROM locales";
+    $locales = $app['db']->fetchAll($sql, array());
+        
+    return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));
+})->bind('geolocales');
+
 
 
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
