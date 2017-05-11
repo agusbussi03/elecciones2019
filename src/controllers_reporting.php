@@ -5,11 +5,11 @@ $app->get('/rep_circuito', function () use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
 
-    $sql = "SELECT m.sec,m.cirnro,m.cirlet,c.nomb,count(*) from mesas m,circuitos c "
+    $sql = "SELECT m.sec,m.cirnro,m.cirlet,c.nomb,count(*) as cuenta from mesas m,circuitos c "
             . "where m.sec=c.sec and m.cirnro=c.cirnro and m.cirlet=c.cirlet and m.testigo=1 and m.sec not in (9,13,14) "
             . "group by m.sec,m.cirnro,m.cirlet,c.nomb "
-            . "UNION select sec,9999,'','SANTA FE',count(*) from mesas where sec=9 and testigo=1 group by sec "
-            . "UNION select 13,9999,'','ROSARIO',count(*) from mesas where sec in (13,14) and testigo=1 group by sec";
+            . "UNION select sec,9999,'','SANTA FE',count(*) as cuenta from mesas where sec=9 and testigo=1 group by sec "
+            . "UNION select 13,9999,'','ROSARIO',count(*) as cuenta from mesas where sec in (13,14) and testigo=1 group by sec";
     $resultado = $app['db']->fetchAll($sql);
     foreach ($resultado as $item) {
 
@@ -43,6 +43,8 @@ $app->get('/rep_circuito', function () use ($app) {
 
         $circuitos[] = array('datos' => $item, 'concejal' => array('cargadas' => $mesas_cargadas,'nocargadas' => $mesas_nocargadas,));
     }
-    print_r($circuitos);
+    //print_r($circuitos);
+       return $app['twig']->render('rep_circuitos.html.twig', array( 'circuitos' => $circuitos));
+
 });
 

@@ -56,7 +56,7 @@ function initialize() {
     // Info Window Content
     var infoWindowContent = [
          {% for item in locales %}
-        ['<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">{{item.nombre}}</h1>'+
+        ['<div id="content"><div id="siteNotice"></div><h4 id="firstHeading" class="firstHeading">{{item.nombre}}</h4>'+
             '<div id="bodyContent"><p> Mesa desde '+{{item.mesadesde}}+ ' hasta '+{{item.mesahasta}}+'</p></div></div>'],
          {% endfor %}
  
