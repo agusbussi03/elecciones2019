@@ -76,11 +76,11 @@ class Mesa {
         $otros['parnombre'] = 'OTROS';
         $otros['pslista'] = 0;
         $otros['nombre'] = '';
-        $blancos['psgob'] =$nulos['psgob'] =$otros['psgob'] = 'R';
-        $blancos['psdip'] =$nulos['psdip'] =$otros['psdip'] = 'R';
-        $blancos['pssen'] =$nulos['pssen'] =$otros['pssen'] = 'R';
-        $blancos['psint'] =$nulos['psint'] =$otros['psint'] = 'R';
-        $blancos['pscon'] =$nulos['pscon'] =$otros['pscon'] = 'R';
+        $blancos['psgob'] = $nulos['psgob'] = $otros['psgob'] = 'R';
+        $blancos['psdip'] = $nulos['psdip'] = $otros['psdip'] = 'R';
+        $blancos['pssen'] = $nulos['pssen'] = $otros['pssen'] = 'R';
+        $blancos['psint'] = $nulos['psint'] = $otros['psint'] = 'R';
+        $blancos['pscon'] = $nulos['pscon'] = $otros['pscon'] = 'R';
         $mascara[] = $blancos;
         $mascara[] = $nulos;
         $mascara[] = $otros;
@@ -107,7 +107,18 @@ class Mesa {
         if ($sumavotos[0] == 0) {
             $sql = "INSERT renglon SELECT ?,'',renglon,sec,cirnro,cirlet,pspar,parnombre,pslista,nombre,0,0,0,0,0,0,sortp,sortl 
                     from actapartido WHERE sec=? and cirnro=? and cirlet=?";
+            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
 
+//// BLANCOS 
+            $sql = "INSERT renglon VALUES (?,'',97,?,?,?,9997,'BLANCOS',0,'',0,0,0,0,0,0,0,0);";
+            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
+
+//// NULOS
+            $sql = "INSERT renglon VALUES (?,'',98,?,?,?,9998,'NULOS',0,'',0,0,0,0,0,0,0,0);";
+            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
+
+            //// OTROS
+            $sql = "INSERT renglon VALUES (?,'',99,?,?,?,9999,'OTROS',0,'',0,0,0,0,0,0,0,0);";
             $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
         }
         return $sumavotos;

@@ -198,13 +198,17 @@ $app->get('/mesacarga_elige', function () use ($app) {
 $app->post('/mesacarga_elige', function () use ($app) {
     require 'Mesa.php';
     $mensaje = "";
-    $nro = $_POST['nro'];
-    if (!($nro > 0))
-        $mensaje = "Mesa incorrecta";
-    $mesa = new Mesa($nro, $app);
-    if ($mesa->getTestigo() != 1)
-        $mensaje = "Mesa no definida como testigo";
     $categorias = array('G', 'DN');
+    $nro = $_POST['nro'];
+    if (!($nro > 0)) {
+        $categorias = array();
+        $mensaje = "Mesa incorrecta";
+    }
+    $mesa = new Mesa($nro, $app);
+    if ($mesa->getTestigo() != 1) {
+        $categorias = array();
+        $mensaje = "Mesa no definida como testigo";
+    }
     $mesa->sumavotos();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
 })->bind('mesacarga_elige_p');
@@ -263,9 +267,9 @@ $app->get('/geolocales', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    $sql = "SELECT * FROM locales";
+    $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde)";
     $locales = $app['db']->fetchAll($sql, array());
-        
+
     return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));
 })->bind('geolocales');
 
@@ -286,6 +290,8 @@ $app->error(function (\Exception $e, Request $request, $code) use ($app) {
 
     return new Response($app['twig']->resolveTemplate($templates)->render(array('code' => $code)), $code);
 });
+
+include('controllers_reporting.php');
 
 function validar($rol) {
     if (!isset($_SESSION['usuario']))

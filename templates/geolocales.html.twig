@@ -49,15 +49,18 @@ function initialize() {
     // Multiple Markers
     var markers = [
         {% for item in locales %}
-        ['{{item.nombre}}', {{item.lat}},{{item.lon}},{%if item.sec==9 %}'green-dot.png'{%else%}'red-dot.png'{%endif%}],
+        ['{{item.nombre}}', {{item.lat}},{{item.lon}},{%if item.testigo==1 %}'green-dot.png'{%else%}'red-dot.png'{%endif%}],
          {% endfor %}
      ];
                         
     // Info Window Content
     var infoWindowContent = [
          {% for item in locales %}
-        ['{{item.nombre}}'],
+        ['<div id="content"><div id="siteNotice"></div><h1 id="firstHeading" class="firstHeading">{{item.nombre}}</h1>'+
+            '<div id="bodyContent"><p> Mesa desde '+{{item.mesadesde}}+ ' hasta '+{{item.mesahasta}}+'</p></div></div>'],
          {% endfor %}
+ 
+             
     ];
         
     // Display multiple markers on a map
