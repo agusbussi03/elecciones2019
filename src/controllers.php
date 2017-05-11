@@ -267,7 +267,7 @@ $app->get('/geolocales', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde)";
+    $sql = "SELECT l.*,1 testigo from locales l,mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde UNION SELECT l.*,0 testigo from locales l,mesas m where (testigo<>1 or testigo is null) and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde ";
     $locales = $app['db']->fetchAll($sql, array());
 
     return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));
