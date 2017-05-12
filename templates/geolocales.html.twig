@@ -49,7 +49,7 @@ function initialize() {
     // Multiple Markers
     var markers = [
         {% for item in locales %}
-        ['{{item.nombre}}', {{item.lat}},{{item.lon}},{%if item.testigo==1 %}'green-dot.png'{%else%}'red-dot.png'{%endif%}],
+        ['{{item.nombre}}', {{item.lat}}+ (Math.random()*0.25) / 1500,{{item.lon}}+ (Math.random()*0.25) / 1500,{%if item.testigo==1 %}'green-dot.png'{%else%}'red-dot.png'{%endif%}],
          {% endfor %}
      ];
                         

@@ -37,6 +37,40 @@
                                         <td>{{item.datos.cirnro}}{{item.datos.cirlet}}</td>
                                         <td>{{item.datos.nomb}}</td>
                                         <td>{{item.datos.cuenta}}</td>
+                                        </td>
+                                        <td>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_C{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" href="#collapse_I_C{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" aria-expanded="false" class="collapsed">CARGADAS: {{item.intendente.cargadas|length}}</a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse_I_C{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                    <div class="panel-body">
+                                                        {% for item2 in item.intendente.cargadas %}
+                                                            <button type="button" class="btn btn-primary" style="width:60px"
+                                                                    onclick="window.location.href = ''">{{item2.mesa}}</button>
+                                                        {%endfor%}        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_N{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" href="#collapse_I_N{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" aria-expanded="false" class="collapsed">NO CARGADAS: {{item.intendente.nocargadas|length}}</a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse_I_N{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                    <div class="panel-body">
+                                                        {% for item2 in item.intendente.nocargadas %}
+                                                            <button type="button" class="btn btn-primary" style="width:60px"
+                                                                    onclick="window.location.href = ''">{{item2.mesa}}</button>
+                                                        {%endfor%}  
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </td>
                                         <td>
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
@@ -46,9 +80,9 @@
                                                 </div>
                                                 <div id="collapse_C_C{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                         {% for item2 in item.concejal.cargadas %}
-                                                        <button type="button" class="btn btn-primary" style="width:60px"
-                                                                onclick="window.location.href = ''">{{item2.mesa}}</button>
+                                                        {% for item2 in item.concejal.cargadas %}
+                                                            <button type="button" class="btn btn-primary" style="width:60px"
+                                                                    onclick="window.location.href = ''">{{item2.mesa}}</button>
                                                         {%endfor%}        
                                                     </div>
                                                 </div>
@@ -61,16 +95,13 @@
                                                 </div>
                                                 <div id="collapse_C_N{{item.datos.sec}}-{{item.datos.cirnro}}{{item.datos.cirlet}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                         {% for item2 in item.concejal.nocargadas %}
-                                                        <button type="button" class="btn btn-primary" style="width:60px"
-                                                                onclick="window.location.href = ''">{{item2.mesa}}</button>
+                                                        {% for item2 in item.concejal.nocargadas %}
+                                                            <button type="button" class="btn btn-primary" style="width:60px"
+                                                                    onclick="window.location.href = ''">{{item2.mesa}}</button>
                                                         {%endfor%}  
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                        </td>
-                                        <td>{{item.concejal.nocargadas|length}}</td>
+                                            </div>                                        
                                         <td><button type="button" class="btn btn-primary" 
                                                     onclick="window.location.href = ''">Cargos diputados</button>
                                         </td>
