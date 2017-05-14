@@ -23,6 +23,9 @@ class Estado {
         $sql = "SELECT count(distinct mesa) FROM `renglon` ";
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_con_carga'] = $resultado[0];
+         $sql = "SELECT * FROM log  order by id desc limit 0,5";
+        $resultado = $app['db']->fetchAll($sql);
+        $estado['log'] = $resultado;
         return $estado;
     }
 

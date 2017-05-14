@@ -12,6 +12,7 @@ class Configuracion {
     private $intermedia = 0;
     private $partido_principal = 0;
     private $lista_principal = 0;
+    private $senadores_nacionales=0;
     private $app;
 
     function __construct($app) {
@@ -22,6 +23,7 @@ class Configuracion {
         $this->intermedia = $configuracion['intermedia'];
         $this->partido_principal = $configuracion['partido_principal'];
         $this->lista_principal = $configuracion['lista_principal'];
+         $this->senadores_nacionales = $configuracion['senadores_nacionales'];
     }
 
     function grabar($datos) {
@@ -30,10 +32,11 @@ class Configuracion {
         $this->intermedia = $datos['intermedia'];
         $this->partido_principal = $datos['partido_principal'];
         $this->lista_principal = $datos['lista_principal'];
-        ;
-        $sql = "UPDATE configuracion SET ano=?,tipo=?,intermedia=?,partido_principal=?,lista_principal=?;";
+        $this->senadores_nacionales = $datos['senadores_nacionales'];
+        $sql = "UPDATE configuracion "
+                . "SET ano=?,tipo=?,intermedia=?,partido_principal=?,lista_principal=?,senadores_nacionales=?;";
         $this->app['db']->executeQuery($sql, array((int) $this->ano, (int) $this->tipo,(int) $this->intermedia,
-            (int) $this->partido_principal, (int) $this->lista_principal));
+            (int) $this->partido_principal, (int) $this->lista_principal, (int) $this->senadores_nacionales));
         return "Datos modificados";
     }
 
@@ -60,5 +63,9 @@ class Configuracion {
     function getApp() {
         return $this->app;
     }
+    function getSenadores_nacionales() {
+        return $this->senadores_nacionales;
+    }
+
 
 }

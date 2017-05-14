@@ -47,9 +47,11 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     {% if mensaje %}
-                        <div class="alert alert-success alert-dismissable">
+                         {% if mensaje.codigo==0 %}<div class="alert alert-success alert-dismissable">{%endif%}
+                         {% if mensaje.codigo==1 %}<div class="alert alert-danger alert-dismissable">{%endif%}
+                         {% if mensaje.codigo==0 %}<div class="alert alert-warning alert-dismissable">{%endif%}
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                            {{mensaje}} 
+                            {{mensaje.texto}} 
                         </div>
                     {% endif %}
                     <form id="formu" method="POST">
@@ -57,7 +59,7 @@
                         
                         <!--input type="submit" value="Grabar" class="btn btn-primary"-->
                     </form>   
-                    {% if categorias|length >0 %}
+                    {% if  mesa is defined %}
 
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -76,9 +78,11 @@
                                         onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
                                     Senador</button>
                                     {%endif%}
+                                  {%if mesa.intendente==1%}  
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
                                         onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'I'}) }}';">
                                     Intendente</button>
+                                    {%endif%}
                                 <button type="button" class="btn btn-primary btn-lg btn-block"
                                         onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'C'}) }}';">
                                     Concejal</button>
@@ -91,8 +95,11 @@
                                 Categorias provinciales
                             </div>
                             <div class="panel-body">
+                                
                                 <button type="button" class="btn btn-primary btn-lg btn-block">Diputado Nacional</button>
-                                <button type="button" class="btn btn-primary btn-lg btn-block">Senador Nacional</button>
+                                 {%if configuracion.senadores_nacionales==1%}
+                                     <button type="button" class="btn btn-primary btn-lg btn-block">Senador Nacional</button>
+                                 {% endif %}
                             </div>
                         </div>
 
@@ -105,12 +112,9 @@
 {% endblock %}    
 
 {% block final %}
-    {% if not categorias %}
         <script>
             $('#nro').focus();
         </script>
-    {% endif %}
-
 {% endblock %}
 
 

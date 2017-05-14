@@ -13,19 +13,26 @@ class Mesa {
     private $electo = '';
     private $testigo = '';
     private $usuario = '';
+    private $intendente = 0;
     private $app;
 
     function __construct($nro, $app) {
         $this->app = $app;
         $this->nro = $nro;
         $datos = $this->app['db']->fetchAssoc("SELECT * from mesas where mesa=$this->nro");
-
+        if (!($datos['sec'] > 0))
+            throw new Exception("Mesa no existe");
         $this->electo = $datos['electo'];
         $this->sec = $datos['sec'];
         $this->cirnro = $datos['cirnro'];
         $this->cirlet = $datos['cirlet'];
         $this->testigo = $datos['testigo'];
         $this->usuario = $datos['usuario'];
+                $datos = $this->app['db']->fetchAssoc("SELECT * from circuitos "
+                        . "where sec=$this->sec and cirnro=$this->cirnro and cirlet='$this->cirlet'");
+        if (!($datos['sec'] > 0))
+            throw new Exception("Error en la mesa");
+        $this->intendente=$datos['int'];
     }
 
     function getnro() {
@@ -59,8 +66,11 @@ class Mesa {
     function getUsuario() {
         return $this->usuario;
     }
+    function getIntendente() {
+        return $this->intendente;
+    }
 
-    function getMascara() {
+        function getMascara() {
         $sql = "SELECT * FROM actapartido WHERE sec=? and cirnro=? and cirlet=?";
         $mascara = $this->app['db']->fetchAll($sql, array($this->sec, $this->cirnro, $this->cirlet));
         $blancos = $nulos = $otros = $mascara[0];
@@ -132,9 +142,11 @@ class Mesa {
             $partido = $dato[1];
             $lista = $dato[2];
             $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
-
             $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->nro));
         }
+        $sql = "insert into log (usuario,texto,datos) "
+                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->nro','" . print_r($votos, 1) . "');";
+        $this->app['db']->executeQuery($sql);
         return;
     }
 

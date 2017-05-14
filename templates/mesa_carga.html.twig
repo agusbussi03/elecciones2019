@@ -62,7 +62,7 @@
                             {%if categoria=='C'%}<th>Concejal</th>{%endif%}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id='tablacarga'>
                         {% set mascara=mesa.getmascara() %}
                         {% for item in mascara.0 %}
                             <tr class="odd gradeX" id="r_{{item.renglon}}">
@@ -70,7 +70,7 @@
                                     {{ item.pspar }}-{{ item.parnombre }}
                                 </td>
                                 <td>
-                                    {{ item.pslista }}-{{ item.nombre }}
+                                    {%if item.pslista!=0%}{{ item.pslista }}-{{ item.nombre }}{%endif%}
                                 </td>
                                 {%if configuracion.intermedia==1%}
                                     {%if categoria=='G'%}
@@ -141,6 +141,14 @@
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
         $(document).ready(function () {
+            i = 1;
+            $.each($('#tablacarga').children(), function (key, fila) {
+                texto = fila.cells[2].innerHTML;
+                if (texto.indexOf('input') === -1) {
+                    $('#r_' + i).hide();
+                }
+                i++;
+            });
             $('.inputs')[0].focus();
         });
 
@@ -158,9 +166,6 @@
             }
         }
         );
-
-
-
     </script>
 
 

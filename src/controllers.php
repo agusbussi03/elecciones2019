@@ -185,7 +185,6 @@ $app->post('/mesacarga/{nro}', function ($nro) use ($app) {
     $mesa->actualiza($_POST);
     $categorias = array();
     return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
-    //return $app['twig']->render('mesa_carga_elige.html.twig', array( 'categorias' => $categorias, 'mensaje'=>$mensaje));
 })->bind('mesacarga_p');
 
 $app->get('/mesacarga_elige', function () use ($app) {
@@ -202,12 +201,19 @@ $app->post('/mesacarga_elige', function () use ($app) {
     $nro = $_POST['nro'];
     if (!($nro > 0)) {
         $categorias = array();
-        $mensaje = "Mesa incorrecta";
+        $mensaje = array('codigo'=>1,'texto'=>'Mesa incorrecta');
     }
-    $mesa = new Mesa($nro, $app);
+    try {
+         $mesa = new Mesa($nro, $app);
+    } catch (Exception $ex) {
+        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo'=>1,'texto'=>$ex->getMessage())));
+    }
+   
     if ($mesa->getTestigo() != 1) {
         $categorias = array();
-        $mensaje = "Mesa no definida como testigo";
+        $mensaje = array('codigo'=>1,'texto'=>'Mesa no definida como testigo');
+       return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => $mensaje));
+
     }
     $mesa->sumavotos();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
