@@ -90,5 +90,21 @@ class Filtros {
         //print_r($filtroscircuitos);die;
         return $filtroscircuitos;
     }
+  static function getFiltrosNacionales($app) {
 
+       /* $sql = "SELECT * FROM `filtros` WHERE tipo in ('G','D') 
+        UNION
+        SELECT * FROM `filtros` WHERE tipo in ('S') and sec=$sec
+        UNION
+        SELECT * FROM `filtros` WHERE tipo in ('I','C') and sec=$sec and cirnro=$cirnro and cirlet='$cirlet'";
+        //echo $sql;
+        $filtroscircuitos = array();
+        $resultado = $app['db']->fetchAll($sql);
+        foreach ($resultado as $item) {
+            $filtroscircuitos[$item['sec']][$item['cirnro']][$item['cirlet']][$item['pspar']][$item['pslista']][$item['tipo']] = 1;
+        }
+        //print_r($filtroscircuitos);die;
+        return $filtroscircuitos;*/
+     return array();
+    }
 }

@@ -219,6 +219,21 @@ $app->post('/mesacarga_elige', function () use ($app) {
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
 })->bind('mesacarga_elige_p');
 
+
+$app->get('/mesanacional/{nro}', function ($nro) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    require 'MesaNacional.php';
+    require 'Filtros.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new MesaNacional($nro, $app);
+    $mesa->getMascara();
+    $filtrosnacionales = Filtros::getFiltrosNacionales( $app);
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'filtros' => $filtrosnacionales, 'configuracion' => new Configuracion($app)));
+})->bind('mesanacional');
+
 /* * ************** C O N F I G U  R A C I O N *********************************** */
 
 
