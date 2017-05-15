@@ -1,7 +1,7 @@
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
-         <img src="/elecciones/web/imagenes/logo.jpg" alt="" style="float:left" height="50px">
+        <img src="/elecciones/web/imagenes/logo.jpg" alt="" style="float:left" height="50px">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
@@ -35,7 +35,8 @@
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
                 <li class="sidebar-search">
-                    <form role="form" onsubmit="window.location.href = '{{path('homepage')}}' + 'mesa/' + $('#nro').val();return false;" > 
+                    <form role="form" onsubmit="window.location.href = '{{path('homepage')}}' + 'mesa/' + $('#nro').val();
+                            return false;" > 
                         <div class="input-group custom-search-form">
                             <input type="text" class="form-control" name="nro" id="nro" placeholder="Busar mesa...">
                             <span class="input-group-btn">
@@ -68,9 +69,13 @@
                         <li>
                             <a href="{{ path('provincia') }}">Provincia</a>
                         </li>
-                                                <li>
+                        <li>
                             <a href="{{ path('geolocales') }}">Locales (GEO)</a>
                         </li>
+                                                <li>
+                            <a href="{{ path('mesanacional',{'nro':1}) }}">Mesas nacionales</a>
+                        </li>
+                        
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>

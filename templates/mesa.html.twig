@@ -29,7 +29,7 @@
                             <thead>
                                 <tr>
                                     <th>Partido</th>
-                                    <th>Lista</th>
+                                    {% if configuracion.tipo==0%}<th>Lista</th>{%endif%}
                                         {%if configuracion.intermedia==1%}
                                         <th>Gobernador</th>
                                         <th>Diputados</th>
@@ -49,10 +49,12 @@
                                             <!--/a-->
                                             {{ item.pspar }} - {{ item.parnombre }}
                                         </td>
+                                       {% if configuracion.tipo==0%}
                                         <td>
                                             <img src="{{ asset('imagenes/lista')}}/001{{ item.pslista }}.jpg" height="50px">
                                             {{ item.pslista }} - {{ item.nombre }}
                                         </td>
+                                       {%endif%} 
                                         {%if configuracion.intermedia==1%}
                                             <td>
                                                 {% if item.psgob=='R' %}

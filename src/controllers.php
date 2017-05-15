@@ -234,6 +234,33 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'filtros' => $filtrosnacionales, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
+$app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
+    require 'MesaNacional.php';
+    require 'Filtros.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new MesaNacional($nro, $app);
+    $categoria = 'D';
+    if (isset($_GET['categoria']))
+        $categoria = $_GET['categoria'];
+    $mesa->getMascara();
+    $filtroscircuitos = Filtros::getFiltrosNacionales( $app);
+    return $app['twig']->render('mesanacional_carga.html.twig', array('mesa' => $mesa, 'categoria' => $categoria, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+})->bind('mesanacionalcarga');
+
+
+
+$app->post('/mesacarga/{nro}', function ($nro) use ($app) {
+    require 'MesaNacional.php';
+    require 'Configuracion.php';
+    $mensaje = "";
+    $mesa = new MesaNacional($nro, $app);
+    $mesa->actualiza($_POST);
+    $categorias = array();
+    return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
+})->bind('mesanacionalcarga_p');
+
+
 /* * ************** C O N F I G U  R A C I O N *********************************** */
 
 

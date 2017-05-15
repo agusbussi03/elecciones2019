@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th>Partido</th>
-                            <th>Lista</th>
+                             {% if configuracion.tipo==0%}<th>Lista</th>{%endif%}
                                 {%if configuracion.intermedia==1%}
                                     {%if categoria=='G'%}<th>Gobernador</th>{%endif%}
                                 {%if categoria=='D'%}<th>Diputados</th>{%endif%}
@@ -69,9 +69,11 @@
                                 <td>
                                     {{ item.pspar }}-{{ item.parnombre }}
                                 </td>
+                                {% if configuracion.tipo==0%}
                                 <td>
                                     {%if item.pslista!=0%}{{ item.pslista }}-{{ item.nombre }}{%endif%}
                                 </td>
+                                {%endif%}
                                 {%if configuracion.intermedia==1%}
                                     {%if categoria=='G'%}
                                         <td>
@@ -143,7 +145,8 @@
         $(document).ready(function () {
             i = 1;
             $.each($('#tablacarga').children(), function (key, fila) {
-                texto = fila.cells[2].innerHTML;
+                //alert(fila.cells.length);
+                texto = fila.cells[fila.cells.length-1].innerHTML;
                 if (texto.indexOf('input') === -1) {
                     $('#r_' + i).hide();
                 }
