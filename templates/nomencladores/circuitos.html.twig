@@ -5,7 +5,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Provincia</h1>
+                <h1 class="page-header">Circuitos</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -22,22 +22,24 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Votantes</th>
-                                    <th>Mesas</th>
-                                    <th></th>
+                                    <th>Intend.</th>
+                                    <th>Cons. T.</th>
+                                    <th>Cons. S.</th>
+                                    <th>Electores N.</th>
+                                    <th>Electores P.</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in provincia  if item.tipo == 'P'%}
-                                <tr class="odd gradeX">
-                                    <td>{{item.nomb}}</td>
-                                    <td>{{item.votantes}}</td>
-                                    <td>{{item.mesasd}}-{{item.mesash}}</td>
-                                    <td><button type="button" class="btn btn-primary" onclick="window.location.href='{{ path('filtrosgobernador') }}';">Cargos gobernador</button>
-                                    <button type="button" class="btn btn-primary" onclick="window.location.href='{{ path('filtrosgobernador') }}';">Cargos diputados</button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                                {% for item in circuitos%}
+                                    <tr class="odd gradeX">
+                                        <td>{{item.nombre}}</td>
+                                        <td>{{item.intendente}}</td>
+                                        <td>{{item.conc_titulares}}</td>
+                                        <td>{{item.conc_suplentes}}</td>
+                                        <td>{{item.electores_nacion}}</td>
+                                        <td>{{item.electores_provincia}}</td>
+                                    </tr>
+                                {% endfor %}
 
                             </tbody>
                         </table>
@@ -53,25 +55,25 @@
         <!-- /.row -->
     </div>
     <!-- /#wrapper -->
-    
-    
+
+
 
 {% endblock %}    
 
 {% block final %}
-     <!-- DataTables JavaScript -->
+    <!-- DataTables JavaScript -->
     <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-    $(document).ready(function() {
-        $('#dataTables-example').DataTable({
-            responsive: true
+        $(document).ready(function () {
+            $('#dataTables-example').DataTable({
+                responsive: true
+            });
         });
-    });
     </script>
-    
-    
+
+
 {% endblock %}
 
- 
+

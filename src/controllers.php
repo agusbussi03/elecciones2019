@@ -54,74 +54,7 @@ $app->post('/login', function () use ($app) {
     }
 });
 
-
-/* * ************** F I L T R O S *********************************** */
-$app->get('/circuitos', function () use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    $circuitos = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='M'");
-    return $app['twig']->render('circuitos.html.twig', array('circuitos' => $circuitos));
-})->bind('circuitos');
-
-$app->get('/secciones', function () use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    $secciones = $app['db']->fetchAll("SELECT * FROM circuitos where tipo='S'");
-    return $app['twig']->render('secciones.html.twig', array('secciones' => $secciones));
-})->bind('secciones');
-
-$app->get('/provincia', function () use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    $provincia = $app['db']->fetchAll('SELECT * FROM circuitos');
-    return $app['twig']->render('provincia.html.twig', array('provincia' => $provincia));
-})->bind('provincia');
-
-$app->get('/filtrosgobernador', function () use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    require 'Filtros.php';
-    $mensaje = "";
-    $filtros = new Filtros('G', 0, 0, '', $app);
-    $resultado = $filtros->getFiltros();
-    return $app['twig']->render('filtrosgobernador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
-})->bind('filtrosgobernador');
-
-$app->post('/filtrosgobernador', function () use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    require 'Filtros.php';
-    $filtros = new Filtros('G', 0, 0, '', $app);
-    $mensaje = $filtros->procesar($_POST);
-    $resultado = $filtros->getFiltros();
-    return $app['twig']->render('filtrosgobernador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
-});
-
-$app->get('/filtrossenador/{sec}', function ($sec) use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    require 'Filtros.php';
-    $mensaje = "";
-    $filtros = new Filtros('S', $sec, 0, '', $app);
-    $resultado = $filtros->getFiltros();
-    return $app['twig']->render('filtrossenador.html.twig', array('disponibles' => $resultado['disponibles'], 'filtros' => $resultado['filtros'], 'mensaje' => $mensaje));
-})->bind('filtrossenador');
-
-$app->post('/filtro/{accion}', function ($accion) use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    require 'Filtros.php';
-    Filtros::$accion($_POST['datos'], $app);
-    return json_encode("OK");
-})->bind('filtro');
-
+include("controllers_nomencladores.php");
 /* * ************** M E S A S *********************************** */
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {

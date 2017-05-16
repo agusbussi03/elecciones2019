@@ -5,7 +5,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Circuitos</h1>
+                <h1 class="page-header">Secciones</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -21,35 +21,29 @@
                         <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                             <thead>
                                 <tr>
-                                    <th>Seccion</th>
-                                    <th>Circuito</th>
-                                    <th>Tipo</th>
+                                    <th>#</th>
                                     <th>Nombre</th>
-                                    <th>Tributa</th>
-                                    <th>Intend.</th>
-                                    <th>Cons. T.</th>
-                                    <th>Cons. S.</th>
-                                    <th>Votantes</th>
+                                    <th>Votantes N.</th>
+                                    <th>Votantes P.</th>
                                     <th>Mesas</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in circuitos%}
-                                    {% if item.tipo == 'M' or item.tipo == 'C' or item.tipo == 'T'%}
-                                        <tr class="odd gradeX">
-                                            <td>{{item.sec}}</td>
-                                            <td>{{item.cirnro}}{{item.cirlet}}</td>
-                                            <td>{{item.tipo}}</td>
-                                            <td>{{item.nomb}}</td>
-                                            <td>{{item.cirnrotr}}{{item.cirlettr}}</td>
-                                            <td>{{item.int}}</td>
-                                            <td>{{item.cont}}</td>
-                                            <td>{{item.cons}}</td>
-                                            <td>{{item.votantes}}</td>
-                                            <td>{{item.mesasd}}-{{item.mesash}}</td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
+                                {% for item in secciones%}
+
+                                <tr class="odd gradeX">
+                                    <td>{{item.id}}</td>
+                                    <td>{{item.nombre}}</td>
+                                    <td>{{item.electores_nacion}}</td>
+                                    <td>{{item.electores_nacion}}</td>
+                                    <td>{{item.mesa_desde}}-{{item.mesa_hasta}}</td>
+                                    <td><button type="button" class="btn btn-primary" 
+                                                onclick="window.location.href='{{ path('circuitos',{'seccion':item.id}) }}';">Localidades</button>
+                                    </td>
+                                   
+                                </tr>
+                            {% endfor %}
 
                             </tbody>
                         </table>
@@ -65,25 +59,25 @@
         <!-- /.row -->
     </div>
     <!-- /#wrapper -->
-
-
+    
+    
 
 {% endblock %}    
 
 {% block final %}
-    <!-- DataTables JavaScript -->
+     <!-- DataTables JavaScript -->
     <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-        $(document).ready(function () {
-            $('#dataTables-example').DataTable({
-                responsive: true
-            });
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable({
+            responsive: true
         });
+    });
     </script>
-
-
+    
+    
 {% endblock %}
 
-
+ 
