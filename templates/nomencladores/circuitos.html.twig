@@ -43,6 +43,8 @@
                                             <td>{{item.electores_nacion}}</td>
                                             <td>{{item.electores_provincia}}</td>
                                             <td> 
+                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('cargosintendente',{'circuito':item.id}) }}';">C. Intendente</button>
+                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('cargosconcejal',{'circuito':item.id}) }}';">C. Concejal</button>
                                                 <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('circuito_edit',{'id':item.id}) }}';">Editar</button>
                                                 <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('circuito_delete',{'seccion':seccion,'id':item.id}) }}';">Borrar</button>
                                             </td>
@@ -88,10 +90,10 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                                                            $(document).ready(function () {
-                                                                $('#dataTables-example').DataTable({
-                                                                    responsive: true
-                                                                });
-                                                            });
+                                                    $(document).ready(function () {
+                                                        $('#dataTables-example').DataTable({
+                                                            responsive: true
+                                                        });
+                                                    });
                 </script>
             {% endblock %}

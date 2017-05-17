@@ -66,9 +66,8 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
-    $mesa->getMascara();
-    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
-    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+    $mascara=$mesa->getMascara();
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'mascara'=>$mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesa');
 
 
@@ -248,7 +247,7 @@ $app->get('/geolocales', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesas m where testigo=1 and m.mesa<=l.mesahasta and m.mesa>=l.mesadesde)";
+    $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde)";
     $locales = $app['db']->fetchAll($sql, array());
 
     return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));

@@ -21,19 +21,23 @@
                         <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                             <thead>
                                 <tr>
-                                    <th>Seccion</th>
-                                    <th>Circuito</th>
                                     <th>Mesa</th>
-                                    <th>Electores</th>
+                                    <th>Provincia</th>
+                                    <th>Departamento</th>
+                                    <th>Localidad</th>
+                                    <th>Electores P.</th>
+                                    <th>Electores N.</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in testigos%}
                                         <tr class="odd gradeX">
-                                            <td>{{item.sec}}</td>
-                                            <td>{{item.cirnro}}{{item.cirlet}}</td>
-                                            <td>{{item.mesa}}</td>
-                                            <td>{{item.electo}}</td>
+                                            <td>{{item.numero}}</td>
+                                            <td>{{item.p_nombre}}</td>
+                                            <td>{{item.s_nombre}}</td>
+                                            <td>{{item.c_nombre}}</td>
+                                            <td>{{item.electores_provincia}}</td>
+                                             <td>{{item.electores_nacion}}</td>
                                         </tr>
                                 {% endfor %}
 

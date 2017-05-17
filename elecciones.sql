@@ -54,7 +54,7 @@ CREATE TABLE `cargo_departamental` (
   `tipo` varchar(1) DEFAULT NULL,
   `seccion_id` int(11) NOT NULL,
   `lista_id` int(5) NOT NULL,
-  `candidato_id` int(11) NOT NULL,
+  `candidato_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_cargo_departamental_seccion1_idx` (`seccion_id`),
   KEY `fk_cargo_departamental_lista1_idx` (`lista_id`),
@@ -62,7 +62,7 @@ CREATE TABLE `cargo_departamental` (
   CONSTRAINT `fk_cargo_departamental_candidato1` FOREIGN KEY (`candidato_id`) REFERENCES `candidato` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cargo_departamental_lista1` FOREIGN KEY (`lista_id`) REFERENCES `partido_lista` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cargo_departamental_seccion1` FOREIGN KEY (`seccion_id`) REFERENCES `seccion` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,6 +71,7 @@ CREATE TABLE `cargo_departamental` (
 
 LOCK TABLES `cargo_departamental` WRITE;
 /*!40000 ALTER TABLE `cargo_departamental` DISABLE KEYS */;
+INSERT INTO `cargo_departamental` VALUES (6,'S',9,17,NULL),(7,'S',9,1,NULL),(8,'S',9,2,NULL);
 /*!40000 ALTER TABLE `cargo_departamental` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +87,7 @@ CREATE TABLE `cargo_local` (
   `tipo` varchar(1) DEFAULT NULL,
   `lista_id` int(5) NOT NULL,
   `circuito_id` int(11) NOT NULL,
-  `candidato_id` int(11) NOT NULL,
+  `candidato_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_cargo_local_lista1_idx` (`lista_id`),
   KEY `fk_cargo_local_circuito1_idx` (`circuito_id`),
@@ -94,7 +95,7 @@ CREATE TABLE `cargo_local` (
   CONSTRAINT `fk_cargo_local_candidato1` FOREIGN KEY (`candidato_id`) REFERENCES `candidato` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cargo_local_circuito1` FOREIGN KEY (`circuito_id`) REFERENCES `circuito` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cargo_local_lista1` FOREIGN KEY (`lista_id`) REFERENCES `partido_lista` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -103,6 +104,7 @@ CREATE TABLE `cargo_local` (
 
 LOCK TABLES `cargo_local` WRITE;
 /*!40000 ALTER TABLE `cargo_local` DISABLE KEYS */;
+INSERT INTO `cargo_local` VALUES (4,'I',1,5,NULL),(7,'I',20,1,NULL),(8,'I',10,1,NULL),(10,'C',2,1,NULL),(11,'C',6,1,NULL),(12,'C',18,1,NULL);
 /*!40000 ALTER TABLE `cargo_local` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +155,7 @@ CREATE TABLE `cargo_provincial` (
   KEY `fk_cargo_gobernador_provincia1_idx` (`provincia_id`),
   CONSTRAINT `fk_cargo_gobernador_lista1` FOREIGN KEY (`lista_id`) REFERENCES `partido_lista` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cargo_gobernador_provincia1` FOREIGN KEY (`provincia_id`) REFERENCES `provincia` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -162,7 +164,7 @@ CREATE TABLE `cargo_provincial` (
 
 LOCK TABLES `cargo_provincial` WRITE;
 /*!40000 ALTER TABLE `cargo_provincial` DISABLE KEYS */;
-INSERT INTO `cargo_provincial` VALUES (26,1,1,'D'),(15,1,1,'G'),(18,2,1,'D'),(24,2,1,'G'),(10,6,1,'D'),(11,13,1,'D'),(9,14,1,'G'),(19,17,1,'G'),(12,18,1,'D'),(6,178,1,'G');
+INSERT INTO `cargo_provincial` VALUES (26,1,1,'D'),(15,1,1,'G'),(29,3,1,'D'),(10,6,1,'D'),(11,13,1,'D'),(9,14,1,'G'),(19,17,1,'G'),(6,178,1,'G');
 /*!40000 ALTER TABLE `cargo_provincial` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -221,7 +223,7 @@ CREATE TABLE `configuracion` (
 
 LOCK TABLES `configuracion` WRITE;
 /*!40000 ALTER TABLE `configuracion` DISABLE KEYS */;
-INSERT INTO `configuracion` VALUES (2017,1,0,9004,1234,1);
+INSERT INTO `configuracion` VALUES (2017,0,1,9004,1234,1);
 /*!40000 ALTER TABLE `configuracion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,7 +274,7 @@ CREATE TABLE `mesa` (
   KEY `fk_mesa_seccionales1_idx` (`seccionales_id`),
   CONSTRAINT `fk_mesa_circuito1` FOREIGN KEY (`circuito_id`) REFERENCES `circuito` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_mesa_seccionales1` FOREIGN KEY (`seccionales_id`) REFERENCES `seccional` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,6 +283,7 @@ CREATE TABLE `mesa` (
 
 LOCK TABLES `mesa` WRITE;
 /*!40000 ALTER TABLE `mesa` DISABLE KEYS */;
+INSERT INTO `mesa` VALUES (1,123,263,300,1,NULL);
 /*!40000 ALTER TABLE `mesa` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -360,7 +363,7 @@ CREATE TABLE `provincia` (
 
 LOCK TABLES `provincia` WRITE;
 /*!40000 ALTER TABLE `provincia` DISABLE KEYS */;
-INSERT INTO `provincia` VALUES (1,'SANTA FE',1500000,5700000,7100);
+INSERT INTO `provincia` VALUES (1,'SANTA FE',1500000,5700000,7250);
 /*!40000 ALTER TABLE `provincia` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -525,4 +528,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-05-17 12:41:05
+-- Dump completed on 2017-05-17 20:40:29
