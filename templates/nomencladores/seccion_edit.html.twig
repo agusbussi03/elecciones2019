@@ -1,0 +1,68 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    {% include "navigator.html.twig" %}
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Editar seccion</h1>
+            </div>
+        </div>
+
+
+
+
+        <div class="row">
+            {% if mensaje is defined %}
+                <div {% if mensaje.codigo==0 %}class="alert alert-success alert-dismissable"
+                {%endif%}
+                {% if mensaje.codigo==1 %}class="alert alert-danger alert-dismissable"{%endif%}
+                {% if mensaje.codigo==2 %}class="alert alert-warning alert-dismissable"{%endif%}
+                >
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                {{mensaje.texto}} 
+            </div>
+            {% endif %}
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <form role="form" action="{{path('seccion_edit',{'id':seccion.id})}}" method="POST">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input class="form-control" name="nombre" value="{{seccion.nombre}}" type="text" size="40">
+                                <label>Votantes Nacionales</label>
+                                <input class="form-control" name="electores_nacion" value="{{seccion.electores_nacion}}" type="number" size="4" min="1" >
+                                <label>Votantes Provinciales</label>
+                                <input class="form-control" name="electores_provincia" value="{{seccion.electores_provincia}}"  type="number" size="4" min="1">
+                                <label>Mesa desde</label>
+                                <input class="form-control" name="mesa_desde" value="{{seccion.mesa_desde}}"  type="number" size="4" min="1">
+                               <label>Mesa hasta</label>
+                                <input class="form-control" name="mesa_hasta" value="{{seccion.mesa_hasta}}"  type="number" size="4" min="1">
+                                <input type="submit"  class="btn btn-primary" value="Grabar">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        {% endblock %}    
+
+            {% block final %}
+                <!-- DataTables JavaScript -->
+                <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+                <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+                <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+                <script>
+                    $(document).ready(function () {
+                        $('#dataTables-example').DataTable({
+                            responsive: true
+                        });
+                    });
+                </script>
+
+
+            {% endblock %}
+
+

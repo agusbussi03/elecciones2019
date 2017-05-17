@@ -62,7 +62,7 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Mesa.php';
-    require 'Filtros.php';
+    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
@@ -83,7 +83,7 @@ $app->get('/mesastestigo', function () use ($app) {
 
 $app->get('/testigo/{nro}/{accion}', function ($nro, $accion) use ($app) {
     require 'Mesa.php';
-    require 'Filtros.php';
+    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
@@ -96,7 +96,7 @@ $app->get('/testigo/{nro}/{accion}', function ($nro, $accion) use ($app) {
 
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     require 'Mesa.php';
-    require 'Filtros.php';
+   // require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
@@ -158,7 +158,7 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'MesaNacional.php';
-    require 'Filtros.php';
+    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
@@ -169,7 +169,7 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     require 'MesaNacional.php';
-    require 'Filtros.php';
+    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);

@@ -5,7 +5,7 @@
  *
  * @author pablo
  */
-class Filtros {
+class Cargos {
 
     private $tipo = '';
     private $sec = 0;
