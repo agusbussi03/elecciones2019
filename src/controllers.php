@@ -62,14 +62,18 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Mesa.php';
-    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
-    $mesa = new Mesa($nro, $app);
-    $mascara=$mesa->getMascara();
-    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'mascara'=>$mascara, 'configuracion' => new Configuracion($app)));
+    try {
+        $mesa = new Mesa($nro, $app);
+    } catch (Exception $ex) {
+        $mensaje = array('codigo' => 1, 'texto' => $ex->getMessage());
+        $mesa = array("numero" => $nro);
+        return $app['twig']->render('mesa.html.twig', array('mensaje' => $mensaje, 'mesa' => $mesa));
+    }
+    $mascara = $mesa->getMascara();
+    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesa');
-
 
 $app->get('/mesastestigo', function () use ($app) {
     if (!validar('admin')) {
@@ -80,31 +84,30 @@ $app->get('/mesastestigo', function () use ($app) {
     return $app['twig']->render('mesastestigo.html.twig', array('testigos' => $testigos));
 })->bind('mesastestigo');
 
-$app->get('/testigo/{nro}/{accion}', function ($nro, $accion) use ($app) {
+$app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     require 'Mesa.php';
-    //require 'Filtros.php';
-    require 'Configuracion.php';
-    $mensaje = "";
-    $mesa = new Mesa($nro, $app);
-    $mesa->$accion();
-    $mesa->getMascara();
-    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
-    return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
-})->bind('testigo');
+    $circuito = $app['db']->fetchAssoc("SELECT * from circuito where id=$circuito", array());
+    if (isset($_GET['nueva'])) {
+        Mesa::setTestigo($_GET['numero'], $_GET['electores_provincia'], $_GET['electores_nacion'], $circuito['id'], $app);
+    }
+    if (isset($_GET['borrar'])) {
+        Mesa::unsetTestigo($_GET['borrar'], $app);
+    }
+    $mesas = Mesa::testigosporcircuito($circuito['id'], $app);
+    return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas));
+})->bind('testigo_accion');
 
 
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     require 'Mesa.php';
-   // require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
     $categoria = 'G';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
-    $mesa->getMascara();
-    $filtroscircuitos = Filtros::getFiltrosCircuito($mesa->getSec(), $mesa->getCirnro(), $mesa->getCirlet(), $app);
-    return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'categoria' => $categoria, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+    $mascara=$mesa->getMascara();
+    return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara'=>$mascara,'categoria' => $categoria,  'configuracion' => new Configuracion($app)));
 })->bind('mesacarga');
 
 
@@ -133,21 +136,14 @@ $app->post('/mesacarga_elige', function () use ($app) {
     $nro = $_POST['nro'];
     if (!($nro > 0)) {
         $categorias = array();
-        $mensaje = array('codigo'=>1,'texto'=>'Mesa incorrecta');
+        $mensaje = array('codigo' => 1, 'texto' => 'Mesa incorrecta');
     }
     try {
-         $mesa = new Mesa($nro, $app);
+        $mesa = new Mesa($nro, $app);
     } catch (Exception $ex) {
-        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo'=>1,'texto'=>$ex->getMessage())));
+        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => $ex->getMessage())));
     }
-   
-    if ($mesa->getTestigo() != 1) {
-        $categorias = array();
-        $mensaje = array('codigo'=>1,'texto'=>'Mesa no definida como testigo');
-       return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => $mensaje));
-
-    }
-    $mesa->sumavotos();
+   $mesa->sumavotos();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
 })->bind('mesacarga_elige_p');
 
@@ -162,7 +158,7 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $mesa->getMascara();
-    $filtrosnacionales = Filtros::getFiltrosNacionales( $app);
+    $filtrosnacionales = Filtros::getFiltrosNacionales($app);
     return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'filtros' => $filtrosnacionales, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
@@ -176,13 +172,13 @@ $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
     $mesa->getMascara();
-    $filtroscircuitos = Filtros::getFiltrosNacionales( $app);
+    $filtroscircuitos = Filtros::getFiltrosNacionales($app);
     return $app['twig']->render('mesanacional_carga.html.twig', array('mesa' => $mesa, 'categoria' => $categoria, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacionalcarga');
 
 
 
-$app->post('/mesacarga/{nro}', function ($nro) use ($app) {
+$app->post('/mesacarganacional/{nro}', function ($nro) use ($app) {
     require 'MesaNacional.php';
     require 'Configuracion.php';
     $mensaje = "";

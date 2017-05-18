@@ -17,10 +17,10 @@ class Estado {
 
     static function getEstado($app) {
         $estado = array();
-        $sql = "SELECT count(*)  from mesas where testigo=1";
+        $sql = "SELECT count(*)  from mesa ";
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_testigo'] = $resultado[0];
-        $sql = "SELECT count(distinct mesa) FROM `renglon` ";
+        $sql = "SELECT count(distinct mesa_id) FROM `renglon` ";
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_con_carga'] = $resultado[0];
          $sql = "SELECT * FROM log  order by id desc limit 0,5";

@@ -68,23 +68,23 @@
                                     <div class="panel-body">
                                         {%if configuracion.intermedia==1%}
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'G'}) }}';">
+                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'G'}) }}';">
                                                 Gobernador
                                             </button>
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'D'}) }}';">
+                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'D'}) }}';">
                                                 Diputado</button>
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
+                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'S'}) }}';">
                                                 Senador</button>
                                             {%endif%}
                                             {%if mesa.intendente==1%}  
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'I'}) }}';">
+                                                    onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'I'}) }}';">
                                                 Intendente</button>
                                             {%endif%}
                                         <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.nro,'categoria': 'C'}) }}';">
+                                                onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'C'}) }}';">
                                             Concejal</button>
                                     </div>
                                 </div>
@@ -97,11 +97,11 @@
                                     <div class="panel-body">
 
                                         <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.nro,'categoria': 'D'}) }}';">
+                                                onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.numero,'categoria': 'D'}) }}';">
                                             Diputado Nacional</button>
                                             {%if configuracion.senadores_nacionales==1%}
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
-                                                    onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.nro,'categoria': 'S'}) }}';">
+                                                    onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.numero,'categoria': 'S'}) }}';">
                                                 Senador Nacional</button>
                                             {% endif %}
                                     </div>

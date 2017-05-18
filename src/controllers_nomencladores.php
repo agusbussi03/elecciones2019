@@ -214,7 +214,7 @@ $app->get('/cargosgobernador/{provincia}', function ($provincia) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=1 and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosgobernador');
@@ -229,7 +229,7 @@ $app->get('/cargosgobernador_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=1 and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosgobernador_delete');
@@ -247,7 +247,7 @@ $app->post('/cargosgobernador_add/{id}', function ($id) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=$provincia and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosgobernador_add');
@@ -259,7 +259,7 @@ $app->get('/cargosdiputado/{provincia}', function ($provincia) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=$provincia and tipo='D' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosdiputado');
@@ -274,7 +274,7 @@ $app->get('/cargosdiputado_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=$provincia and tipo='D' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosdiputado_delete');
@@ -293,7 +293,7 @@ $app->post('/cargosdiputado_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosdiputado_add');
 
@@ -304,7 +304,7 @@ $app->get('/cargossenador/{seccion}', function ($seccion) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_departamental 
              WHERE seccion_id=$seccion and tipo='S' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador');
@@ -319,7 +319,7 @@ $app->get('/cargossenador_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_departamental 
              WHERE seccion_id=$seccion and tipo='S' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador_delete');
@@ -339,7 +339,7 @@ $app->post('/cargossenador_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador_add');
 
@@ -358,7 +358,7 @@ $app->post('/cargosdiputado_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosdiputado_add');
 
@@ -369,7 +369,7 @@ $app->get('/cargossenador/{seccion}', function ($seccion) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_departamental 
              WHERE seccion_id=$seccion and tipo='S' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador');
@@ -384,7 +384,7 @@ $app->get('/cargossenador_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_departamental 
              WHERE seccion_id=$seccion and tipo='S' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador_delete');
@@ -403,7 +403,7 @@ $app->post('/cargossenador_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador_add');
 
@@ -415,7 +415,7 @@ $app->get('/cargosintendente/{circuito}', function ($circuito) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local
              WHERE circuito_id=$circuito and tipo='I' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente');
@@ -430,7 +430,7 @@ $app->get('/cargosintendente_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local 
              WHERE circuito_id=$circuito and tipo='I' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente_delete');
@@ -449,7 +449,7 @@ $app->post('/cargosintendente_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente_add');
 
@@ -461,7 +461,7 @@ $app->get('/cargosconcejal/{circuito}', function ($circuito) use ($app) {
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local
              WHERE circuito_id=$circuito and tipo='C' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosconcejal');
@@ -476,7 +476,7 @@ $app->get('/cargosconcejal_delete/{id}', function ($id) use ($app) {
     $app['db']->executeQuery($sql, array((int) $id));
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local 
              WHERE circuito_id=$circuito and tipo='C' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosconcejal_delete');
@@ -495,6 +495,74 @@ $app->post('/cargosconcejal_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }*/
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido,id_lista");
+    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosconcejal_add');
+
+
+
+/* * **************************************************************** */
+/* * ************** LOCALES *********************************** */
+/* * **************************************************************** */
+$app->get('/locales', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $locales = $app['db']->fetchAll('SELECT * FROM locales');
+    return $app['twig']->render('nomencladores/locales.html.twig', array('locales' => $locales));
+})->bind('locales');
+/*
+$app->post('/local_add', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $sql = "INSERT INTO provincia VALUES (NULL,?,?,?,?)";
+    $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'], (int) $_POST['electores_provincia'], (int) $_POST['mesas']));
+    $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
+    $mensaje = array('codigo' => 0, 'texto' => "La provincia fue cargada");
+    return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
+})->bind('provincia_add');
+*/
+$app->get('/local_delete/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $mensaje = array('codigo' => 0, 'texto' => "El local fue eliminado");
+    try {
+        $sql = "DELETE FROM locales WHERE id=?";
+        $app['db']->executeQuery($sql, array((int) $id));
+    } catch (Exception $ex) {
+        $mensaje = array('codigo' => 1, 'texto' => "El local tiene informacion relacionado");
+    }
+    $locales = $app['db']->fetchAll('SELECT * FROM locales');
+    return $app['twig']->render('nomencladores/locales.html.twig', array('locales' => $locales, 'mensaje' => $mensaje));
+})->bind('locales_delete');
+/*
+$app->get('/provincia_edit/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$id");
+    return $app['twig']->render('nomencladores/provincia_edit.html.twig', array('provincia' => $provincia));
+})->bind('provincia_edit');
+
+$app->post('/provincia_edit/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $mensaje = array('codigo' => 0, 'texto' => "La provincia fue modificada");
+    try {
+        $sql = "UPDATE provincia SET nombre=?,votantes_nacion=?,votantes_provincia=?,"
+                . "mesas=? WHERE id=?";
+        $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['votantes_nacion'],
+            (int) $_POST['votantes_provincia'], $_POST['mesas'], (int) $id));
+    } catch (Exception $ex) {
+        $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
+    }
+    $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
+    return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
+})->bind('provincia_editp');
+ 
+ * */
+ 
+ 

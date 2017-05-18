@@ -7,6 +7,7 @@
 class Mesa {
 
     private $numero = 0;
+    private $id;
     private $electores_provincia = 0;
     private $electores_nacion = 0;
     private $circuito = 0;
@@ -28,6 +29,7 @@ class Mesa {
 
         if (!($datos))
             throw new Exception("Mesa no existe");
+        $this->id = $datos['id'];
         $this->electores_provincia = $datos['electores_provincia'];
         $this->electores_nacion = $datos['electores_nacion'];
         $this->circuito = $datos['c_id'];
@@ -37,6 +39,10 @@ class Mesa {
         $this->provincia = $datos['p_id'];
         $this->provincia_nombre = $datos['p_nombre'];
         $this->intendente = $datos['intendente'];
+    }
+
+    function getId() {
+        return $this->id;
     }
 
     function getNumero() {
@@ -91,23 +97,23 @@ class Mesa {
 
         $cargo_sql = "SELECT * FROM cargo_provincial c,partido_lista p WHERE provincia_id=? and c.lista_id=p.id ";
         $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->provincia));
-        $mascara=array();
+        $mascara = array();
         foreach ($cargos as $item) {
-            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id_partido" => $item['id_partido'],
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
-            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' .str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
         }
         $cargo_sql = "SELECT * FROM cargo_departamental c,partido_lista p WHERE seccion_id=? and c.lista_id=p.id ";
         $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->seccion));
         foreach ($cargos as $item) {
-            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT). '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id_partido" => $item['id_partido'],
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
             $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
         }
         $cargo_sql = "SELECT * FROM cargo_local c,partido_lista p WHERE circuito_id=? and c.lista_id=p.id ";
         $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->circuito));
         foreach ($cargos as $item) {
-            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id_partido" => $item['id_partido'],
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
             $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
         }
@@ -129,25 +135,22 @@ class Mesa {
     }
 
     function sumavotos() {
-        $sql = "SELECT count(*),sum(gob),sum(dip),sum(sen),sum(inte),sum(con),sum(mco) from renglon "
-                . "WHERE mesa=?";
-        $sumavotos = $this->app['db']->fetchArray($sql, array((int) $this->nro));
-        if ($sumavotos[0] == 0) {
-            $sql = "INSERT renglon SELECT ?,'',renglon,sec,cirnro,cirlet,pspar,parnombre,pslista,nombre,0,0,0,0,0,0,sortp,sortl 
-                    from actapartido WHERE sec=? and cirnro=? and cirlet=?";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-//// BLANCOS 
-            $sql = "INSERT renglon VALUES (?,'',97,?,?,?,9997,'BLANCOS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-//// NULOS
-            $sql = "INSERT renglon VALUES (?,'',98,?,?,?,9998,'NULOS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-            //// OTROS
-            $sql = "INSERT renglon VALUES (?,'',99,?,?,?,9999,'OTROS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
+        $sql = "SELECT count(*) as cuenta,sum(gobernador),sum(diputado),sum(senador),"
+                . "sum(intendente),sum(concejal) from renglon WHERE mesa_id=?";
+        $sumavotos = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        if ($sumavotos['cuenta'] == 0) {
+            $mascara = $this->getMascara();
+            foreach ($mascara as $item) {
+                $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
+                $this->app['db']->executeQuery($sql, array((int) $this->id, $item['datos']['id']));
+            }
+            //BLANCOS NULOS Y OTROS
+             $sql = "SELECT * from partido_lista WHERE especial=1";
+            $especiales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+            foreach ($especiales as $item) {
+                $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
+                $this->app['db']->executeQuery($sql, array((int) $this->id, $item['id']));
+            }
         }
         return $sumavotos;
     }
@@ -168,22 +171,28 @@ class Mesa {
         return;
     }
 
-    function setTestigo() {
-        $sql = "UPDATE mesas SET testigo=1 where mesa=$this->nro and tipo=''";
-        $this->app['db']->executeQuery($sql);
-        $this->testigo = 1;
+    static function setTestigo($numero, $electores_provincia, $electores_nacion, $circuito, $app) {
+        $sql = "INSERT INTO mesa VALUES(NULL,?,?,?,?,NULL)";
+        $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito));
     }
 
-    function unsetTestigo() {
-        $sql = "UPDATE mesas SET testigo=0 where mesa=$this->nro and tipo=''";
-        $this->app['db']->executeQuery($sql);
-        $this->testigo = 0;
+    static function unsetTestigo($id, $app) {
+        $sql = "DELETE FROM mesa where id=$id";
+        $app['db']->executeQuery($sql);
     }
 
     static function testigos($app) {
         $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
                 . "FROM mesa m,circuito c,seccion s,provincia p "
                 . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id ";
+        $resultado = $app['db']->fetchAll($sql);
+        return $resultado;
+    }
+
+    static function testigosporcircuito($circuito, $app) {
+        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
+                . "FROM mesa m,circuito c,seccion s,provincia p "
+                . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and c.id=$circuito ";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }
