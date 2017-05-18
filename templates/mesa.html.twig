@@ -54,22 +54,22 @@
                                             {%endif%} 
                                             {%if configuracion.intermedia==1%}
                                                 <td>
-                                                    {% if 'G' in item.cargos %}0{%else%}-{% endif %}
+                                                    {% if 'G' in item.cargos %}{{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if 'D' in item.cargos %}0{%else%}-{% endif %}
+                                                    {% if 'D' in item.cargos %}{{votos[item.datos.id].diputado}}{%else%}-{% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if 'S' in item.cargos %}0{%else%}-{% endif %}
+                                                    {% if 'S' in item.cargos %}{{votos[item.datos.id].senador}}{%else%}-{% endif %}
                                                 </td>
                                             {%endif%}
 
                                             <td>
-                                                {% if 'I' in item.cargos %}0{%else%}-{% endif %}
+                                                {% if 'I' in item.cargos %}{{votos[item.datos.id].intendente}}{%else%}-{% endif %}
                                             </td>                                              
 
                                             <td>
-                                                {% if 'C' in item.cargos %}0{%else%}-{% endif %}
+                                                {% if 'C' in item.cargos %}{{votos[item.datos.id].concejal}}{%else%}-{% endif %}
                                             </td> 
                                         </tr>
                                     {% endfor %}

@@ -564,5 +564,69 @@ $app->post('/provincia_edit/{id}', function ($id) use ($app) {
 })->bind('provincia_editp');
  
  * */
+
  
- 
+ /* * **************************************************************** */
+/* * ******************** S E C C I O N A L E S *************************** */
+ /* * **************************************************************** */
+
+
+$app->get('/seccionales/{circuito}', function ($circuito) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+    return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales));
+})->bind('seccionales');
+
+$app->post('/seccional_add/{circuito}', function ($circuito) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $sql = "INSERT INTO seccional VALUES (NULL,?,?,?,?)";
+    $app['db']->executeQuery($sql, array($_POST['nombre'],(int) $_POST['electores_nacion'], (int) $_POST['electores_provincia'],(int) $circuito));
+    $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+    $mensaje = array('codigo' => 0, 'texto' => "La seccional fue cargada");
+    return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'mensaje' => $mensaje, 'seccionales' => $seccionales));
+})->bind('seccional_add');
+
+$app->get('/seccional_delete/{circuito}/{id}', function ($circuito, $id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $mensaje = array('codigo' => 0, 'texto' => "La seccion fue eliminada");
+    try {
+        $sql = "DELETE FROM seccional WHERE id=?";
+        $app['db']->executeQuery($sql, array((int) $id));
+    } catch (Exception $ex) {
+        $mensaje = array('codigo' => 1, 'texto' => "La seccional tiene informacion cargada");
+    }
+    $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+    return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'mensaje' => $mensaje, 'seccionales' => $seccionales));
+})->bind('seccional_delete');
+
+$app->get('/seccional_edit/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $seccional = $app['db']->fetchAssoc("SELECT * FROM seccional where id=$id");
+    return $app['twig']->render('nomencladores/seccional_edit.html.twig', array('seccional' => $seccional));
+})->bind('seccional_edit');
+
+$app->post('/seccional_edit/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $mensaje = array('codigo' => 0, 'texto' => "La seccional fue modificada");
+    try {
+        $sql = "UPDATE seccional SET nombre=?,electores_nacion=?,electores_provincia=? WHERE id=?";
+        $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
+            (int) $_POST['electores_provincia'], (int) $id));
+        $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
+        $circuito = $circuito['circuito_id'];
+    } catch (Exception $ex) {
+        $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
+    }
+    $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+    return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'mensaje' => $mensaje));
+})->bind('seccional_editp');

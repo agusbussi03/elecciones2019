@@ -21,6 +21,7 @@
                                     <th>Provincia</th>
                                     <th>Departamento</th>
                                     <th>Localidad</th>
+                                    <th>Seccional</th>
                                     <th>Electores P.</th>
                                     <th>Electores N.</th>
                                     <th></th>
@@ -33,6 +34,7 @@
                                         <td>{{item.p_nombre}}</td>
                                         <td>{{item.s_nombre}}</td>
                                         <td>{{item.c_nombre}}</td>
+                                        <td>{{item.sec_nombre}}</td>
                                         <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
                                         <td>
@@ -62,6 +64,15 @@
                             <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
                             <label>Electores nacion</label>
                             <input class="form-control" name="electores_nacion" type="number" size="4" min="1">
+                            {%if seccionales|length >0%}
+                                <select name="seccional_id">
+                                    {% for item in seccionales %}
+                                        <option value="{{item.id}}">{{item.nombre}}</option>
+                                    {% endfor %}
+                                </select>
+                                {%else%}
+                                    <input type="hidden" name="seccional_id" value="0">
+                            {%endif%}
 
                             <input type="submit"  class="btn btn-primary" name=nueva value="Crear">
                         </div>
@@ -77,11 +88,11 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-                                                                                                $(document).ready(function () {
-                                                                                                    $('#dataTables-example').DataTable({
-                                                                                                        responsive: true
-                                                                                                    });
-                                                                                                });
+                                        $(document).ready(function () {
+                                            $('#dataTables-example').DataTable({
+                                                responsive: true
+                                            });
+                                        });
     </script>
 {% endblock %}
 

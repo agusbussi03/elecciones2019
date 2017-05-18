@@ -77,21 +77,21 @@
                                     {%if categoria=='G'%}
                                         <td>
                                             {% if 'G' in item.cargos %}
-                                                <input class="form-control inputs" name="G,{{item.datos.id_partido}},{{item.datos.id_lista}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" name="G,{{item.datos.id}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
                                         </td>
                                     {%endif%} 
                                     {%if categoria=='D'%}
                                         <td>
-                                            {% if 'I' in item.cargos %}
-                                                <input class="form-control inputs" value="" name="D,{{item.datos.id_partido}},{{item.datos.id_lista}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                            {% if 'D' in item.cargos %}
+                                                <input class="form-control inputs" value="" name="D,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
                                         </td>
                                     {%endif%} 
                                     {%if categoria=='S'%}
                                         <td>
                                             {% if 'S' in item.cargos %} 
-                                                <input class="form-control inputs" value="" name="S,{{item.datos.id_partido}},{{item.datos.id_lista}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" value="" name="S,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
                                         </td>
                                     {%endif%} 
@@ -99,7 +99,7 @@
                                 {%if categoria=='I'%}
                                     <td>
                                         {% if 'I' in item.cargos %}
-                                            <input class="form-control inputs" value='' name="I,{{item.datos.id_partido}},{{item.datos.id_lista}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                            <input class="form-control inputs" value='' name="I,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                         {% endif %}
 
                                     </td>      
@@ -107,7 +107,7 @@
                                 {%if categoria=='C'%}
                                     <td>
                                         {% if 'C' in item.cargos %}
-                                            <input class="form-control inputs" value="" name="C,{{item.datos.id_partido}},{{item.datos.id_lista}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                            <input class="form-control inputs" value="" name="C,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                         {% endif %}
                                     </td> 
                                 {% endif %}

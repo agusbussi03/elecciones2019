@@ -25,6 +25,7 @@
                                     <th>Provincia</th>
                                     <th>Departamento</th>
                                     <th>Localidad</th>
+                                    <th>Seccional</th>
                                     <th>Electores P.</th>
                                     <th>Electores N.</th>
                                 </tr>
@@ -36,6 +37,7 @@
                                             <td>{{item.p_nombre}}</td>
                                             <td><a href="{{path('circuitos',{'seccion':item.s_id})}}">{{item.s_nombre}}</a></td>
                                             <td>{{item.c_nombre}}</a></td>
+                                            <td>{{item.sec_nombre}}</td>
                                             <td>{{item.electores_provincia}}</td>
                                              <td>{{item.electores_nacion}}</td>
                                         </tr>

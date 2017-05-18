@@ -117,6 +117,13 @@ class Mesa {
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
             $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
         }
+        $cargo_sql = "SELECT * FROM partido_lista p WHERE p.especial=1 ";
+        $cargos = $this->app['db']->fetchAll($cargo_sql);
+        foreach ($cargos as $item) {
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
+                'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"] = array("G", "D", "S", "I", "C");
+        }
         ksort($mascara);
         return $mascara;
     }
@@ -144,36 +151,44 @@ class Mesa {
                 $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
                 $this->app['db']->executeQuery($sql, array((int) $this->id, $item['datos']['id']));
             }
-            //BLANCOS NULOS Y OTROS
-             $sql = "SELECT * from partido_lista WHERE especial=1";
-            $especiales = $this->app['db']->fetchAll($sql, array((int) $this->id));
-            foreach ($especiales as $item) {
-                $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
-                $this->app['db']->executeQuery($sql, array((int) $this->id, $item['id']));
-            }
         }
         return $sumavotos;
     }
 
+    function votos() {
+        $sql = "SELECT * from renglon WHERE mesa_id=?";
+        $votos = array();
+        $resultado = $this->app['db']->fetchAll($sql, array((int) $this->id));
+
+        foreach ($resultado as $item) {
+            $votos[$item['lista_id']] = $item;
+        }
+        return $votos;
+    }
+
     function actualiza($votos) {
-        $columnas = array('G' => 'gob', 'D' => 'dip', 'S' => 'sen', 'I' => 'inte', 'C' => 'con');
+        $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador', 'I' => 'intendente', 'C' => 'concejal');
         foreach ($votos as $clave => $valor) {
             $dato = explode(",", $clave);
             $columna = $columnas[$dato[0]];
-            $partido = $dato[1];
-            $lista = $dato[2];
-            $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
-            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->nro));
+            $partido_lista = $dato[1];
+            $sql = "UPDATE renglon set $columna=? where lista_id=? and mesa_id=?";
+            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido_lista, (int) $this->id));
         }
         $sql = "insert into log (usuario,texto,datos) "
-                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->nro','" . print_r($votos, 1) . "');";
+                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->numero','" . print_r($votos, 1) . "');";
         $this->app['db']->executeQuery($sql);
         return;
     }
 
-    static function setTestigo($numero, $electores_provincia, $electores_nacion, $circuito, $app) {
-        $sql = "INSERT INTO mesa VALUES(NULL,?,?,?,?,NULL)";
-        $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito));
+    static function setTestigo($numero, $electores_provincia, $electores_nacion, $circuito, $seccional, $app) {
+        if ($seccional > 0) {
+            $sql = "INSERT INTO mesa VALUES (NULL,?,?,?,?,?)";
+            $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito, $seccional));
+        } else {
+            $sql = "INSERT INTO mesa VALUES (NULL,?,?,?,?,NULL)";
+            $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito));
+        }
     }
 
     static function unsetTestigo($id, $app) {
@@ -182,16 +197,16 @@ class Mesa {
     }
 
     static function testigos($app) {
-        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
-                . "FROM mesa m,circuito c,seccion s,provincia p "
+        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
+                . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
                 . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id ";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }
 
     static function testigosporcircuito($circuito, $app) {
-        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
-                . "FROM mesa m,circuito c,seccion s,provincia p "
+        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
+                . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
                 . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and c.id=$circuito ";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
