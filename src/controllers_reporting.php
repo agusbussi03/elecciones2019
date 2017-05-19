@@ -67,17 +67,34 @@ $app->get('/rep_concejales_seccional/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-   
-        $sql = "SELECT sec.nombre,p.nombre_partido,p.nombre_lista,sum(concejal) "
-                . "FROM renglon r, mesa m, seccional sec, partido_lista p WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and concejal>0 group by sec.nombre,p.nombre_partido,p.nombre_lista "
-                . "ORDER BY sec.nombre asc,`p`.`nombre_partido` ASC, p.nombre_lista asc  ";
-        $votos = $app['db']->fetchAll($sql, array((int) $id));
-  
 
-    print_r($votos);
-   die;
-    return $app['twig']->render('reporting/res_concejales.html.twig', array('resultados' => $resultados));
+    $sql = "SELECT sec.nombre,p.nombre_partido,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+            . "FROM renglon r, mesa m, seccional sec, partido_lista p, cargo_local car "
+            . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
+            . "and m.circuito_id=? and concejal>=0 and car.lista_id=r.lista_id "
+            . "and car.circuito_id=m.circuito_id and car.tipo='C' "
+            . "group by sec.nombre,p.id_partido,p.nombre_partido,p.id_lista,p.nombre_lista "
+            . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+    $votos = $app['db']->fetchAll($sql, array((int) $id));
+    $resultado = array();
+    foreach ($votos as $item) {
+        $resultado[$item['nombre']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
+    }
+    //especiales
+      $sql = "SELECT sec.nombre,p.nombre_partido,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+            . "FROM renglon r, mesa m, seccional sec, partido_lista p "
+            . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
+            . "and m.circuito_id=? and concejal>=0 and p.especial=1 "
+            . "group by sec.nombre,p.id_partido,p.nombre_partido,p.id_lista,p.nombre_lista "
+            . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+    $votos = $app['db']->fetchAll($sql, array((int) $id));
+    foreach ($votos as $item) {
+        $resultado[$item['nombre']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
+    }
+    
+    
+    //print_r($resultado);  
+    return $app['twig']->render('reporting/res_concejales.html.twig', array('votos' => $resultado));
 })->bind('rep_concejales_seccional');
 ;
 

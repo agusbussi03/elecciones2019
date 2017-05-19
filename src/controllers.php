@@ -50,7 +50,8 @@ $app->post('/login', function () use ($app) {
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
         $app['twig']->addGlobal('session', $_SESSION);
-        return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+         return $app->redirect($app['url_generator']->generate('homepage'));
+      //  return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     }
 });
 
@@ -66,6 +67,7 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     $mensaje = "";
     try {
         $mesa = new Mesa($nro, $app);
+        $mesa->sumavotos();
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => $ex->getMessage());
         $mesa = array("numero" => $nro);

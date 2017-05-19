@@ -239,10 +239,11 @@ $app->post('/cargosgobernador_add/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $provincia = $id;
-    try {
-        $sql = "INSERT into cargo_provincial values(NULL,?,?,'G')";
+   try {
+        $sql = "INSERT into cargo_provincial values(NULL,?,?,'G',NULL)";
         $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
-    } catch (Exception $ex) {
+   } catch (Exception $ex) {
+        echo $ex->getMessage();
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
     $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
