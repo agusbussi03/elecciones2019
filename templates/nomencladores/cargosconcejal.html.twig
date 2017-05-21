@@ -19,6 +19,8 @@
                                     <tr>
                                         <th>Partido</th>
                                         <th>Lista</th>
+                                        <th>Candidato</th>
+                                        <th></th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -27,10 +29,13 @@
                                         <tr class="odd gradeX">
                                             <td>{{item.id_partido}}-{{item.nombre_partido}}</td>
                                             <td>{{item.id_lista}}-{{item.nombre_lista}}</td>
+                                            
+                                             <td>{{item.apellido}} {{item.nombre}}</td>
+                                             <td>{%if item.foto|length >0 %}<img width='100px' src="data:image/png;base64,{{item.foto}}"{%endif%}</td>
                                             <td>                                                 
                                                 <button type="button" class="btn btn-danger" 
-                                                        onclick="window.location.href = '{{ path('cargosconcejal_delete',{'id':item.id}) }}';">Borrar</button>
-                                            </td>                                    
+                                                        onclick="window.location.href = '{{ path('cargosconcejal_delete',{'id':item.id_cargo}) }}';">Borrar</button>
+                                            </td>                                   
                                         </tr>
                                     {% endfor %}
                                 </tbody>

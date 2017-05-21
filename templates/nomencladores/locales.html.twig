@@ -27,9 +27,9 @@
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Mesa desde</th>
-                                        <th>Mesa hasta</th>
-                                        <th>Seccion</th>
+                                        <th>Direccion</th>
+                                        <th>Telefono</th>
+                                        <th>Contacto</th>
                                         <th>Coordenadas</th>
                                         <th></th>
                                     </tr>
@@ -38,13 +38,13 @@
                                     {% for item in locales %}
                                         <tr class="odd gradeX">
                                             <td>{{item.nombre}}</td>
-                                            <td>{{item.mesadesde}}</td>
-                                            <td>{{item.mesahasta}}</td>
-                                            <td>{{item.sec}}</td>
+                                            <td>{{item.direccion}}</td>
+                                            <td>{{item.telefono}}</td>
+                                            <td>{{item.contacto}}</td>
                                             <td>{{item.lat}},{{item.lon}}</td>
                                             <td>
-                                                <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
-                                                <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('provincia_delete',{'id':item.id}) }}';">Borrar</button>
+                                                <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('local_edit',{'id':item.id}) }}';">Editar</button>
+                                                <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('local_delete',{'id':item.id}) }}';">Borrar</button>
                                             </td>
                                         </tr>
                                     {% endfor %}
