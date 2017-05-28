@@ -75,6 +75,7 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     }
     $mascara = $mesa->getMascara();
     $votos = $mesa->votos();
+    //print_r($mascara);print_r($votos);
     return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesa');
 
@@ -159,13 +160,11 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'MesaNacional.php';
-    //require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $mesa->getMascara();
-    $filtrosnacionales = Filtros::getFiltrosNacionales($app);
-    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'filtros' => $filtrosnacionales, 'configuracion' => new Configuracion($app)));
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,  'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {

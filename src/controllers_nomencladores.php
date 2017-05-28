@@ -286,7 +286,7 @@ $app->post('/cargosdiputado_add/{id}', function ($id) use ($app) {
     }
     $provincia = $id;
     try {
-        $sql = "INSERT into cargo_provincial values(NULL,?,?,'D')";
+        $sql = "INSERT into cargo_provincial values(NULL,?,?,'D',NULL)";
         $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
         $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
              WHERE provincia_id=$provincia and tipo='D' and lista_id=partido_lista.id order by id_partido,id_lista");
@@ -345,25 +345,25 @@ $app->post('/cargossenador_add/{id}', function ($id) use ($app) {
     return $app['twig']->render('nomencladores/cargossenador.html.twig', array('seccion' => $seccion, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargossenador_add');
 
-
-$app->post('/cargosdiputado_add/{id}', function ($id) use ($app) {
-    if (!validar('admin')) {
-        return $app->redirect($app['url_generator']->generate('login'));
-    }
-    $provincia = $id;
-    try {
-        $sql = "INSERT into cargo_provincial values(NULL,?,?,'D')";
-        $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
-        $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
-             WHERE provincia_id=$provincia and tipo='D' and lista_id=partido_lista.id order by id_partido,id_lista");
-    } catch (Exception $ex) {
-        return $app->redirect($app['url_generator']->generate('provincia'));
-    }
-    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
-    return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
-})->bind('cargosdiputado_add');
-
+/*
+  $app->post('/cargosdiputado_add/{id}', function ($id) use ($app) {
+  if (!validar('admin')) {
+  return $app->redirect($app['url_generator']->generate('login'));
+  }
+  $provincia = $id;
+  try {
+  $sql = "INSERT into cargo_provincial values(NULL,?,?,'D')";
+  $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
+  $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial
+  WHERE provincia_id=$provincia and tipo='D' and lista_id=partido_lista.id order by id_partido,id_lista");
+  } catch (Exception $ex) {
+  return $app->redirect($app['url_generator']->generate('provincia'));
+  }
+  $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+  $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
+  return $app['twig']->render('nomencladores/cargosdiputado.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
+  })->bind('cargosdiputado_add');
+ */
 
 $app->get('/cargossenador/{seccion}', function ($seccion) use ($app) {
     if (!validar('admin')) {
@@ -644,3 +644,114 @@ $app->post('/seccional_edit/{id}', function ($id) use ($app) {
     $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
     return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'mensaje' => $mensaje));
 })->bind('seccional_editp');
+
+
+
+/* * **************************************************************** */
+/* * ******************** P A R T I D O S *************************** */
+/* * **************************************************************** */
+
+
+$app->get('/partidos', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista");
+    foreach ($partidos2 as $item) {
+        $item['logo'] = base64_encode($item['logo']);
+        $partidos[] = $item;
+    }
+    return $app['twig']->render('nomencladores/partidos.html.twig', array('partidos' => $partidos));
+})->bind('partidos');
+
+$app->post('/partido_logo/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    if (isset($_FILES['logo']['tmp_name'])) {
+        $logo = file_get_contents($_FILES['logo']['tmp_name']);
+        try {
+            $sql = "UPDATE partido_lista SET logo=? WHERE id=?";
+            $app['db']->executeQuery($sql, array($logo, (int) $id));
+        } catch (Exception $ex) {
+            $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion: " . $ex->getMessage());
+            $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista");
+            foreach ($partidos2 as $item) {
+                $item['logo'] = base64_encode($item['logo']);
+                $partidos[] = $item;
+            }
+            return $app['twig']->render('nomencladores/partidos.html.twig', array('mensaje' => $mensaje, 'partidos' => $partidos));
+        }
+    }
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista");
+    foreach ($partidos2 as $item) {
+        $item['logo'] = base64_encode($item['logo']);
+        $partidos[] = $item;
+    }
+    return $app['twig']->render('nomencladores/partidos.html.twig', array('partidos' => $partidos));
+})->bind('partido_logo');
+
+
+/*
+  $app->post('/seccional_add/{circuito}', function ($circuito) use ($app) {
+  if (!validar('admin')) {
+  return $app->redirect($app['url_generator']->generate('login'));
+  }
+  $sql = "INSERT INTO seccional VALUES (NULL,?,?,?,?)";
+  $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'], (int) $_POST['electores_provincia'], (int) $circuito));
+  $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+  $mensaje = array('codigo' => 0, 'texto' => "La seccional fue cargada");
+  return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'mensaje' => $mensaje, 'seccionales' => $seccionales));
+  })->bind('seccional_add');
+
+  $app->get('/seccional_delete/{circuito}/{id}', function ($circuito, $id) use ($app) {
+  if (!validar('admin')) {
+  return $app->redirect($app['url_generator']->generate('login'));
+  }
+  $mensaje = array('codigo' => 0, 'texto' => "La seccion fue eliminada");
+  try {
+  $sql = "DELETE FROM seccional WHERE id=?";
+  $app['db']->executeQuery($sql, array((int) $id));
+  } catch (Exception $ex) {
+  $mensaje = array('codigo' => 1, 'texto' => "La seccional tiene informacion cargada");
+  }
+  $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+  return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'mensaje' => $mensaje, 'seccionales' => $seccionales));
+  })->bind('seccional_delete');
+
+  $app->get('/seccional_edit/{id}', function ($id) use ($app) {
+  if (!validar('admin')) {
+  return $app->redirect($app['url_generator']->generate('login'));
+  }
+  $seccional = $app['db']->fetchAssoc("SELECT * FROM seccional where id=$id");
+  return $app['twig']->render('nomencladores/seccional_edit.html.twig', array('seccional' => $seccional));
+  })->bind('seccional_edit');
+
+  $app->post('/seccional_edit/{id}', function ($id) use ($app) {
+  if (!validar('admin')) {
+  return $app->redirect($app['url_generator']->generate('login'));
+  }
+  $mensaje = array('codigo' => 0, 'texto' => "La seccional fue modificada");
+  try {
+  $sql = "UPDATE seccional SET nombre=?,electores_nacion=?,electores_provincia=? WHERE id=?";
+  $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
+  (int) $_POST['electores_provincia'], (int) $id));
+  $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
+  $circuito = $circuito['circuito_id'];
+  } catch (Exception $ex) {
+  $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
+  }
+  $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
+  return $app['twig']->render('nomencladores/seccionales.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'mensaje' => $mensaje));
+  })->bind('seccional_editp');
+ */
+
+
+$app->get('/partidosnacionales', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $partidos = $app['db']->fetchAll("SELECT * FROM partido_lista_nacional");
+    
+    return $app['twig']->render('nomencladores/partidosnacionales.html.twig', array('partidos' => $partidos));
+})->bind('partidosnacionales');
