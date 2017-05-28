@@ -2,6 +2,11 @@
 
 {% block content %}
     {% include "navigator.html.twig" %}
+    {% set total_gobernador=0 %}
+    {% set total_diputado=0 %}
+    {% set total_senador=0 %}
+    {% set total_intendente=0 %}
+    {% set total_concejal=0 %}
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
@@ -24,7 +29,7 @@
                         <div class="panel-heading">
                             Ubicacion:  {{mesa.seccion_nombre}} - Circuito:{{mesa.circuito_nombre}}  Electores:{{mesa.electores_provincia}} 
                         </div>
-                        <!-- /.panel-heading -->
+
                         <div class="panel-body">
                             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                                 <thead>
@@ -50,29 +55,58 @@
                                             {% if configuracion.tipo==0%}
                                                 <td>
                                                     {{ item.datos.id_lista }} - {{ item.datos.nombre_lista }}
+
                                                 </td>
                                             {%endif%} 
                                             {%if configuracion.intermedia==1%}
                                                 <td>
-                                                    {% if 'G' in item.cargos %}{{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
+                                                    {% if 'G' in item.cargos %}
+                                                         {% set total_gobernador=total_gobernador+votos[item.datos.id].gobernador%}
+                                                         {{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if 'D' in item.cargos %}{{votos[item.datos.id].diputado}}{%else%}-{% endif %}
+                                                    {% if 'D' in item.cargos %}
+                                                         {% set total_diputado=total_diputado+votos[item.datos.id].diputado%}
+                                                         {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
                                                 </td>
                                                 <td>
-                                                    {% if 'S' in item.cargos %}{{votos[item.datos.id].senador}}{%else%}-{% endif %}
+                                                    {% if 'S' in item.cargos %}
+                                                         {% set total_senador=total_senador+votos[item.datos.id].senador%}
+                                                         {{votos[item.datos.id].senador}}{%else%}-{% endif %}
                                                 </td>
                                             {%endif%}
 
                                             <td>
-                                                {% if 'I' in item.cargos %}{{votos[item.datos.id].intendente}}{%else%}-{% endif %}
+                                                {% if 'I' in item.cargos %}
+                                                    {% set total_intendente=total_intendente+votos[item.datos.id].intendente%}
+                                                    {{votos[item.datos.id].intendente}}{%else%}-{% endif %}
                                             </td>                                              
 
                                             <td>
-                                                {% if 'C' in item.cargos %}{{votos[item.datos.id].concejal}}{%else%}-{% endif %}
+                                                {% if 'C' in item.cargos %}
+                                                    {% set total_concejal=total_concejal+votos[item.datos.id].concejal%}
+                                                    {{votos[item.datos.id].concejal}}{%else%}-{% endif %}
                                             </td> 
                                         </tr>
                                     {% endfor %}
+
+                                    <tr class="odd gradeX">
+                                        <td>TOTAL</td>
+                                        {% if configuracion.tipo==0%}
+                                            <td></td>
+                                        {%endif%} 
+                                        {%if configuracion.intermedia==1%}
+                                            <td>{{total_gobernador}}</td>
+                                            <td>{{total_diputado}}</td>
+                                            <td>{{total_senador}}</td>
+                                        {%endif%}
+                                        <td>{{total_intendente}}</td>                                              
+                                        <td>{{total_concejal}}
+                                        </td> 
+                                    </tr>
+
+
+
 
                                 </tbody>
                             </table>

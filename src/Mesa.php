@@ -168,6 +168,7 @@ class Mesa {
 
     function actualiza($votos) {
         $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador', 'I' => 'intendente', 'C' => 'concejal');
+        unset($votos['total_votos']);
         foreach ($votos as $clave => $valor) {
             $dato = explode(",", $clave);
             $columna = $columnas[$dato[0]];

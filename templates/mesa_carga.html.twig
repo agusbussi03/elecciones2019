@@ -75,21 +75,21 @@
                                         {%if categoria=='G'%}
                                             <td>
                                                 {% if 'G' in item.cargos %}
-                                                    <input class="form-control inputs" name="G,{{item.datos.id}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%}  name="G,{{item.datos.id}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
                                         {%if categoria=='D'%}
                                             <td>
                                                 {% if 'D' in item.cargos %}
-                                                    <input class="form-control inputs" value="" name="D,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="D,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
                                         {%if categoria=='S'%}
                                             <td>
                                                 {% if 'S' in item.cargos %} 
-                                                    <input class="form-control inputs" value="" name="S,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="S,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
@@ -97,20 +97,30 @@
                                     {%if categoria=='I'%}
                                         <td>
                                             {% if 'I' in item.cargos %}
-                                                <input class="form-control inputs" value='' name="I,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value='' name="I,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
 
                                         </td>      
                                     {% endif %}                                        
                                     {%if categoria=='C'%}
+
                                         <td>
                                             {% if 'C' in item.cargos %}
-                                                <input class="form-control inputs" value="" name="C,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="C,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
                                         </td> 
                                     {% endif %}
                                 </tr>
                             {% endfor %}
+
+
+                            <tr class="odd gradeX" id="total">
+                                <td>
+                                    TOTAL
+                                </td> <td></td>
+                                <td>
+                                    <input class="form-control inputs" value="" type="number" id='total_votos' name="total_votos" size="3">
+                                </td>          
 
                         </tbody>
                     </table>
@@ -129,6 +139,7 @@
             <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
             <script>
                 $(document).ready(function () {
+                     $('#otros').hide();
                     i = 1;
                     $.each($('#tablacarga').children(), function (key, fila) {
                         //alert(fila.cells.length);
@@ -138,6 +149,7 @@
                         }
                         i++;
                     });
+
                     $('.inputs')[0].focus();
                 });
 
@@ -155,6 +167,38 @@
                     }
                 }
                 );
+
+                $("#formu").submit(function (event) {
+                    if (!(parseInt($('#total_votos').val()) > 0)) {
+                        alert('Ingrese el total de votos');
+                        event.preventDefault();
+                        return;
+                    }
+                    if (parseInt($('#total_votos').val()) >{{ mesa.electores_provincia }} ) {
+                        alert('El total de votos supera los {{ mesa.electores_provincia }} (total de electores)');
+                        event.preventDefault();
+                        return;
+                    }
+
+                    suma = 0;
+                    $.each($('.inputs'), function (key, fila) {
+                        if ((parseInt(fila.value) > 0) && (fila.name != 'total_votos'))
+                            suma += parseInt(fila.value);
+                    });
+                    otros = parseInt($('#total_votos').val()) - suma;
+
+                    if (!(otros >=0) ) {
+                        alert('La suma de los votos por partido/lista supera el total informado ');
+                        event.preventDefault();
+                        return;
+                    }
+
+
+                    $('#otros').val(otros);
+                    //event.preventDefault();
+                });
+
+
             </script>
 
 
