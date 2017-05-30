@@ -49,7 +49,7 @@
                     {% for clave,item in votos %}
                         <tr class="odd gradeX" id="r_{{loop.index}}">
                             <td style="width:400px;">
-                                {{ clave }}
+                                {{ seccionales[clave].nombre }}
                             </td> 
                             {% set total=0 %}
                             {% for item2 in item %}

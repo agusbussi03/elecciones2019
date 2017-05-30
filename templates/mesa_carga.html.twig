@@ -75,21 +75,21 @@
                                         {%if categoria=='G'%}
                                             <td>
                                                 {% if 'G' in item.cargos %}
-                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%}  name="G,{{item.datos.id}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99997 %} id='otros'{%endif%}  name="G,{{item.datos.id}}" value="" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
                                         {%if categoria=='D'%}
                                             <td>
                                                 {% if 'D' in item.cargos %}
-                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="D,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99997 %} id='otros'{%endif%} value="" name="D,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
                                         {%if categoria=='S'%}
                                             <td>
                                                 {% if 'S' in item.cargos %} 
-                                                    <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="S,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                    <input class="form-control inputs" {% if item.datos.id_partido==99997 %} id='otros'{%endif%} value="" name="S,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
@@ -97,7 +97,7 @@
                                     {%if categoria=='I'%}
                                         <td>
                                             {% if 'I' in item.cargos %}
-                                                <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value='' name="I,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" {% if item.datos.id_partido==99997 %} id='otros'{%endif%} value='' name="I,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
 
                                         </td>      
@@ -106,7 +106,7 @@
 
                                         <td>
                                             {% if 'C' in item.cargos %}
-                                                <input class="form-control inputs" {% if item.datos.id_partido==99999 %} id='otros'{%endif%} value="" name="C,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
+                                                <input class="form-control inputs" {% if item.datos.id_partido==99997 %} id='otros'{%endif%} value="" name="C,{{item.datos.id}}" type="number" size="3" min="0" max="{{mesa.electores_provincia}}">
                                             {% endif %}
                                         </td> 
                                     {% endif %}

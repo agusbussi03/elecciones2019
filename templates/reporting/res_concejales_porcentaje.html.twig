@@ -33,6 +33,7 @@
                         <td style="font-size:12px;width:400px;">
                             Seccional
                         </td>
+                        <td>Peso</td>
                         {#{dump(votos)}#}
                         {% for clave,item in votos|first %}
                             <td style="font-size:12px;">
@@ -46,12 +47,17 @@
                     {% for clave,item in votos %}
                         <tr class="odd gradeX" id="r_{{loop.index}}">
                             <td style="width:400px;">
-                                {{ clave }}
+                                {{  seccionales[clave].nombre  }}
+                            </td> 
+                            <td style="width:400px;">
+                                {{ seccionales[clave].electores }} ({{ seccionales[clave].peso }}%)
                             </td> 
                             {% set total=0 %}
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
-                                    {{item2}}{%if loop.index>1%}%{%endif%}
+                                    {%if loop.index>1%}{{item2}}% 
+                                        ({{(item2 * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%)
+                                     {%else%}{{item2}}{%endif%}
                                 </td>
                                 {%set total=total+item2 %}
                             {%endfor%}
@@ -62,6 +68,7 @@
                         <td style="width:300px;">
                             <b>TOTAL</b>
                         </td> 
+                        <td></td>
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 

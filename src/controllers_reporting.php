@@ -68,74 +68,27 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "SELECT sec.nombre,p.nombre_partido,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
-            . "FROM renglon r, mesa m, seccional sec, partido_lista p, cargo_local car "
-            . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-            . "and m.circuito_id=? and concejal>=0 and car.lista_id=r.lista_id "
-            . "and car.circuito_id=m.circuito_id and car.tipo='C' "
-            . "group by sec.nombre,p.id_partido,p.nombre_partido,p.id_lista,p.nombre_lista "
-            . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
-    $votos = $app['db']->fetchAll($sql, array((int) $id));
-    $resultado = $totales = array();
-    foreach ($votos as $item) {
-        $resultado[$item['nombre']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
-        if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
-            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] += $item['suma'];
-        else
-            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
-    }
-    //especiales
-    $sql = "SELECT sec.nombre,p.nombre_partido,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
-            . "FROM renglon r, mesa m, seccional sec, partido_lista p "
-            . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-            . "and m.circuito_id=? and concejal>=0 and p.especial=1 "
-            . "group by sec.nombre,p.id_partido,p.nombre_partido,p.id_lista,p.nombre_lista "
-            . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
-    $votos = $app['db']->fetchAll($sql, array((int) $id));
-    foreach ($votos as $item) {
-        $resultado[$item['nombre']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
-        if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
-            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] += $item['suma'];
-        else
-            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
-    }
+    require_once 'Concejales.php';
+    $concejales=new Concejales($id,$app);
+    //print_r($concejales->getSeccionales());
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
-    if ($tipo == 'votos') {
-        return $app['twig']->render('reporting/res_concejales_votos.html.twig', array('votos' => $resultado, 'circuito' => $circuito, 'totales' => $totales));
+   
+    if ($tipo == 'votos') { 
+        $resultado=$concejales->getResultados();
+        return $app['twig']->render('reporting/res_concejales_votos.html.twig', 
+                array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' =>$resultado['totales'],'seccionales'=>$concejales->getSeccionales()));
     }
     if ($tipo == 'porcentajes') {
-        $porcentajes = $totales_generales = array();
-        $general = 0;
-        foreach ($resultado as $clave => $valor) {
-            $suma = suma($valor);
-            $general += $suma;
-            $porcentajes[$clave]['EMITIDOS'] = $suma;
-            foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2] = round($valor2 / $suma*100, 2);
-            }
-        }
-        $totales_porcentajes['EMITIDOS'] = $general;
-        foreach ($totales as $clave => $valor) {
-            $totales_porcentajes[$clave] = round($valor / $general*100, 2);
-        }
-        return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', array('votos' => $porcentajes, 'circuito' => $circuito, 'totales' => $totales_porcentajes));
+        $resultado=$concejales->getPorcentajes();
+        //print_r($resultado);
+        return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', 
+                array('votos' => $resultado['porcentajes'], 'circuito' => $circuito, 
+                    'totales' => $resultado['totales_porcentajes'],'seccionales'=>$concejales->getSeccionales()));
     }
     if ($tipo == 'graficos') {
-        $porcentajes = $totales_generales = array();
-        $general = 0;
-        foreach ($resultado as $clave => $valor) {
-            $suma = suma($valor);
-            $general += $suma;
-            $porcentajes[$clave]['EMITIDOS'] = $suma;
-            foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2] = round($valor2 / $suma*100, 2);
-            }
-        }
-        $totales_porcentajes['EMITIDOS'] = $general;
-        foreach ($totales as $clave => $valor) {
-            $totales_porcentajes[$clave] = round($valor / $general*100, 2);
-        }
-        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('votos' => $porcentajes, 'circuito' => $circuito, 'totales' => $totales_porcentajes));
+         $resultado=$concejales->getPorcentajes();
+        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', 
+                array('votos' =>  $resultado['porcentajes'], 'circuito' => $circuito, 'totales' =>  $resultado['totales_porcentajes']));
     }
 })->bind('rep_concejales_seccional');
 
