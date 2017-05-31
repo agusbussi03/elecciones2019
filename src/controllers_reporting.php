@@ -90,6 +90,14 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app['twig']->render('reporting/res_concejales_grafico.html.twig', 
                 array('votos' =>  $resultado['porcentajes'], 'circuito' => $circuito, 'totales' =>  $resultado['totales_porcentajes']));
     }
+    if ($tipo == 'distribucion') {
+         $resultado=$concejales->getDistribucion();
+        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
+                array('votos' =>  $resultado['porcentajes'], 'circuito' => $circuito, 'totales' =>  $resultado['totales_porcentajes']));
+    }
+    
+    
+    
 })->bind('rep_concejales_seccional');
 
 function suma($item) {

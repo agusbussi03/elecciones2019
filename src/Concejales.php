@@ -47,43 +47,85 @@ class Concejales {
             else
                 $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']] = $item['suma'];
         }
-        return(array('votos'=>$resultado,'totales'=>$totales));
+        return(array('votos' => $resultado, 'totales' => $totales));
     }
-    
-    function getPorcentajes(){
+
+    function getPorcentajes() {
         $porcentajes = $totales_porcentajes = array();
-        $general=0;
-        $resultado=$this->getResultados();
-         foreach ($resultado['votos'] as $clave => $valor) {
+        $general = 0;
+        $resultado = $this->getResultados();
+        foreach ($resultado['votos'] as $clave => $valor) {
             $suma = suma($valor);
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2] = round($valor2 / $suma*100, 2);
+                $porcentajes[$clave][$clave2] = $valor2 / $suma * 100;
             }
         }
         $totales_porcentajes['EMITIDOS'] = $general;
         foreach ($resultado['totales'] as $clave => $valor) {
-            $totales_porcentajes[$clave] = round($valor / $general*100, 2);
+            $totales_porcentajes[$clave] = $valor / $general * 100;
         }
-         return(array('porcentajes'=>$porcentajes,'totales_porcentajes'=>$totales_porcentajes));
+        return(array('porcentajes' => $porcentajes, 'totales_porcentajes' => $totales_porcentajes));
     }
-    
-      function getSeccionales(){
-        $sql = "SELECT * FROM seccional WHERE circuito_id=?";
-        $total=0;
-        $resultado=array();
-        $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
-        foreach($seccionales as $item){
-            $total+=$item['electores_provincia'];
-        }
-        foreach($seccionales as $item){
-            $resultado[$item['id']]=array('id'=>$item['id'],'nombre'=>$item['nombre'],
-                'electores'=>$item['electores_provincia'],'peso'=>round($item['electores_provincia']/$total*100,2));
-        }
+
+    function getDistribucion() {
+        $resultado=$this->getPorcentajes();
+        $resultado=$resultado['porcentajes'];
+        $seccionales= $this->getSeccioniales();
+        $sql = "SELECT * FROM circuito WHERE id=?  ";
+        $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        $titulares=$circuito['conc_titulares'];
+        $suplentes=$circuito['conc_suplentes'];
+        print_r($resultado);
+        print_r($seccionales);
+        $porcentajes_peso=array();
+         foreach($resultado as $clave=>$item){
+             foreach($item as $clave2=>$item2){
+                 if ($clave2!='EMITIDOS' && $clave2!='BLANCOS--' &&$clave2!='NULOS--' &&$clave2!='OTROS--'){
+                     if (!isset($porcentajes_peso[$clave2])) $porcentajes_peso[$clave2]=$item2*$seccionales[$clave]['peso']/100;
+                     else $porcentajes_peso[$clave2]+=$item2*$seccionales[$clave]['peso']/100;
+                 }
+             }
+         }
+         print_r($porcentajes_peso);
+         $dhont=array();
+         $total_concejales=$titulares+$suplentes;
+         $i=1; 
+         while ($i<=$total_concejales){
+             foreach ($porcentajes_peso as $clave=>$item){
+                 $dhont[]=array('partido'=>$clave,'orden'=>$i,"valor"=>$item/$i);  
+             }
+             $i++;
+         }
+         print_r($dhont);
+         $primaria=FALSE;
+         
+         if ($primaria){
+             
+         }else{
+             /////////////// GENERAL'
+            // print_r($resultado);
+            // print_r($seccionales);
+             
+         }
         
-         return($resultado);
+         
     }
-    
+
+    function getSeccioniales() {
+        $sql = "SELECT * FROM seccional WHERE circuito_id=?";
+        $total = 0;
+        $resultado = array();
+        $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($seccionales as $item) {
+            $total += $item['electores_provincia'];
+        }
+        foreach ($seccionales as $item) {
+            $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 2));
+        }
+        return($resultado);
+    }
 
 }
