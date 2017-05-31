@@ -93,7 +93,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     if ($tipo == 'distribucion') {
          $resultado=$concejales->getDistribucion();
         return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
-                array('votos' =>  $resultado['porcentajes'], 'circuito' => $circuito, 'totales' =>  $resultado['totales_porcentajes']));
+                array('circuito' => $circuito, 'totales' =>  $resultado));
     }
     
     

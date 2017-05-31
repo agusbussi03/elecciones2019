@@ -70,50 +70,55 @@ class Concejales {
     }
 
     function getDistribucion() {
-        $resultado=$this->getPorcentajes();
-        $resultado=$resultado['porcentajes'];
-        $seccionales= $this->getSeccioniales();
+        $resultado = $this->getPorcentajes();
+        $resultado = $resultado['porcentajes'];
+        $seccionales = $this->getSeccionales();
         $sql = "SELECT * FROM circuito WHERE id=?  ";
         $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
-        $titulares=$circuito['conc_titulares'];
-        $suplentes=$circuito['conc_suplentes'];
-        print_r($resultado);
-        print_r($seccionales);
-        $porcentajes_peso=array();
-         foreach($resultado as $clave=>$item){
-             foreach($item as $clave2=>$item2){
-                 if ($clave2!='EMITIDOS' && $clave2!='BLANCOS--' &&$clave2!='NULOS--' &&$clave2!='OTROS--'){
-                     if (!isset($porcentajes_peso[$clave2])) $porcentajes_peso[$clave2]=$item2*$seccionales[$clave]['peso']/100;
-                     else $porcentajes_peso[$clave2]+=$item2*$seccionales[$clave]['peso']/100;
-                 }
-             }
-         }
-         print_r($porcentajes_peso);
-         $dhont=array();
-         $total_concejales=$titulares+$suplentes;
-         $i=1; 
-         while ($i<=$total_concejales){
-             foreach ($porcentajes_peso as $clave=>$item){
-                 $dhont[]=array('partido'=>$clave,'orden'=>$i,"valor"=>$item/$i);  
-             }
-             $i++;
-         }
-         print_r($dhont);
-         $primaria=FALSE;
-         
-         if ($primaria){
-             
-         }else{
-             /////////////// GENERAL'
+        $titulares = $circuito['conc_titulares'];
+        $suplentes = $circuito['conc_suplentes'];
+        //print_r($resultado);
+        //print_r($seccionales);
+        $porcentajes_peso = array();
+        foreach ($resultado as $clave => $item) {
+            foreach ($item as $clave2 => $item2) {
+                if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {
+                    if (!isset($porcentajes_peso[$clave2]))
+                        $porcentajes_peso[$clave2] = $item2 * $seccionales[$clave]['peso'] / 100;
+                    else
+                        $porcentajes_peso[$clave2] += $item2 * $seccionales[$clave]['peso'] / 100;
+                }
+            }
+        }
+        //print_r($porcentajes_peso);
+        $dhont = array();
+        $total_concejales = $titulares + $suplentes;
+        $i = 1;
+        $partidos= $this->getPartidos();
+        //print_r($partidos);
+        while ($i <= $total_concejales) {
+            foreach ($porcentajes_peso as $clave => $item) {
+                $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item / $i,"logo"=> buscarfoto($partidos, $clave));
+            }
+            $i++;
+        }
+        usort($dhont, 'ordena_dhont');
+        $dhont = array_slice($dhont, 0, $total_concejales);
+        //print_r($dhont);
+        $primaria = FALSE;
+
+        if ($primaria) {
+            
+        } else {
+            /////////////// GENERAL'
             // print_r($resultado);
             // print_r($seccionales);
-             
-         }
-        
-         
+        }
+
+        return($dhont);
     }
 
-    function getSeccioniales() {
+    function getSeccionales() {
         $sql = "SELECT * FROM seccional WHERE circuito_id=?";
         $total = 0;
         $resultado = array();
@@ -128,4 +133,28 @@ class Concejales {
         return($resultado);
     }
 
+    function getPartidos() {
+        $sql = "SELECT * FROM partido_lista,cargo_local "
+                . "where partido_lista.id=cargo_local.lista_id and cargo_local.circuito_id=?";
+        $partidos = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        $resultado=array();
+        
+        return($partidos);
+    }
+
+}
+
+function ordena_dhont($a, $b) { {
+        if ($a['valor'] == $b['valor']) {
+            return 0;
+        }
+        return ($a['valor'] > $b['valor']) ? -1 : 1;
+    }
+}
+function buscarfoto($partido,$patron){
+    foreach($partido as $item){
+        if ($item['nombre_partido']."-".$item['id_lista']."-".$item['nombre_lista']==$patron) 
+                return base64_encode($item['logo']);
+    }
+    return "";
 }
