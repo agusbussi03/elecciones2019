@@ -30,7 +30,8 @@
                                         <th>Direccion</th>
                                         <th>Telefono</th>
                                         <th>Contacto</th>
-                                        <th>Coordenadas</th>
+                                        <th>Mesas</th>
+                                        <th>Coords</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -41,6 +42,7 @@
                                             <td>{{item.direccion}}</td>
                                             <td>{{item.telefono}}</td>
                                             <td>{{item.contacto}}</td>
+                                            <td>{{item.mesadesde}}-{{item.mesahasta}}</td>
                                             <td>{{item.lat}},{{item.lon}}</td>
                                             <td>
                                                 <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('local_edit',{'id':item.id}) }}';">Editar</button>

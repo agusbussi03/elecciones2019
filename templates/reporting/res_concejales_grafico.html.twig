@@ -22,14 +22,18 @@
                 <h1 class="page-header">Concejales {{circuito.nombre}}- PORCENTAJES</h1>
             </div>
             <div style='float: right;width:35%'>
-                <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
-                <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
-                <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
-            <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
+           <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('homepage') }}';">Home</button>
             </div>
         </div>
 

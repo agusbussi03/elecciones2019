@@ -27,9 +27,9 @@
                                 <thead>
                                     <tr>
                                         <th>Nro. P.</th>
-                                        <th>Partido></th><th>Nro. L.</th>
+                                        <th>Partido</th><th>Nro. L.</th>
                                         <th>Lista</th>
-                                        <th></th> <th></th>
+                                        <th></th> <th></th><th>Provincia</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,7 +46,8 @@
                                                     <input name="logo" type="file">
                                                 <button type="submit" class="btn btn-primary">Subir logo</button>
                                                 </form>
-                                               </td>
+                                            </td>
+                                            <td>{{item.provincia_id}}</td>
                                         </tr>
                                     {% endfor %}
 

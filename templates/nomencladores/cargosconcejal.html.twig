@@ -6,11 +6,13 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Cargos Concejal {{circuito.nombre}}</h1>
-                <a href="{{ path('circuitos',{'seccion':circuito.seccion_id}) }}">volver</a>
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-12">                
+                <ol class="breadcrumb">
+                    <li><a href='{{ path('circuitos',{'seccion':circuito.seccion_id}) }}'>VOLVER A {{circuito.nombre}}</a></li>
+                </ol>
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <form action="filtrosgobernador" method="POST">

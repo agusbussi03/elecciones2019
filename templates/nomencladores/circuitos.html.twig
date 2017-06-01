@@ -4,11 +4,16 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Circuitos</h1>
+                <h1 class="page-header">Localidades / Circuitos</h1>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-12">
+                                <ol class="breadcrumb">
+                    <li><a href='{{ path('provincia',{'provincia':breadcumb.provincia_id}) }}'>{{breadcumb.provincia_nombre}}</a></li>
+                     <li><a href='{{ path('secciones',{'provincia':breadcumb.provincia_id}) }}'>DEPARTAMENTOS DE {{breadcumb.provincia_nombre}}</a></li>
+                      <li class="active">{{breadcumb.seccion_nombre}}</li>
+                </ol>
                 {% if mensaje is defined %}
                     <div {% if mensaje.codigo==0 %}class="alert alert-success alert-dismissable"
                     {%endif%}

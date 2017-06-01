@@ -69,35 +69,33 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require_once 'Concejales.php';
-    $concejales=new Concejales($id,$app);
+    $concejales = new Concejales($id, $app);
     //print_r($concejales->getSeccionales());
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
-   
-    if ($tipo == 'votos') { 
-        $resultado=$concejales->getResultados();
-        return $app['twig']->render('reporting/res_concejales_votos.html.twig', 
-                array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' =>$resultado['totales'],'seccionales'=>$concejales->getSeccionales()));
+
+    if ($tipo == 'votos') {
+        $resultado = $concejales->getResultados();
+        return $app['twig']->render('reporting/res_concejales_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'seccionales' => $concejales->getSeccionales()));
     }
     if ($tipo == 'porcentajes') {
-        $resultado=$concejales->getPorcentajes();
-        //print_r($resultado);
-        return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', 
-                array('votos' => $resultado['porcentajes'], 'circuito' => $circuito, 
-                    'totales' => $resultado['totales_porcentajes'],'seccionales'=>$concejales->getSeccionales()));
+        $resultado = $concejales->getPorcentajes();
+        return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $resultado['totales_porcentajes'], 'seccionales' => $concejales->getSeccionales()));
+    }
+    if ($tipo == 'porcentajes_ponderado') {
+        $total_ponderado = $concejales->getPorcentajeponderado();
+         $resultado = $concejales->getPorcentajes();
+        return $app['twig']->render('reporting/res_concejales_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $total_ponderado, 'seccionales' => $concejales->getSeccionales()));
     }
     if ($tipo == 'graficos') {
-         $resultado=$concejales->getPorcentajes();
-        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', 
-                array('votos' =>  $resultado['porcentajes'], 'circuito' => $circuito, 'totales' =>  $resultado['totales_porcentajes']));
+        $resultado = $concejales->getPorcentajes();
+        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito, 'totales' => $resultado['totales_porcentajes']));
     }
     if ($tipo == 'distribucion') {
-         $resultado=$concejales->getDistribucion();
-        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
-                array('circuito' => $circuito, 'totales' =>  $resultado));
+        $resultado = $concejales->getDistribucion();
+        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));
     }
-    
-    
-    
 })->bind('rep_concejales_seccional');
 
 function suma($item) {

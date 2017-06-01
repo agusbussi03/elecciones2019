@@ -69,16 +69,11 @@ class Concejales {
         return(array('porcentajes' => $porcentajes, 'totales_porcentajes' => $totales_porcentajes));
     }
 
-    function getDistribucion() {
+    
+    function getPorcentajeponderado(){
+        $seccionales = $this->getSeccionales();
         $resultado = $this->getPorcentajes();
         $resultado = $resultado['porcentajes'];
-        $seccionales = $this->getSeccionales();
-        $sql = "SELECT * FROM circuito WHERE id=?  ";
-        $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
-        $titulares = $circuito['conc_titulares'];
-        $suplentes = $circuito['conc_suplentes'];
-        //print_r($resultado);
-        //print_r($seccionales);
         $porcentajes_peso = array();
         foreach ($resultado as $clave => $item) {
             foreach ($item as $clave2 => $item2) {
@@ -90,7 +85,16 @@ class Concejales {
                 }
             }
         }
-        //print_r($porcentajes_peso);
+        return($porcentajes_peso);
+    }
+    
+    function getDistribucion() {
+        
+        $porcentajes_peso= $this->getPorcentajeponderado();
+        $sql = "SELECT * FROM circuito WHERE id=?  ";
+        $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        $titulares = $circuito['conc_titulares'];
+        $suplentes = $circuito['conc_suplentes'];
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;

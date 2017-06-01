@@ -8,14 +8,18 @@
                 <h1 class="page-header">Concejales {{circuito.nombre}}- PORCENTAJES</h1>
             </div>
             <div style='float: right;width:35%'>
-                <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
-                 <button type="button" class="btn btn-outline btn-primary btn-lg"
-                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
-                  <button type="button" class="btn btn-outline btn-primary btn-lg"
-                          onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
-            <button type="button" class="btn btn-outline btn-primary btn-lg"
+                <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
+           <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('homepage') }}';">Home</button>
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -58,7 +62,6 @@
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
                                     {%if loop.index>1%}{{item2|number_format(2, '.', ',')}}% 
-                                        ({{(item2 * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%)
                                      {%else%}{{item2}}{%endif%}
                                 </td>
                                 {%set total=total+item2 %}
