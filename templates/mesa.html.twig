@@ -11,6 +11,9 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Mesa {{ mesa.numero }}</h1>
+                <li>
+                    <a href="{{ path('mesanacional',{'nro':mesa.numero}) }}">Mesas nacional</a>
+                </li>
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -61,101 +64,101 @@
                                             {%if configuracion.intermedia==1%}
                                                 <td>
                                                     {% if 'G' in item.cargos %}
-                                                         {% set total_gobernador=total_gobernador+votos[item.datos.id].gobernador%}
-                                                         {{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if 'D' in item.cargos %}
-                                                         {% set total_diputado=total_diputado+votos[item.datos.id].diputado%}
-                                                         {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
-                                                </td>
-                                                <td>
-                                                    {% if 'S' in item.cargos %}
-                                                         {% set total_senador=total_senador+votos[item.datos.id].senador%}
-                                                         {{votos[item.datos.id].senador}}{%else%}-{% endif %}
-                                                </td>
-                                            {%endif%}
+                                                        {% set total_gobernador=total_gobernador+votos[item.datos.id].gobernador%}
+                                                        {{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if 'D' in item.cargos %}
+                                                            {% set total_diputado=total_diputado+votos[item.datos.id].diputado%}
+                                                            {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
+                                                        </td>
+                                                        <td>
+                                                            {% if 'S' in item.cargos %}
+                                                                {% set total_senador=total_senador+votos[item.datos.id].senador%}
+                                                                {{votos[item.datos.id].senador}}{%else%}-{% endif %}
+                                                            </td>
+                                                        {%endif%}
 
-                                            <td>
-                                                {% if 'I' in item.cargos %}
-                                                    {% set total_intendente=total_intendente+votos[item.datos.id].intendente%}
-                                                    {{votos[item.datos.id].intendente}}{%else%}-{% endif %}
-                                            </td>                                              
+                                                        <td>
+                                                            {% if 'I' in item.cargos %}
+                                                                {% set total_intendente=total_intendente+votos[item.datos.id].intendente%}
+                                                                {{votos[item.datos.id].intendente}}{%else%}-{% endif %}
+                                                            </td>                                              
 
-                                            <td>
-                                                {% if 'C' in item.cargos %}
-                                                    {% set total_concejal=total_concejal+votos[item.datos.id].concejal%}
-                                                    {{votos[item.datos.id].concejal}}{%else%}-{% endif %}
-                                            </td> 
-                                        </tr>
-                                    {% endfor %}
+                                                            <td>
+                                                                {% if 'C' in item.cargos %}
+                                                                    {% set total_concejal=total_concejal+votos[item.datos.id].concejal%}
+                                                                    {{votos[item.datos.id].concejal}}{%else%}-{% endif %}
+                                                                </td> 
+                                                            </tr>
+                                                        {% endfor %}
 
-                                    <tr class="odd gradeX">
-                                        <td>TOTAL</td>
-                                        {% if configuracion.tipo==0%}
-                                            <td></td>
-                                        {%endif%} 
-                                        {%if configuracion.intermedia==1%}
-                                            <td>{{total_gobernador}}</td>
-                                            <td>{{total_diputado}}</td>
-                                            <td>{{total_senador}}</td>
-                                        {%endif%}
-                                        <td>{{total_intendente}}</td>                                              
-                                        <td>{{total_concejal}}
-                                        </td> 
-                                    </tr>
-
-
+                                                        <tr class="odd gradeX">
+                                                            <td>TOTAL</td>
+                                                            {% if configuracion.tipo==0%}
+                                                                <td></td>
+                                                            {%endif%} 
+                                                            {%if configuracion.intermedia==1%}
+                                                                <td>{{total_gobernador}}</td>
+                                                                <td>{{total_diputado}}</td>
+                                                                <td>{{total_senador}}</td>
+                                                            {%endif%}
+                                                            <td>{{total_intendente}}</td>                                              
+                                                            <td>{{total_concejal}}
+                                                            </td> 
+                                                        </tr>
 
 
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {%endif%}
-            </div>
 
-            {% endblock %}    
 
-                {% block final %}
-                    <!-- DataTables JavaScript -->
-                    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-                    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
-                    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
-                    <script>
-                        {#
-                
-                        $(window).bind('load', function () {
-                            $('img').each(function () {
-                                if ((typeof this.naturalWidth != "undefined" &&
-                                        this.naturalWidth == 0)
-                                        || this.readyState == 'uninitialized') {
-                                    $(this).attr('src', '{{asset('imagenes')}}/lol.png');
-                                }
-                            });
-                        });
-                        $(".btn-circle").click(function () {
-                            if (this.value == 1) {
-                                $.post("{{ path('filtro',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                    // validar retorno
-                                });
-                                this.value = 0;
-                                $(this).attr("class", 'btn btn-warning btn-circle');
-                                $(this).children().attr("class", "fa fa-times");
-                            } else {
-                                $.post("{{ path('filtro',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                    //validar retorno
-                                });
-                                this.value = 1;
-                                $(this).attr("class", 'btn btn-info btn-circle');
-                                $(this).children().attr("class", "fa fa-check");
-                            }
-                        });
-                    </script>
-                #}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {%endif%}
+                                </div>
 
-                    {% endblock %}
+                                {% endblock %}    
+
+                                    {% block final %}
+                                        <!-- DataTables JavaScript -->
+                                        <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+                                        <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+                                        <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+                                        <script>
+                                            {#
+                                    
+                                            $(window).bind('load', function () {
+                                                $('img').each(function () {
+                                                    if ((typeof this.naturalWidth != "undefined" &&
+                                                            this.naturalWidth == 0)
+                                                            || this.readyState == 'uninitialized') {
+                                                        $(this).attr('src', '{{asset('imagenes')}}/lol.png');
+                                                    }
+                                                });
+                                            });
+                                            $(".btn-circle").click(function () {
+                                                if (this.value == 1) {
+                                                    $.post("{{ path('filtro',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                        // validar retorno
+                                                    });
+                                                    this.value = 0;
+                                                    $(this).attr("class", 'btn btn-warning btn-circle');
+                                                    $(this).children().attr("class", "fa fa-times");
+                                                } else {
+                                                    $.post("{{ path('filtro',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                        //validar retorno
+                                                    });
+                                                    this.value = 1;
+                                                    $(this).attr("class", 'btn btn-info btn-circle');
+                                                    $(this).children().attr("class", "fa fa-check");
+                                                }
+                                            });
+                                        </script>
+                                    #}
+
+                                        {% endblock %}
 
 

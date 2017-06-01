@@ -95,7 +95,7 @@ class Mesa {
 
     function getMascara() {
 
-        $cargo_sql = "SELECT * FROM cargo_provincial c,partido_lista p WHERE provincia_id=? and c.lista_id=p.id ";
+        $cargo_sql = "SELECT * FROM cargo_provincial c,partido_lista p WHERE c.provincia_id=? and c.lista_id=p.id ";
         $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->provincia));
         $mascara = array();
         foreach ($cargos as $item) {

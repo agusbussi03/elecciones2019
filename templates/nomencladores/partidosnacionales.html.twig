@@ -30,7 +30,7 @@
                                         <th>Nro. P.</th>
                                         <th>Partido></th><th>Nro. L.</th>
                                         <th>Lista</th>
-                                        <th>Dipuatado</th>
+                                        <th>Diputado</th>
                                         <th>Senador</th>
                                     </tr>
                                 </thead> 
@@ -43,8 +43,8 @@
                                                 <td>{{item.nombre_partido}}</td>
                                                 <td>{{item.id_lista}}</td>
                                                 <td>{{item.nombre_lista}}</td>
-                                                <td><input type="checkbox" name="D,{{item.id}}" class="btn btn-primary"></td>
-                                                <td><input type="checkbox" name="S,{{item.id}}" class="btn btn-primary"></td>
+                                                <td><input type="checkbox" name="D,{{item.id}}" {%if item.diputado=='D'%}checked{%endif%} class="btn btn-primary"></td>
+                                                <td><input type="checkbox" name="S,{{item.id}}"  {%if item.senador=='S'%}checked{%endif%} class="btn btn-primary"></td>
                                             </tr>
                                         {% endfor %}
 

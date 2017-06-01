@@ -6,7 +6,7 @@
  */
 class MesaNacional {
 
-    private $nro = '';
+    private $numero = '';
     private $electo = '';
     private $testigo = '';
     private $usuario = '';
@@ -15,17 +15,17 @@ class MesaNacional {
 
     function __construct($nro, $app) {
         $this->app = $app;
-        $this->nro = $nro;
-        $datos = $this->app['db']->fetchAssoc("SELECT * from mesas where mesa=$this->nro");
-        if (!($datos['sec'] > 0))
+        $this->numero = $nro;
+        $datos = $this->app['db']->fetchAssoc("SELECT * from mesa where numero=$this->numero");
+        if (!($datos['id'] > 0))
             throw new Exception("Mesa no existe");
-        $this->electo = $datos['electo'];
-        $this->testigo = $datos['testigo'];
-        $this->usuario = $datos['usuario'];
+        $this->id=$datos['id'];
+        $this->electores = $datos['electores_nacion'];
+
     }
 
-    function getnro() {
-        return $this->nro;
+    function getNumero() {
+        return $this->numero;
     }
 
     function getElecto() {
@@ -41,27 +41,24 @@ class MesaNacional {
     }
 
     function getMascara() {
-        $sql = "SELECT * FROM actanacional";
-        $mascara = $this->app['db']->fetchAll($sql);
-        $blancos = $nulos = $otros = $mascara[0];
-        $blancos['pspar'] = 9997;
-        $blancos['partido'] = 'BLANCOS';
-        $blancos['pslista'] = 0;
-        $blancos['lista'] = '';
-        $nulos['pspar'] = 9998;
-        $nulos['partido'] = 'NULOS';
-        $nulos['pslista'] = 0;
-        $nulos['lista'] = '';
-        $otros['pspar'] = 9999;
-        $otros['partido'] = 'OTROS';
-        $otros['pslista'] = 0;
-        $otros['lista'] = '';
-        $blancos['diputado'] = $nulos['diputado'] = $otros['diputado'] = 1;
-        $blancos['senador'] = $nulos['senador'] = $otros['senador'] = 'R';
-        $mascara[] = $blancos;
-        $mascara[] = $nulos;
-        $mascara[] = $otros;
-        return array($mascara);
+         $cargo_sql = "SELECT * FROM cargo_nacional c,partido_lista_nacional p WHERE  c.lista_nacional_id=p.id ";
+        $cargos = $this->app['db']->fetchAll($cargo_sql, array());
+        $mascara = array();
+        foreach ($cargos as $item) {
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
+                'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
+        }
+        $cargo_sql = "SELECT * FROM partido_lista_nacional p WHERE p.especial=1 ";
+        $cargos = $this->app['db']->fetchAll($cargo_sql);
+        foreach ($cargos as $item) {
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
+                'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
+            $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"] = array( "D", "S");
+        }
+        ksort($mascara);
+        
+        return $mascara;
     }
 
     function procesar($datos) {
@@ -78,29 +75,27 @@ class MesaNacional {
     }
 
     function sumavotos() {
-        $sql = "SELECT count(*),sum(gob),sum(dip),sum(sen),sum(inte),sum(con),sum(mco) from renglon "
-                . "WHERE mesa=?";
-        $sumavotos = $this->app['db']->fetchArray($sql, array((int) $this->nro));
-        if ($sumavotos[0] == 0) {
-            $sql = "INSERT renglon SELECT ?,'',renglon,sec,cirnro,cirlet,pspar,parnombre,pslista,nombre,0,0,0,0,0,0,sortp,sortl 
-                    from actapartido WHERE sec=? and cirnro=? and cirlet=?";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-//// BLANCOS 
-            $sql = "INSERT renglon VALUES (?,'',97,?,?,?,9997,'BLANCOS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-//// NULOS
-            $sql = "INSERT renglon VALUES (?,'',98,?,?,?,9998,'NULOS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
-
-            //// OTROS
-            $sql = "INSERT renglon VALUES (?,'',99,?,?,?,9999,'OTROS',0,'',0,0,0,0,0,0,0,0);";
-            $this->app['db']->executeQuery($sql, array((int) $this->nro, (int) $this->sec, (int) $this->cirnro, $this->cirlet));
+        $sql = "SELECT count(*) as cuenta,sum(diputado),sum(senador) from renglon_nacional WHERE mesa_id=?";
+        $sumavotos = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        if ($sumavotos['cuenta'] == 0) {
+            $mascara = $this->getMascara();
+            foreach ($mascara as $item) {
+                $sql = "INSERT renglon_nacional (mesa_id,lista_nacional_id) VALUES (?,?)";
+                $this->app['db']->executeQuery($sql, array((int) $this->id, (int)$item['datos']['id']));
+            }
         }
         return $sumavotos;
     }
+ function votos() {
+        $sql = "SELECT * from renglon_nacional WHERE mesa_id=?";
+        $votos = array();
+        $resultado = $this->app['db']->fetchAll($sql, array((int) $this->id));
 
+        foreach ($resultado as $item) {
+            $votos[$item['lista_nacional_id']] = $item;
+        }
+        return $votos;
+    }
     function actualiza($votos) {
         $columnas = array('G' => 'gob', 'D' => 'dip', 'S' => 'sen', 'I' => 'inte', 'C' => 'con');
         foreach ($votos as $clave => $valor) {
@@ -109,25 +104,15 @@ class MesaNacional {
             $partido = $dato[1];
             $lista = $dato[2];
             $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
-            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->nro));
+            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->numero));
         }
         $sql = "insert into log (usuario,texto,datos) "
-                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->nro','" . print_r($votos, 1) . "');";
+                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->numero','" . print_r($votos, 1) . "');";
         $this->app['db']->executeQuery($sql);
         return;
     }
 
-    function setTestigo() {
-        $sql = "UPDATE mesas SET testigo=1 where mesa=$this->nro and tipo=''";
-        $this->app['db']->executeQuery($sql);
-        $this->testigo = 1;
-    }
-
-    function unsetTestigo() {
-        $sql = "UPDATE mesas SET testigo=0 where mesa=$this->nro and tipo=''";
-        $this->app['db']->executeQuery($sql);
-        $this->testigo = 0;
-    }
+   
 
     static function testigos($app) {
         $sql = "SELECT * FROM mesas where testigo=1";

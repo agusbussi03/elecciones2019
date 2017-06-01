@@ -163,8 +163,11 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
-    $mesa->getMascara();
-    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,  'configuracion' => new Configuracion($app)));
+    $mesa->sumavotos();
+     $votos = $mesa->votos();
+    $mascara=$mesa->getMascara();
+    //print_r($votos);
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,'votos' => $votos, 'mascara'=>$mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {

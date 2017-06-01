@@ -760,7 +760,9 @@ $app->get('/partidosnacionales', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $partidos = $app['db']->fetchAll("SELECT * FROM partido_lista_nacional");
+    $partidos = $app['db']->fetchAll("SELECT p.*,cnd.tipo as diputado,cns.tipo as senador  FROM partido_lista_nacional p "
+            . "LEFT JOIN (select * from cargo_nacional where tipo='D') cnd on p.id=cnd.lista_nacional_id "
+            . "LEFT JOIN (select * from cargo_nacional where tipo='S') cns on p.id=cns.lista_nacional_id ");
 
     return $app['twig']->render('nomencladores/partidosnacionales.html.twig', array('partidos' => $partidos));
 })->bind('partidosnacionales');
