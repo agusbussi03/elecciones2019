@@ -62,10 +62,10 @@
                             {% set total=0 %}
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
-                                    {%if loop.index>1%}{{(item2 * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%
+                                    {%if loop.index>1%}{{(item2.porcentaje * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%
                                      {%else%}{{item2}}{%endif%}
                                 </td>
-                                {%set total=total+item2 %}
+                                 {%if loop.index>1%}{%set total=total+item2.porcentaje %}{%endif%}
                             {%endfor%}
                             
                         </tr>
@@ -78,9 +78,9 @@
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 
-                                <b>{{item2|number_format(2, '.', ',')}}%</b>
+                                <b>{{item2.porcentaje|number_format(2, '.', ',')}}%</b>
                             </td>
-                            {%set total=total+item2 %}
+                            {%set total=total+item2.porcentaje %}
                         {%endfor%}
                         
                     </tr>

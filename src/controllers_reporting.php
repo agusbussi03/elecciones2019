@@ -79,18 +79,21 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     }
     if ($tipo == 'porcentajes') {
         $resultado = $concejales->getPorcentajes();
+        //echo "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS";
+       // print_r($resultado);
         return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $concejales->getSeccionales()));
     }
     if ($tipo == 'porcentajes_ponderado') {
         $total_ponderado = $concejales->getPorcentajeponderado();
-         $resultado = $concejales->getPorcentajes();
+        $resultado = $concejales->getPorcentajes();
         return $app['twig']->render('reporting/res_concejales_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $total_ponderado, 'seccionales' => $concejales->getSeccionales()));
     }
     if ($tipo == 'graficos') {
-        $resultado = $concejales->getPorcentajes();
-        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito, 'totales' => $resultado['totales_porcentajes']));
+        $resultado = $concejales->getPorcentajeponderado();
+        $partidos=$concejales->getPartidos();
+        return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('totales' => $resultado, 'circuito' => $circuito,'partidos'=>$partidos));
     }
     if ($tipo == 'distribucion') {
         $resultado = $concejales->getDistribucion();
@@ -101,7 +104,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
 function suma($item) {
     $suma = 0;
     foreach ($item as $i) {
-        $suma += $i;
+        $suma += $i['votos'];
     }
     return$suma;
 }

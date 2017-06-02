@@ -60,9 +60,9 @@
                             {% set total=0 %}
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
-                                    {{item2}}
+                                    {{item2.votos}}
                                 </td>
-                                {%set total=total+item2 %}
+                                {%set total=total+item2.votos %}
                             {%endfor%}
                             <td style="text-align: right">{{total}}</td>
                         </tr>
@@ -74,9 +74,9 @@
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 
-                                <b>{{item2}}</b>
+                                <b>{{item2.votos}}</b>
                             </td>
-                            {%set total=total+item2 %}
+                            {%set total=total+item2.votos %}
                         {%endfor%}
                         <td style="text-align: right;"><b>{{total}}</b></td>
                     </tr>
