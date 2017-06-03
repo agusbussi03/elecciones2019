@@ -155,6 +155,18 @@ class Mesa {
         return $sumavotos;
     }
 
+    function regenera() {
+        $mascara = $this->getMascara();
+        $sql = "DELETE FROM renglon WHERE mesa_id=?";
+            $this->app['db']->executeQuery($sql, array((int) $this->id));
+        foreach ($mascara as $item) {
+            $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
+            $this->app['db']->executeQuery($sql, array((int) $this->id, $item['datos']['id']));
+        }
+
+        return;
+    }
+
     function votos() {
         $sql = "SELECT * from renglon WHERE mesa_id=?";
         $votos = array();
@@ -197,10 +209,10 @@ class Mesa {
         $app['db']->executeQuery($sql);
     }
 
-    static function testigos($app) {
+    static function testigos($provincia,$app) {
         $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
                 . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
-                . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id ";
+                . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and p.id=$provincia";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }

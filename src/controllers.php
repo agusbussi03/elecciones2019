@@ -13,7 +13,8 @@ $app->get('/', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+   // return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+     return $app->redirect($app['url_generator']->generate('provincia'));
 })->bind('homepage');
 
 /* * ************** L O G I N *********************************** */
@@ -44,14 +45,14 @@ $app->post('/login', function () use ($app) {
     if ($mensaje != "")
         return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
     else {
-        //$_SESSION['usuario'] = $usuario;
+//$_SESSION['usuario'] = $usuario;
         $_SESSION['usuario'] = $usuario->getUsuario();
         $_SESSION['admin'] = $usuario->getAdmin();
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
         $app['twig']->addGlobal('session', $_SESSION);
-         return $app->redirect($app['url_generator']->generate('homepage'));
-      //  return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+        return $app->redirect($app['url_generator']->generate('homepage'));
+//  return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     }
 });
 
@@ -75,27 +76,28 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     }
     $mascara = $mesa->getMascara();
     $votos = $mesa->votos();
-    //print_r($mascara);print_r($votos);
+//print_r($mascara);print_r($votos);
     return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesa');
 
-$app->get('/mesastestigo', function () use ($app) {
+$app->get('/mesastestigo/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require 'Mesa.php';
-    $testigos = Mesa::testigos($app);
-    return $app['twig']->render('mesastestigo.html.twig', array('testigos' => $testigos));
+    $testigos = Mesa::testigos($provincia, $app);
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+    return $app['twig']->render('mesastestigo.html.twig', array('provincia'=>$provincia,'testigos' => $testigos));
 })->bind('mesastestigo');
 
 $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     require 'Mesa.php';
-    
+
     $seccionales = $app['db']->fetchAll("SELECT * from seccional where circuito_id=$circuito", array());
     $circuito = $app['db']->fetchAssoc("SELECT * from circuito where id=$circuito", array());
-    
+
     if (isset($_GET['nueva'])) {
-        Mesa::setTestigo($_GET['numero'], $_GET['electores_provincia'], $_GET['electores_nacion'], $circuito['id'],$_GET['seccional_id'], $app);
+        Mesa::setTestigo($_GET['numero'], $_GET['electores_provincia'], $_GET['electores_nacion'], $circuito['id'], $_GET['seccional_id'], $app);
     }
     if (isset($_GET['borrar'])) {
         Mesa::unsetTestigo($_GET['borrar'], $app);
@@ -164,15 +166,15 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $mesa->sumavotos();
-     $votos = $mesa->votos();
-    $mascara=$mesa->getMascara();
-    //print_r($votos);
-    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,'votos' => $votos, 'mascara'=>$mascara, 'configuracion' => new Configuracion($app)));
+    $votos = $mesa->votos();
+    $mascara = $mesa->getMascara();
+//print_r($votos);
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     require 'MesaNacional.php';
-    //require 'Filtros.php';
+//require 'Filtros.php';
     require 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
@@ -196,6 +198,21 @@ $app->post('/mesacarganacional/{nro}', function ($nro) use ($app) {
     return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
 })->bind('mesanacionalcarga_p');
 
+
+$app->get('/regenerarmesas/{provincia}', function ($provincia) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+    require 'MesaNacional.php';
+
+    $testigos = Mesa::testigos($provincia, $app);
+    print_r($testigos);
+    foreach ($testigos as $item) {
+        $mesa = new Mesa($item['numero'], $app);
+        $mesa->regenera();
+    }
+    return $app->redirect($app['url_generator']->generate('provincia'));
+})->bind('regenerarmesas');
 
 /* * ************** C O N F I G U  R A C I O N *********************************** */
 
@@ -221,7 +238,22 @@ $app->post('/configuracion', function () use ($app) {
     return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
 });
 
-
+$app->get('/backup', function () use ($app) {
+    $backup_file = "backup_" . date("Y-m-d-H-i-s") . '.gz';
+    $command = "mysqldump --opt -h " . $app['datos_conexion']['host'] . " -u " . $app['datos_conexion']['user'] . " -p" .
+            $app['datos_conexion']['password'] . "  " . $app['datos_conexion']['dbname'] . " | gzip > " . $backup_file;
+    system($command);
+    //header("Content-Type: image/png");
+header("Content-Length: " . filesize($backup_file));
+header('Content-Type: application/zip');
+header('Content-Disposition: attachment; filename="'.$backup_file.'"');
+    $fp = fopen($backup_file, 'rb');
+    fpassthru($fp);
+    require 'Configuracion.php';
+    $mensaje = 'Backup enviado';
+    $configuracion = new Configuracion($app);
+    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+})->bind('backup');
 /* * ************** U S U A R I O S *********************************** */
 
 $app->get('/usuarios', function () use ($app) {
@@ -264,7 +296,7 @@ $app->error(function (\Exception $e, Request $request, $code) use ($app) {
         return;
     }
 
-    // 404.html, or 40x.html, or 4xx.html, or error.html
+// 404.html, or 40x.html, or 4xx.html, or error.html
     $templates = array(
         'errors/' . $code . '.html.twig',
         'errors/' . substr($code, 0, 2) . 'x.html.twig',

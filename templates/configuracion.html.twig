@@ -7,11 +7,9 @@
             <div class="col-lg-12">
                 <h1 class="page-header">Configuracion</h1>
             </div>
-            <!-- /.col-lg-12 -->
         </div>
-        <!-- /.row -->
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-6">
                 <div class="panel panel-default">
 
                     <div class="panel-heading">
@@ -57,29 +55,47 @@
                                         <input class="form-control" name="lista_principal" value="{{configuracion.lista_principal}}">
                                         <p class="help-block">Nro. de lista</p>
                                     </div>   
-                                       <div class="form-group">
+                                    <div class="form-group">
                                         <label>Senadores Nacionales</label>
                                         <select class="form-control" name="senadores_nacionales">
                                             <option value="0" {% if configuracion.senadores_nacionales==0 %} selected {% endif %}>No</option>
                                             <option value="1" {% if configuracion.senadores_nacionales==1 %} selected {% endif %}>Si</option>
                                         </select>
                                     </div>
-                                         <input type="submit" value="Grabar" class="btn btn-primary">
+                                    <input type="submit" value="Grabar" class="btn btn-primary">
                                 </form>
                             </div>
                         </div>
-                        <!-- /.table-responsive -->
-
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
             </div>
-            <!-- /.col-lg-12 -->
+
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Copia de seguridad
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <form role="form" action="{{path('configuracion')}}" method="POST">
+                                    <div class="form-group">
+                                        <label>Cargar datos</label>
+                                        <input type="file">
+                                    </div>
+                                    <input type="submit" disabled value="Grabar" class="btn btn-primary">
+                                </form>
+
+                                <li>
+                                    <a href="{{ path('backup') }}">Descargar Base de Datos</a>
+                                </li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- /.row -->
     </div>
-    <!-- /#wrapper -->
 
 
 

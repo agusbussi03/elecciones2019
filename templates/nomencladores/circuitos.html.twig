@@ -48,10 +48,10 @@
                                             <td>{{item.electores_nacion}}</td>
                                             <td>{{item.electores_provincia}}</td>
                                             <td> 
-                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('cargosintendente',{'circuito':item.id}) }}';">C. Intendente</button>
-                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('cargosconcejal',{'circuito':item.id}) }}';">C. Concejal</button>
-                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('testigo_accion',{'circuito':item.id}) }}';">Mesas</button>
-                                                <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('seccionales',{'circuito':item.id}) }}';">Seccionales</button>
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosintendente',{'circuito':item.id}) }}';">C. Intendente</button>
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosconcejal',{'circuito':item.id}) }}';">C. Concejal</button>
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('testigo_accion',{'circuito':item.id}) }}';">Mesas</button>
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('seccionales',{'circuito':item.id}) }}';">Seccionales</button>
                                    
                                                 <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('circuito_edit',{'id':item.id}) }}';">Editar</button>
                                                 <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('circuito_delete',{'seccion':seccion,'id':item.id}) }}';">Borrar</button>
@@ -78,8 +78,10 @@
                                 <input class="form-control" name="electores_nacion" type="number" size="4" min="1" >
                                 <label>Votantes Provinciales</label>
                                 <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
-                                <label>Intendente (1: si, 0:no)</label>
-                                <input class="form-control" name="intendente" type="number" size="4" min="0" max="1">
+                                <label>Intendente </label>
+                                <select name="intendente"><option value="0">NO</option><option value="1">SI</option>
+                                </select>
+                                <p></p>
                                 <label>Concejales titulares</label>
                                 <input class="form-control" name="conc_titulares" type="number" size="4" min="1">
                                 <label>Concejales suplentes</label>

@@ -65,11 +65,11 @@ class Concejales {
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2]['porcentaje'] = $valor2['votos'] / $suma * 100;
+                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma>0) ?$valor2['votos'] / $suma * 100:0;
                 $porcentajes[$clave][$clave2]['id'] = $valor2['id']; 
                 if (!isset($totales_porcentajes[$clave2]))
-                    $totales_porcentajes[$clave2]['porcentaje']= $valor2['votos'] / $suma * 100;
-                else $totales_porcentajes[$clave2]['porcentaje']+= $valor2['votos'] / $suma * 100;
+                    $totales_porcentajes[$clave2]['porcentaje']= ($suma>0)? $valor2['votos'] / $suma * 100:0;
+                else $totales_porcentajes[$clave2]['porcentaje']+= ($suma>0)? $valor2['votos'] / $suma * 100:0;
                 $totales_porcentajes[$clave2]['id']= $valor2['id'];
             }
         }

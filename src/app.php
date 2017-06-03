@@ -12,15 +12,18 @@ $app->register(new AssetServiceProvider());
 $app->register(new TwigServiceProvider());
 $app->register(new HttpFragmentServiceProvider());
 
-$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
-    'db.options' => array (
+$datos_conexion=array (
             'driver'    => 'pdo_mysql',
             'host'      => 'localhost',
             'dbname'    => 'elecciones',
             'user'      => 'root',
             'password'  => 'root',
             'charset'   => 'utf8mb4',
-)));
+);
+$app['datos_conexion']=$datos_conexion;
+
+$app->register(new Silex\Provider\DoctrineServiceProvider(), array(
+    'db.options' => $datos_conexion));
 session_start();
 if (!isset($_SESSION['usuario'])){
         $_SESSION['usuario']="";

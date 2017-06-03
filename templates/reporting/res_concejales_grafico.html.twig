@@ -77,16 +77,16 @@
         <div style="clear: both;height:5px;"></div>
 
             {% for clave,item in totales %}
-                {%if loop.index>1%}
+                {%if loop.index>0%}
                  <div class="container">   
                     <div style="width:60%;float:left;text-align:right;">
-                     <p style="float:left;font-size: 18px; font-weight: bold;margin-right: 5px; margin-top: 5px;width:90%;">{{clave}}</p></span>
+                     <p style="float:left;font-size: 18px; font-weight: bold;margin-right: 5px; margin-top: 13px;width:90%;">{{clave}}</p></span>
                     {%if partidos[item.id].logo!=""%}
                     <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="50px" style="float:right;"/>{%endif%}
 
                     </div>
                     <div style="width:30%;float:left;text-align:left;">
-                        <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje}}%</span></div></div>
+                        <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
                     </div>
                    </div> 
                     <div style="clear: both;height:5px;"></div>
