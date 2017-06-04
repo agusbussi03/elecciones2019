@@ -29,10 +29,12 @@
                                         <tr class="odd gradeX">
                                             <td>{{item.id_partido}}-{{item.nombre_partido}}</td>
                                             <td>{{item.id_lista}}-{{item.nombre_lista}}</td>
-                                            <td>                                                 
+                                            <td>   
+                                                {%if config.cerrada==0%}    
                                                 <button type="button" class="btn btn-danger" 
                                                         onclick="window.location.href = '{{ path('cargosintendente_delete',{'id':item.id}) }}';">Borrar</button>
-                                            </td>                                    
+                                            {%endif%}
+                                                </td>                                    
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -44,6 +46,7 @@
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
+                        {%if config.cerrada==0%}    
                         <form role="form" action="{{path('cargosintendente_add',{'id':circuito.id})}}" method="POST">
                             <select name="id_lista">
                                 {% for item in partido_lista %}
@@ -51,6 +54,8 @@
                                 {% endfor %}
                             </select>
                             <input type="submit" value="Grabar" class="btn btn-primary" />
+                        </form>
+                            {%endif%}
                     </div>              
                 </div>                 
             </div>

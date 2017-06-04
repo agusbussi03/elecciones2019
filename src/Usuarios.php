@@ -14,13 +14,14 @@ class Usuarios {
     private $admin = 0;
     private $carga = 0;
     private $lectura = 0;
+    private $provincia = 0;
     private $app;
 
     function __construct($app) {
         $this->app = $app;
     }
 
-    function grabar($datos) {
+   /* function grabar($datos) {
         $this->ano = $datos['ano'];
         $this->tipo = $datos['tipo'];
         $this->intermedia = $datos['intermedia'];
@@ -31,7 +32,7 @@ class Usuarios {
         $this->app['db']->executeQuery($sql, array((int) $this->ano, (int) $this->tipo, (int) $this->intermedia,
             (int) $this->partido_principal, (int) $this->lista_principal));
         return "Datos modificados";
-    }
+    }*/
 
     static function getAll($app) {
         return $app['db']->fetchAll("SELECT * FROM usuarios");
@@ -48,6 +49,7 @@ class Usuarios {
         $this->admin = $user['admin'];
         $this->lectura = $user['lectura'];
         $this->carga = $user['carga'];
+        $this->provincia = $user['provincia_id'];
         return "";
     }
 
@@ -82,5 +84,9 @@ class Usuarios {
     function getPassword() {
         return $this->password;
     }
+    function getProvincia() {
+        return $this->provincia;
+    }
+
 
 }

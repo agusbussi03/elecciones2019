@@ -29,9 +29,11 @@
                                         <tr class="odd gradeX">
                                             <td>{{item.id_partido}}-{{item.nombre_partido}}</td>
                                             <td>{{item.id_lista}}-{{item.nombre_lista}}</td>
-                                            <td>                                                 
-                                                <button type="button" class="btn btn-danger" 
-                                                        onclick="window.location.href = '{{ path('cargossenador_delete',{'id':item.id}) }}';">Borrar</button>
+                                            <td>              
+                                                {%if config.cerrada==0%}    
+                                                    <button type="button" class="btn btn-danger" 
+                                                            onclick="window.location.href = '{{ path('cargossenador_delete',{'id':item.id}) }}';">Borrar</button>
+                                                {%endif%}
                                             </td>                                    
                                         </tr>
                                     {% endfor %}
@@ -44,13 +46,16 @@
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <form role="form" action="{{path('cargossenador_add',{'id':seccion.id})}}" method="POST">
-                            <select name="id_lista">
-                                {% for item in partido_lista %}
-                                    <option value="{{item.id}}">{{item.id_partido}}-{{item.nombre_partido}} {{item.id_lista}}-{{item.nombre_lista}}</option>
-                                {% endfor %}
-                            </select>
-                            <input type="submit" value="Grabar" class="btn btn-primary" />
+                        {%if config.cerrada==0%}    
+                            <form role="form" action="{{path('cargossenador_add',{'id':seccion.id})}}" method="POST">
+                                <select name="id_lista">
+                                    {% for item in partido_lista %}
+                                        <option value="{{item.id}}">{{item.id_partido}}-{{item.nombre_partido}} {{item.id_lista}}-{{item.nombre_lista}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="submit" value="Grabar" class="btn btn-primary" />
+                            </form>
+                        {%endif%}
                     </div>              
                 </div>                 
             </div>

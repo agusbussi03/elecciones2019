@@ -9,12 +9,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 //Request::setTrustedProxies(array('127.0.0.1'));
 
 $app->get('/', function () use ($app) {
-    require 'Estado.php';
+    require_once'Estado.php';
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-   // return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
-     return $app->redirect($app['url_generator']->generate('provincia'));
+    return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
+    //  return $app->redirect($app['url_generator']->generate(''));
 })->bind('homepage');
 
 /* * ************** L O G I N *********************************** */
@@ -32,7 +32,7 @@ $app->get('/logout', function () use ($app) {
 })->bind('logout');
 
 $app->post('/login', function () use ($app) {
-    require 'Usuarios.php';
+    require_once'Usuarios.php';
     $mensaje = '';
     $usuario = new Usuarios($app);
     $resultado = $usuario->getByUsername($_POST['usuario']);
@@ -50,6 +50,7 @@ $app->post('/login', function () use ($app) {
         $_SESSION['admin'] = $usuario->getAdmin();
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
+        $_SESSION['provincia'] = $usuario->getProvincia();
         $app['twig']->addGlobal('session', $_SESSION);
         return $app->redirect($app['url_generator']->generate('homepage'));
 //  return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
@@ -63,8 +64,8 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    require 'Mesa.php';
-    require 'Configuracion.php';
+    require_once'Mesa.php';
+    require_once'Configuracion.php';
     $mensaje = "";
     try {
         $mesa = new Mesa($nro, $app);
@@ -84,14 +85,14 @@ $app->get('/mesastestigo/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    require 'Mesa.php';
+    require_once'Mesa.php';
     $testigos = Mesa::testigos($provincia, $app);
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    return $app['twig']->render('mesastestigo.html.twig', array('provincia'=>$provincia,'testigos' => $testigos));
+    return $app['twig']->render('mesastestigo.html.twig', array('provincia' => $provincia, 'testigos' => $testigos));
 })->bind('mesastestigo');
 
 $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
-    require 'Mesa.php';
+    require_once'Mesa.php';
 
     $seccionales = $app['db']->fetchAll("SELECT * from seccional where circuito_id=$circuito", array());
     $circuito = $app['db']->fetchAssoc("SELECT * from circuito where id=$circuito", array());
@@ -108,8 +109,8 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
 
 
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
-    require 'Mesa.php';
-    require 'Configuracion.php';
+    require_once'Mesa.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
     $categoria = 'G';
@@ -119,11 +120,9 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesacarga');
 
-
-
 $app->post('/mesacarga/{nro}', function ($nro) use ($app) {
-    require 'Mesa.php';
-    require 'Configuracion.php';
+    require_once'Mesa.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new Mesa($nro, $app);
     $mesa->actualiza($_POST);
@@ -132,14 +131,14 @@ $app->post('/mesacarga/{nro}', function ($nro) use ($app) {
 })->bind('mesacarga_p');
 
 $app->get('/mesacarga_elige', function () use ($app) {
-    require 'Configuracion.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $categorias = array();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias));
 })->bind('mesacarga_elige');
 
 $app->post('/mesacarga_elige', function () use ($app) {
-    require 'Mesa.php';
+    require_once'Mesa.php';
     $mensaje = "";
     $categorias = array('G', 'DN');
     $nro = $_POST['nro'];
@@ -161,36 +160,36 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    require 'MesaNacional.php';
-    require 'Configuracion.php';
+    require_once'MesaNacional.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $mesa->sumavotos();
     $votos = $mesa->votos();
     $mascara = $mesa->getMascara();
-//print_r($votos);
+    //print_r($mascara);
+    //print_r($votos);
     return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
-    require 'MesaNacional.php';
-//require 'Filtros.php';
-    require 'Configuracion.php';
+    require_once'MesaNacional.php';
+//require_once'Filtros.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $categoria = 'D';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
-    $mesa->getMascara();
-    $filtroscircuitos = Filtros::getFiltrosNacionales($app);
-    return $app['twig']->render('mesanacional_carga.html.twig', array('mesa' => $mesa, 'categoria' => $categoria, 'filtros' => $filtroscircuitos, 'configuracion' => new Configuracion($app)));
+    $mascara = $mesa->getMascara();
+    return $app['twig']->render('mesanacional_carga.html.twig', array('mascara' => $mascara, 'mesa' => $mesa, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacionalcarga');
 
 
 
-$app->post('/mesacarganacional/{nro}', function ($nro) use ($app) {
-    require 'MesaNacional.php';
-    require 'Configuracion.php';
+$app->post('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
+    require_once'MesaNacional.php';
+    require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
     $mesa->actualiza($_POST);
@@ -203,7 +202,7 @@ $app->get('/regenerarmesas/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require 'MesaNacional.php';
+    require_once'MesaNacional.php';
 
     $testigos = Mesa::testigos($provincia, $app);
     print_r($testigos);
@@ -221,7 +220,7 @@ $app->get('/configuracion', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require 'Configuracion.php';
+    require_once'Configuracion.php';
     $mensaje = '';
     $configuracion = new Configuracion($app);
     return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
@@ -231,7 +230,7 @@ $app->post('/configuracion', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require 'Configuracion.php';
+    require_once'Configuracion.php';
     $mensaje = 'Datos almacenados';
     $configuracion = new Configuracion($app);
     $configuracion->grabar($_POST);
@@ -244,12 +243,12 @@ $app->get('/backup', function () use ($app) {
             $app['datos_conexion']['password'] . "  " . $app['datos_conexion']['dbname'] . " | gzip > " . $backup_file;
     system($command);
     //header("Content-Type: image/png");
-header("Content-Length: " . filesize($backup_file));
-header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="'.$backup_file.'"');
+    header("Content-Length: " . filesize($backup_file));
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $backup_file . '"');
     $fp = fopen($backup_file, 'rb');
     fpassthru($fp);
-    require 'Configuracion.php';
+    require_once'Configuracion.php';
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
     return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
@@ -260,7 +259,7 @@ $app->get('/usuarios', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require 'Usuarios.php';
+    require_once'Usuarios.php';
     $mensaje = '';
     $usuarios = Usuarios::getAll($app);
     return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios, 'mensaje' => $mensaje));
@@ -270,7 +269,7 @@ $app->post('/usuario', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require 'Configuracion.php';
+    require_once'Configuracion.php';
     $mensaje = 'Datos almacenados';
     $configuracion = new Configuracion($app);
     $configuracion->grabar($_POST);

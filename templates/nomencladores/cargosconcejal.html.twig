@@ -31,12 +31,14 @@
                                         <tr class="odd gradeX">
                                             <td>{{item.id_partido}}-{{item.nombre_partido}}</td>
                                             <td>{{item.id_lista}}-{{item.nombre_lista}}</td>
-                                            
-                                             <td>{{item.apellido}} {{item.nombre}}</td>
-                                             <td>{%if item.foto|length >0 %}<img width='100px' src="data:image/png;base64,{{item.foto}}"{%endif%}</td>
-                                            <td>                                                 
-                                                <button type="button" class="btn btn-danger" 
-                                                        onclick="window.location.href = '{{ path('cargosconcejal_delete',{'id':item.id_cargo}) }}';">Borrar</button>
+
+                                            <td>{{item.apellido}} {{item.nombre}}</td>
+                                            <td>{%if item.foto|length >0 %}<img width='100px' src="data:image/png;base64,{{item.foto}}"{%endif%}</td>
+                                            <td>   
+                                                {%if config.cerrada==0%}    
+                                                    <button type="button" class="btn btn-danger" 
+                                                            onclick="window.location.href = '{{ path('cargosconcejal_delete',{'id':item.id_cargo}) }}';">Borrar</button>
+                                                {%endif%}
                                             </td>                                   
                                         </tr>
                                     {% endfor %}
@@ -49,13 +51,16 @@
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <form role="form" action="{{path('cargosconcejal_add',{'id':circuito.id})}}" method="POST">
-                            <select name="id_lista">
-                                {% for item in partido_lista %}
-                                    <option value="{{item.id}}">{{item.id_partido}}-{{item.nombre_partido}} {{item.id_lista}}-{{item.nombre_lista}}</option>
-                                {% endfor %}
-                            </select>
-                            <input type="submit" value="Grabar" class="btn btn-primary" />
+                        {%if config.cerrada==0%}    
+                            <form role="form" action="{{path('cargosconcejal_add',{'id':circuito.id})}}" method="POST">
+                                <select name="id_lista">
+                                    {% for item in partido_lista %}
+                                        <option value="{{item.id}}">{{item.id_partido}}-{{item.nombre_partido}} {{item.id_lista}}-{{item.nombre_lista}}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="submit" value="Grabar" class="btn btn-primary" />
+                            </form>
+                        {%endif%}
                     </div>              
                 </div>                 
             </div>

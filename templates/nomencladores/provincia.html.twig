@@ -47,14 +47,15 @@
 
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidos',{'provincia':item.id}) }}';">Partidos/Listas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidosnacionales',{'provincia':item.id}) }}';">Partidos/Listas Nacionales</button>
-
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':item.id}) }}';">Escuelas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigo',{'provincia':item.id}) }}';">Mesas Test.</button>
-                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se reconstruira la estructura de carga de todas las mesas. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('regenerarmesas',{'provincia':item.id}) }}';">Regenerar</button>
                                                 
-                                                
+                                    {%if config.cerrada==0%}              
+                                     <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se reconstruira la estructura de carga de todas las mesas. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('regenerarmesas',{'provincia':item.id}) }}';">Regenerar</button>
                                     <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
                                     <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('provincia_delete',{'id':item.id}) }}';">Borrar</button>
-                                    </td>
+                                    {%endif%}
+                                        </td>
                                     </tr>
                                 {% endfor %}
 
@@ -69,8 +70,9 @@
                     <div class="panel-heading">
                         Nueva provincia
                     </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
+                                               
+                    <div class="panel-body"> 
+                        {%if config.cerrada==0%}
                         <form role="form" action="{{path('provincia_add')}}" method="POST">
                             <div class="form-group">
                                 <label>Nombre</label>
@@ -84,7 +86,11 @@
                                 <input type="submit"  class="btn btn-primary" value="Crear nueva">
                             </div>
                         </form>
+                        {%else%}
+                            Configuracion cerrada
+                        {%endif%}
                     </div>
+                           
                 </div>
             </div>
         </div>

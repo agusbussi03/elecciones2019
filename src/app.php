@@ -31,9 +31,13 @@ if (!isset($_SESSION['usuario'])){
         $_SESSION['carga']=0;
         $_SESSION['lectura']=0;
 }
+    require 'Configuracion.php';
+
 $app['twig'] = $app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
     $twig->addGlobal('session', $_SESSION);
+    $twig->addGlobal('config', new Configuracion($app));
+    
     return $twig;
 });
 

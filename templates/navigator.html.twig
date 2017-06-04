@@ -13,7 +13,7 @@
     <!-- /.navbar-header -->
 
     <ul class="nav navbar-top-links navbar-right">
-        {{session.usuario}}
+        {{session.usuario}}({{session.provincia}})
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                 <i class="fa fa-user fa-fw"></i>
@@ -61,9 +61,7 @@
                         <li>
                             <a href="{{ path('provincia') }}">Provincia</a>
                         </li>
-                        <li>
-                            <a href="{{ path('locales') }}">Locales</a>
-                        </li>  
+                        
                         <li>
                             <a href="{{ path('geolocales') }}">Locales (GEO)</a>
                         </li>

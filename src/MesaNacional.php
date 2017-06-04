@@ -7,7 +7,7 @@
 class MesaNacional {
 
     private $numero = '';
-    private $electo = '';
+    private $electores_nacion = '';
     private $testigo = '';
     private $usuario = '';
     private $intendente = 0;
@@ -20,7 +20,7 @@ class MesaNacional {
         if (!($datos['id'] > 0))
             throw new Exception("Mesa no existe");
         $this->id=$datos['id'];
-        $this->electores = $datos['electores_nacion'];
+        $this->electores_nacion = $datos['electores_nacion'];
 
     }
 
@@ -28,11 +28,15 @@ class MesaNacional {
         return $this->numero;
     }
 
-    function getElecto() {
-        return $this->electo;
+    function getElectores_nacion() {
+        return $this->electores_nacion;
     }
 
-    function getTestigo() {
+    function getIntendente() {
+        return $this->intendente;
+    }
+
+        function getTestigo() {
         return $this->testigo;
     }
 
@@ -97,14 +101,14 @@ class MesaNacional {
         return $votos;
     }
     function actualiza($votos) {
-        $columnas = array('G' => 'gob', 'D' => 'dip', 'S' => 'sen', 'I' => 'inte', 'C' => 'con');
+        $columnas = array( 'D' => 'diputado', 'S' => 'senador');
+        unset($votos['total_votos']);
         foreach ($votos as $clave => $valor) {
             $dato = explode(",", $clave);
             $columna = $columnas[$dato[0]];
-            $partido = $dato[1];
-            $lista = $dato[2];
-            $sql = "UPDATE renglon set $columna=? where pspar=? and pslista=? and mesa=?";
-            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido, (int) $lista, (int) $this->numero));
+            $partido_lista = $dato[1];
+            $sql = "UPDATE renglon_nacional set $columna=? where lista_nacional_id=? and mesa_id=?";
+            $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido_lista, (int) $this->id));
         }
         $sql = "insert into log (usuario,texto,datos) "
                 . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->numero','" . print_r($votos, 1) . "');";

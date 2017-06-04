@@ -39,9 +39,11 @@
                                         <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
                                         <td>
+                                            {%if config.cerrada==0%}    
                                             <button type="button" class="btn btn-danger" 
                                                     onclick="window.location.href = '{{ path('testigo_accion',{'circuito':circuito.id}) }}?borrar={{item.id}}';">Borrar</button>
-                                        </td>
+                                       {%endif%}
+                                            </td>
                                     </tr>
                                 {% endfor %}
 
@@ -57,6 +59,7 @@
                     Nueva mesa testigo
                 </div>
                 <div class="panel-body">
+                    {%if config.cerrada==0%}    
                     <form role="form" action="{{path('testigo_accion',{'circuito':circuito.id})}}" method="GET">
                         <div class="form-group">
                             <label>Mesa</label>
@@ -78,6 +81,9 @@
                             <input type="submit"  class="btn btn-primary" name=nueva value="Crear">
                         </div>
                     </form>
+                            {%else%}
+                                Configuracion cerrada
+                            {%endif%}
                 </div>
             </div>
         </div>

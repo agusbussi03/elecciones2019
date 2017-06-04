@@ -43,8 +43,10 @@
                                         <td>{{item.mesa_desde}}-{{item.mesa_hasta}}</td>
                                         <td><button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('circuitos',{'seccion':item.id}) }}';">Localidades</button>
                                             <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargossenador',{'seccion':item.id}) }}';">C. Senador</button>
-                                            <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('seccion_edit',{'id':item.id}) }}';">Editar</button>
-                                            <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('seccion_delete',{'provincia':provincia,'id':item.id}) }}';">Borrar</button>
+                                            {%if config.cerrada==0%}    
+                                                <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('seccion_edit',{'id':item.id}) }}';">Editar</button>
+                                                <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('seccion_delete',{'provincia':provincia,'id':item.id}) }}';">Borrar</button>
+                                            {%endif%}
                                         </td>
 
                                     </tr>
@@ -60,21 +62,25 @@
                             Nueva seccion
                         </div>
                         <div class="panel-body">
-                            <form role="form" action="{{path('seccion_add',{'provincia':provincia})}}" method="POST">
-                                <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input class="form-control" name="nombre" type="text" size="40">
-                                    <label>Votantes Nacionales</label>
-                                    <input class="form-control" name="electores_nacion" type="number" size="4" min="1" >
-                                    <label>Votantes Provinciales</label>
-                                    <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
-                                    <label>Mesa desde</label>
-                                    <input class="form-control" name="mesa_desde" type="number" size="4" min="1">
-                                    <label>Mesa hasta</label>
-                                    <input class="form-control" name="mesa_hasta" type="number" size="4" min="1">
-                                    <input type="submit"  class="btn btn-primary" value="Crear nueva">
-                                </div>
-                            </form>
+                            {%if config.cerrada==0%}    
+                                <form role="form" action="{{path('seccion_add',{'provincia':provincia})}}" method="POST">
+                                    <div class="form-group">
+                                        <label>Nombre</label>
+                                        <input class="form-control" name="nombre" type="text" size="40">
+                                        <label>Votantes Nacionales</label>
+                                        <input class="form-control" name="electores_nacion" type="number" size="4" min="1" >
+                                        <label>Votantes Provinciales</label>
+                                        <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
+                                        <label>Mesa desde</label>
+                                        <input class="form-control" name="mesa_desde" type="number" size="4" min="1">
+                                        <label>Mesa hasta</label>
+                                        <input class="form-control" name="mesa_hasta" type="number" size="4" min="1">
+                                        <input type="submit"  class="btn btn-primary" value="Crear nueva">
+                                    </div>
+                                </form>
+                            {%else%}
+                                Configuracion cerrada
+                            {%endif%}
                         </div>
                     </div>
                 </div>
