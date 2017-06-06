@@ -20,7 +20,6 @@
                     {{mensaje.texto}} 
                 </div>
                 {% endif %}
-
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
@@ -44,12 +43,10 @@
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosgobernador',{'provincia':item.id}) }}';">C. Gobernador</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosdiputado',{'provincia':item.id}) }}';">C. Diputado</button>
 
-
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidos',{'provincia':item.id}) }}';">Partidos/Listas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidosnacionales',{'provincia':item.id}) }}';">Partidos/Listas Nacionales</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':item.id}) }}';">Escuelas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigo',{'provincia':item.id}) }}';">Mesas Test.</button>
-                                                
                                     {%if config.cerrada==0%}              
                                      <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se reconstruira la estructura de carga de todas las mesas. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('regenerarmesas',{'provincia':item.id}) }}';">Regenerar</button>
                                     <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
@@ -58,7 +55,6 @@
                                         </td>
                                     </tr>
                                 {% endfor %}
-
                                 </tbody>
                             </table>
                         </div>     
@@ -94,13 +90,8 @@
                 </div>
             </div>
         </div>
-
-
-
         {% endblock %}    
-
             {% block final %}
-                <!-- DataTables JavaScript -->
                 <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
@@ -111,8 +102,4 @@
                                             });
                                         });
                 </script>
-
-
             {% endblock %}
-
-

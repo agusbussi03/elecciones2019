@@ -589,10 +589,10 @@ $app->post('/local_edit/{id}', function ($id) use ($app) {
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
     }
-   
+
     $localeditado = $app['db']->fetchAssoc("SELECT * FROM locales where id=$id");
-    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=".$localeditado['provincia_id']); 
-    $locales = $app['db']->fetchAll('SELECT * FROM locales where provincia_id='.$provincia['id']);
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=" . $localeditado['provincia_id']);
+    $locales = $app['db']->fetchAll('SELECT * FROM locales where provincia_id=' . $provincia['id']);
     return $app['twig']->render('nomencladores/locales.html.twig', array('provincia' => $provincia, 'locales' => $locales, 'mensaje' => $mensaje));
 })->bind('local_editp');
 
@@ -679,8 +679,21 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
+    if (isset($_GET['borrar'])) {
+        $id_borrar = $_GET['borrar'];
+        $sql = "DELETE FROM renglon WHERE lista_id=?";
+        $app['db']->executeQuery($sql, array((int) $id_borrar));
+        $sql = "DELETE FROM cargo_local WHERE lista_id=?";
+        $app['db']->executeQuery($sql, array((int) $id_borrar));
+        $sql = "DELETE FROM cargo_departamental WHERE lista_id=?";
+        $app['db']->executeQuery($sql, array((int) $id_borrar));
+        $sql = "DELETE FROM cargo_provincial WHERE lista_id=?";
+        $app['db']->executeQuery($sql, array((int) $id_borrar));
+        $sql = "DELETE FROM partido_lista WHERE id=?";
+        $app['db']->executeQuery($sql, array((int) $id_borrar));
+    }
     $partidos = array();
-    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia");
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0");
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $partidos[] = $item;
@@ -688,6 +701,24 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partidos');
+
+$app->post('/partidos/{provincia}', function ($provincia) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+   $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?)";
+            $app['db']->executeQuery($sql, array( $_POST['id_partido'],$_POST['nombre_partido'],
+                    $_POST['id_lista'],$_POST['nombre_lista'],(int) $provincia));
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0");
+    foreach ($partidos2 as $item) {
+        $item['logo'] = base64_encode($item['logo']);
+        $partidos[] = $item;
+    }
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+    return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
+})->bind('partidosp');
+
+
 
 $app->post('/partido_logo/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
