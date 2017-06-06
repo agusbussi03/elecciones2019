@@ -9,10 +9,13 @@ class Concejales {
 
     private $id = 0;
     private $app;
+    private $seccionales = 0;
 
     function __construct($id, $app) {
         $this->app = $app;
         $this->id = $id;
+        $seccionales = $this->app['db']->fetchAssoc("SELECT count(*) as cuenta from seccional where circuito_id=?", array((int) $this->id));
+        $this->seccionales = $seccionales['cuenta'];
     }
 
     function getResultados() {
@@ -23,7 +26,16 @@ class Concejales {
                 . "and car.circuito_id=m.circuito_id and car.tipo='C' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+        if ($this->seccionales == 0) {
+            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,
+                    count(m.id) as cuenta 
+                    FROM renglon r, mesa m,partido_lista p, cargo_local car 
+                    WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=? and concejal>=0 and car.lista_id=r.lista_id 
+                    and car.circuito_id=m.circuito_id and car.tipo='C' group by 'LOCALIDAD','',p.id_partido,p.nombre_partido,
+                    p.id,p.id_lista,p.nombre_lista ORDER BY `p`.`id_partido` ASC, p.nombre_lista asc ";
+        }
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        //print_r($votos);
         $resultado = $totales = array();
         foreach ($votos as $item) {
             $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
@@ -42,6 +54,13 @@ class Concejales {
                 . "and m.circuito_id=? and concejal>=0 and p.especial=1 "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+        if ($this->seccionales == 0) {
+            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+                    . "FROM renglon r, mesa m, partido_lista p "
+                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and concejal>=0 and p.especial=1 "
+                    . "group by 'LOCALIDAD','1',p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
+                    . "ORDER BY p.id_partido ASC, p.nombre_lista asc ";
+        }
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($votos as $item) {
             $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
@@ -57,7 +76,7 @@ class Concejales {
 
     function getPorcentajes() {
         $porcentajes = $totales_porcentajes = array();
-        $totales_porcentajes['EMITIDOS'] =0;
+        $totales_porcentajes['EMITIDOS'] = 0;
         $general = 0;
         $resultado = $this->getResultados();
         foreach ($resultado['votos'] as $clave => $valor) {
@@ -65,20 +84,21 @@ class Concejales {
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma>0) ?$valor2['votos'] / $suma * 100:0;
-                $porcentajes[$clave][$clave2]['id'] = $valor2['id']; 
+                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                $porcentajes[$clave][$clave2]['id'] = $valor2['id'];
                 if (!isset($totales_porcentajes[$clave2]))
-                    $totales_porcentajes[$clave2]['porcentaje']= ($suma>0)? $valor2['votos'] / $suma * 100:0;
-                else $totales_porcentajes[$clave2]['porcentaje']+= ($suma>0)? $valor2['votos'] / $suma * 100:0;
-                $totales_porcentajes[$clave2]['id']= $valor2['id'];
+                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                else
+                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                $totales_porcentajes[$clave2]['id'] = $valor2['id'];
             }
         }
         $totales_porcentajes['EMITIDOS'] = $general;
-        /*foreach ($resultado['totales'] as $clave => $valor) {
-            $totales_porcentajes[$clave]['porcentaje'] = $valor['votos'] / $general * 100;
-             $totales_porcentajes[$clave]['id']=$valor['id'];
-        }
-        */
+        /* foreach ($resultado['totales'] as $clave => $valor) {
+          $totales_porcentajes[$clave]['porcentaje'] = $valor['votos'] / $general * 100;
+          $totales_porcentajes[$clave]['id']=$valor['id'];
+          }
+         */
         return(array('porcentajes' => $porcentajes, 'totales_porcentajes' => $totales_porcentajes));
     }
 
@@ -95,7 +115,7 @@ class Concejales {
                         $porcentajes_peso[$clave2]['porcentaje'] = $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
                     else
                         $porcentajes_peso[$clave2]['porcentaje'] += $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
-                   $porcentajes_peso[$clave2]['id']=$item2['id'];
+                    $porcentajes_peso[$clave2]['id'] = $item2['id'];
                 }
             }
         }
@@ -137,17 +157,26 @@ class Concejales {
     }
 
     function getSeccionales() {
-        $sql = "SELECT * FROM seccional WHERE circuito_id=?";
         $total = 0;
         $resultado = array();
-        $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
-        foreach ($seccionales as $item) {
-            $total += $item['electores_provincia'];
+        if ($this->seccionales > 0) {
+            $sql = "SELECT * FROM seccional WHERE circuito_id=?";
+            $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+            foreach ($seccionales as $item) {
+                $total += $item['electores_provincia'];
+            }
+            foreach ($seccionales as $item) {
+                $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                    'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 2));
+            }
+            
+        } else {   ///// NO TIENE SECCIONALES LA LOCALIDAD
+            $sql = "SELECT * FROM circuito WHERE id=?";
+            $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+            
+            return array("1" => array('id' => "1", "nombre" => $circuito['nombre'], 'electores' => $circuito['electores_provincia'], 'peso' => 100));
         }
-        foreach ($seccionales as $item) {
-            $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
-                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 2));
-        }
+
         return($resultado);
     }
 
@@ -157,9 +186,8 @@ class Concejales {
         $partidos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         $resultado = array();
         foreach ($partidos as $item) {
-            $item['logo']= base64_encode($item['logo']);
+            $item['logo'] = base64_encode($item['logo']);
             $resultado[$item['id']] = $item;
-            
         }
 
         return($resultado);
