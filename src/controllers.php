@@ -223,7 +223,13 @@ $app->get('/configuracion', function () use ($app) {
     require_once'Configuracion.php';
     $mensaje = '';
     $configuracion = new Configuracion($app);
-    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+    $directorio = "upload";
+    $gestor_dir = opendir($directorio);
+    while (false !== ($nombre_fichero = readdir($gestor_dir))) {
+        if (strpos($nombre_fichero, ".gz") > 0)
+            $ficheros[] = $nombre_fichero;
+    }
+    return $app['twig']->render('configuracion.html.twig', array('ficheros' => $ficheros, 'configuracion' => $configuracion, 'mensaje' => $mensaje));
 })->bind('configuracion');
 
 $app->post('/configuracion', function () use ($app) {
@@ -234,25 +240,59 @@ $app->post('/configuracion', function () use ($app) {
     $mensaje = 'Datos almacenados';
     $configuracion = new Configuracion($app);
     $configuracion->grabar($_POST);
-    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+    $directorio = "upload";
+    $gestor_dir = opendir($directorio);
+    while (false !== ($nombre_fichero = readdir($gestor_dir))) {
+        if (strpos($nombre_fichero, ".gz") > 0)
+            $ficheros[] = $nombre_fichero;
+    }
+    return $app['twig']->render('configuracion.html.twig', array('ficheros' => $ficheros, 'configuracion' => $configuracion, 'mensaje' => $mensaje));
 });
 
 $app->get('/backup', function () use ($app) {
-    $backup_file = "backup_" . date("Y-m-d-H-i-s") . '.gz';
+    $backup_file = "upload/" . $_GET['archivo'] . '.gz';
+    $backup_file = str_replace(" ", "_", $backup_file);
     $command = "mysqldump --opt -h " . $app['datos_conexion']['host'] . " -u " . $app['datos_conexion']['user'] . " -p" .
             $app['datos_conexion']['password'] . "  " . $app['datos_conexion']['dbname'] . " | gzip > " . $backup_file;
     system($command);
-    //header("Content-Type: image/png");
-    header("Content-Length: " . filesize($backup_file));
-    header('Content-Type: application/zip');
-    header('Content-Disposition: attachment; filename="' . $backup_file . '"');
-    $fp = fopen($backup_file, 'rb');
-    fpassthru($fp);
     require_once'Configuracion.php';
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
-    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
+    $directorio = "upload";
+    $gestor_dir = opendir($directorio);
+    while (false !== ($nombre_fichero = readdir($gestor_dir))) {
+        if (strpos($nombre_fichero, ".gz") > 0)
+            $ficheros[] = $nombre_fichero;
+    }
+    return $app['twig']->render('configuracion.html.twig', array('ficheros' => $ficheros, 'configuracion' => $configuracion, 'mensaje' => $mensaje));
 })->bind('backup');
+
+$app->get('/restore', function () use ($app) {
+    $backup_file = "upload/" . $_GET['archivo'];
+    if (!file_exists($backup_file))
+        die("ERROR");
+
+    $command = "mysqldump -u" . $app['datos_conexion']['user'] . " -p" . $app['datos_conexion']['password'] . " --add-drop-table --no-data " .
+            $app['datos_conexion']['dbname'] . " | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | " .
+            "mysql -u" . $app['datos_conexion']['user'] . " -p" . $app['datos_conexion']['password'] . " " . $app['datos_conexion']['dbname'];
+    system($command);
+
+    $command = "zcat $backup_file | mysql -u" . $app['datos_conexion']['user'] . " -p" . $app['datos_conexion']['password'] . " " .
+            $app['datos_conexion']['dbname'];
+    system($command);
+    require_once'Configuracion.php';
+    $mensaje = 'Backup enviado';
+    $configuracion = new Configuracion($app);
+    $directorio = "upload";
+    $gestor_dir = opendir($directorio);
+    while (false !== ($nombre_fichero = readdir($gestor_dir))) {
+        if (strpos($nombre_fichero, ".gz") > 0)
+            $ficheros[] = $nombre_fichero;
+    }
+    return $app['twig']->render('configuracion.html.twig', array('ficheros' => $ficheros, 'configuracion' => $configuracion, 'mensaje' => $mensaje));
+})->bind('restore');
+
+
 /* * ************** U S U A R I O S *********************************** */
 
 $app->get('/usuarios', function () use ($app) {

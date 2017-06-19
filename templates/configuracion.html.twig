@@ -62,7 +62,7 @@
                                             <option value="1" {% if configuracion.senadores_nacionales==1 %} selected {% endif %}>Si</option>
                                         </select>
                                     </div>
-                                         <div class="form-group">
+                                    <div class="form-group">
                                         <label>Configuracion cerrada</label>
                                         <select class="form-control" name="cerrada">
                                             <option value="0" {% if configuracion.cerrada==0 %} selected {% endif %}>No</option>
@@ -85,17 +85,23 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-6">
-                                <form role="form" action="{{path('configuracion')}}" method="POST">
-                                    <div class="form-group">
-                                        <label>Cargar datos</label>
-                                        <input type="file">
-                                    </div>
-                                    <input type="submit" disabled value="Grabar" class="btn btn-primary">
-                                </form>
+
 
                                 <li>
-                                    <a href="{{ path('backup') }}">Descargar Base de Datos</a>
-                                </li>
+                                    <form action="{{ path('backup') }}" method="GET">
+                                        <label>Nombre archivo:</label>
+                                        <input class="form-control" name="archivo" value=""/>
+                                        <input type="submit" value="Guardar" class="btn btn-primary"/>
+                                    </form>
+                                        
+                                       
+                                </li> 
+                                <h2>Elecciones guardadas</h2>
+                                {% for item in ficheros %}
+                                    <li>{{item}}
+                                     <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se restauraran los datos de este archivo. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('restore',{'archivo':item}) }}';">Restaurar</button>
+                                    </li>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
