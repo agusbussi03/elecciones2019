@@ -17,13 +17,20 @@ class Mesa {
     private $provincia = 0;
     private $provincia_nombre = '';
     private $seccional = 0;
-    private $intendente = 0;
+    private $intendente_elige = 0;
     private $app;
+    private $gobernador = 0;
+    private $diputado = 0;
+    private $senador = 0;
+    private $intendente = 0;
+    private $concejal = 0;
+    private $diputado_nacional = 0;
+    private $senador_nacional = 0;
 
     function __construct($numero, $app) {
         $this->app = $app;
         $this->numero = $numero;
-        $datos = $this->app['db']->fetchAssoc("SELECT m.*,c.id as c_id,c.nombre as c_nombre,c.intendente as intendente, s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
+        $datos = $this->app['db']->fetchAssoc("SELECT m.*,c.id as c_id,c.nombre as c_nombre,c.intendente as intendente_elige, s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre "
                 . "FROM mesa m,circuito c,seccion s,provincia p "
                 . "WHERE m.numero=$this->numero and m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id ");
 
@@ -38,7 +45,14 @@ class Mesa {
         $this->seccion_nombre = $datos['s_nombre'];
         $this->provincia = $datos['p_id'];
         $this->provincia_nombre = $datos['p_nombre'];
+        $this->intendente_elige = $datos['intendente_elige'];
+        $this->gobernador = $datos['gobernador'];
+        $this->diputado = $datos['diputado'];
+        $this->senador = $datos['senador'];
         $this->intendente = $datos['intendente'];
+        $this->concejal = $datos['concejal'];
+        $this->diputado_nacional = $datos['diputado_nacional'];
+        $this->senador_nacional = $datos['senador_nacional'];
     }
 
     function getId() {
@@ -158,7 +172,7 @@ class Mesa {
     function regenera() {
         $mascara = $this->getMascara();
         $sql = "DELETE FROM renglon WHERE mesa_id=?";
-            $this->app['db']->executeQuery($sql, array((int) $this->id));
+        $this->app['db']->executeQuery($sql, array((int) $this->id));
         foreach ($mascara as $item) {
             $sql = "INSERT renglon (mesa_id,lista_id) VALUES (?,?)";
             $this->app['db']->executeQuery($sql, array((int) $this->id, $item['datos']['id']));
@@ -196,10 +210,10 @@ class Mesa {
 
     static function setTestigo($numero, $electores_provincia, $electores_nacion, $circuito, $seccional, $app) {
         if ($seccional > 0) {
-            $sql = "INSERT INTO mesa VALUES (NULL,?,?,?,?,?)";
+            $sql = "INSERT INTO mesa (id,numero,electores_provincia,electores_nacion,circuito_id,seccionales_id) VALUES (NULL,?,?,?,?,?)";
             $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito, $seccional));
         } else {
-            $sql = "INSERT INTO mesa VALUES (NULL,?,?,?,?,NULL)";
+            $sql = "INSERT INTO mesa (id,numero,electores_provincia,electores_nacion,circuito_id,seccionales_id) VALUES (NULL,?,?,?,?,NULL)";
             $app['db']->executeQuery($sql, array($numero, $electores_provincia, $electores_nacion, $circuito));
         }
     }
@@ -209,10 +223,18 @@ class Mesa {
         $app['db']->executeQuery($sql);
     }
 
-    static function testigos($provincia,$app) {
+    static function testigos($provincia, $app) {
         $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
                 . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
                 . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and p.id=$provincia";
+        $resultado = $app['db']->fetchAll($sql);
+        return $resultado;
+    }
+
+    static function testigosprovincia($provincia, $app) {
+        $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
+                . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
+                . "WHERE (m.gobernador=1 or m.diputado=1) and m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and p.id=$provincia";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }
@@ -225,4 +247,24 @@ class Mesa {
         return $resultado;
     }
 
+    static function cargoagregar($datos, $app) {
+        $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador',
+            'I' => 'intendente', 'C' => 'concejal', 'DN' => 'diputado_nacional', 'SN' => 'senador_nacional');
+        $dato = explode(",", $datos);
+        $columna = $columnas[$dato[0]];
+        $id = $dato[1];
+        $sql = "UPDATE mesa set $columna=1 where id=?";
+        $app['db']->executeQuery($sql,array((int) $id));
+        return json_encode("OK");
+    }
+    static function cargoquitar($datos, $app) {
+        $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador',
+            'I' => 'intendente', 'C' => 'concejal', 'DN' => 'diputado_nacional', 'SN' => 'senador_nacional');
+        $dato = explode(",", $datos);
+        $columna = $columnas[$dato[0]];
+        $id = $dato[1];
+        $sql = "UPDATE mesa set $columna=0 where id=?";
+        $app['db']->executeQuery($sql, array((int) $id));
+        return json_encode("OK");
+    }
 }

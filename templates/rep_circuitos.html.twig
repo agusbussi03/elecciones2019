@@ -5,7 +5,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Carga por circuito</h1>
+                <h1 class="page-header">Carga por Ciudad</h1>
             </div>
         </div>
         <div class="row">
@@ -20,6 +20,8 @@
                                 <tr>
                                     <th>Nombre</th>
                                     <th>INTENDENTE cargadas</th>
+                                    <th>INTENDENTE faltantes</th>
+                                    <th>CONCEJALES cargadas</th>
                                     <th>CONCEJALES faltantes</th>                                    
                                     <th>Reporte</th>
                                     <th></th>
@@ -33,7 +35,7 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
-                                                        <a data-toggle="collapse" data-parent="#concejal_I_C{{item.datos.id}}" href="#collapse_I_C{{item.datos.id}}" aria-expanded="false" class="collapsed">CARGADAS: {{item.intendente.cargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_C{{item.datos.id}}" href="#collapse_I_C{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.intendente.cargadas|length}}</a>
                                                     </h4>
                                                 </div>
                                                 <div id="collapse_I_C{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
@@ -45,10 +47,12 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                          </td>
+                                        <td>          
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
-                                                        <a data-toggle="collapse" data-parent="#concejal_I_N{{item.datos.id}}" href="#collapse_I_N{{item.datos.id}}" aria-expanded="false" class="collapsed">NO CARGADAS: {{item.intendente.nocargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_N{{item.datos.id}}" href="#collapse_I_N{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.intendente.nocargadas|length}}</a>
                                                     </h4>
                                                 </div>
                                                 <div id="collapse_I_N{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
@@ -66,7 +70,7 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
-                                                        <a data-toggle="collapse" data-parent="#concejal_C_C{{item.datos.id}}" href="#collapse_C_C{{item.datos.id}}" aria-expanded="false" class="collapsed">CARGADAS: {{item.concejal.cargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_C_C{{item.datos.id}}" href="#collapse_C_C{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.concejal.cargadas|length}}</a>
                                                     </h4>
                                                 </div>
                                                 <div id="collapse_C_C{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
@@ -78,10 +82,12 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                                    </td>
+                                        <td>
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title">
-                                                        <a data-toggle="collapse" data-parent="#concejal_C_N{{item.datos.id}}" href="#collapse_C_N{{item.datos.id}}" aria-expanded="false" class="collapsed">NO CARGADAS: {{item.concejal.nocargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_C_N{{item.datos.id}}" href="#collapse_C_N{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.concejal.nocargadas|length}}</a>
                                                     </h4>
                                                 </div>
                                                 <div id="collapse_C_N{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">

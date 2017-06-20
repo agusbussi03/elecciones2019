@@ -25,6 +25,12 @@
                                     <th>Seccional</th>
                                     <th>Electores P.</th>
                                     <th>Electores N.</th>
+                                    <th>Gob</th>
+                                    <th>Dip</th>
+                                    <th>Sen</th>
+                                    <th>Int</th>
+                                    <th>Con</th>
+                                    <th>Dip. NAC</th><th>Sen NAC</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -39,11 +45,81 @@
                                         <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
                                         <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.gobernador==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="G,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.diputado==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="D,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.senador==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="S,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.intendente==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="I,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.concejal==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="C,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.diputado_nacional==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="DN,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            {% set value=1 %}{%set claseboton='btn-info' %}{%set clasetilde='fa-check' %}
+                                            {% if item.senador_nacional==0 %} 
+                                                {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
+                                            {%endif%}
+                                            <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} 
+                                                    name="SN,{{item.id}}">
+                                                <i class="fa {{clasetilde}} fa-check"></i>
+                                            </button>
+                                        </td>
+                                        <td>
                                             {%if config.cerrada==0%}    
-                                            <button type="button" class="btn btn-danger" 
-                                                    onclick="window.location.href = '{{ path('testigo_accion',{'circuito':circuito.id}) }}?borrar={{item.id}}';">Borrar</button>
-                                       {%endif%}
-                                            </td>
+                                                <button type="button" class="btn btn-danger" 
+                                                        onclick="window.location.href = '{{ path('testigo_accion',{'circuito':circuito.id}) }}?borrar={{item.id}}';">Borrar</button>
+                                            {%endif%}
+                                        </td>
                                     </tr>
                                 {% endfor %}
 
@@ -60,30 +136,30 @@
                 </div>
                 <div class="panel-body">
                     {%if config.cerrada==0%}    
-                    <form role="form" action="{{path('testigo_accion',{'circuito':circuito.id})}}" method="GET">
-                        <div class="form-group">
-                            <label>Mesa</label>
-                            <input class="form-control" name="numero" type="number" size="4" min="1">
-                            <label>Electores provincia</label>
-                            <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
-                            <label>Electores nacion</label>
-                            <input class="form-control" name="electores_nacion" type="number" size="4" min="1">
-                            {%if seccionales|length >0%}
-                                <select name="seccional_id">
-                                    {% for item in seccionales %}
-                                        <option value="{{item.id}}">{{item.nombre}}</option>
-                                    {% endfor %}
-                                </select>
+                        <form role="form" action="{{path('testigo_accion',{'circuito':circuito.id})}}" method="GET">
+                            <div class="form-group">
+                                <label>Mesa</label>
+                                <input class="form-control" name="numero" type="number" size="4" min="1">
+                                <label>Electores provincia</label>
+                                <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
+                                <label>Electores nacion</label>
+                                <input class="form-control" name="electores_nacion" type="number" size="4" min="1">
+                                {%if seccionales|length >0%}
+                                    <select name="seccional_id">
+                                        {% for item in seccionales %}
+                                            <option value="{{item.id}}">{{item.nombre}}</option>
+                                        {% endfor %}
+                                    </select>
                                 {%else%}
                                     <input type="hidden" name="seccional_id" value="0">
-                            {%endif%}
+                                {%endif%}
 
-                            <input type="submit"  class="btn btn-primary" name=nueva value="Crear">
-                        </div>
-                    </form>
-                            {%else%}
-                                Configuracion cerrada
-                            {%endif%}
+                                <input type="submit"  class="btn btn-primary" name=nueva value="Crear">
+                            </div>
+                        </form>
+                    {%else%}
+                        Configuracion cerrada
+                    {%endif%}
                 </div>
             </div>
         </div>
@@ -95,11 +171,28 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-                                        $(document).ready(function () {
-                                            $('#dataTables-example').DataTable({
-                                                responsive: true
-                                            });
-                                        });
+                                                            $(document).ready(function () {
+                                                                $('#dataTables-example').DataTable({
+                                                                    responsive: true
+                                                                });
+                                                            });
+                                                            $(".btn-circle").click(function () {
+                                                                if (this.value == 0) {
+                                                                    $.post("{{ path('mesacargo',{'accion': 'cargoagregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                                        // validar retorno
+                                                                    });
+                                                                    this.value = 1;
+                                                                    $(this).attr("class", 'btn btn-info btn-circle');
+                                                                    $(this).children().attr("class", "fa fa-check");
+                                                                } else {
+                                                                    $.post("{{ path('mesacargo',{'accion': 'cargoquitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                                        //validar retorno
+                                                                    });
+                                                                    this.value = 0;
+                                                                    $(this).attr("class", 'btn btn-warning btn-circle');
+                                                                    $(this).children().attr("class", "fa fa-times");
+                                                                }
+                                                            });
     </script>
 {% endblock %}
 

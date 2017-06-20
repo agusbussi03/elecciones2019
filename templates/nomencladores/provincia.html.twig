@@ -46,7 +46,7 @@
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidos',{'provincia':item.id}) }}';">Partidos/Listas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidosnacionales',{'provincia':item.id}) }}';">Partidos/Listas Nacionales</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':item.id}) }}';">Escuelas</button>
-                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigo',{'provincia':item.id}) }}';">Mesas Test.</button>
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigoprovincia',{'provincia':item.id}) }}';">Mesas</button>
                                     {%if config.cerrada==0%}              
                                      <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se reconstruira la estructura de carga de todas las mesas. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('regenerarmesas',{'provincia':item.id}) }}';">Regenerar</button>
                                     <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>

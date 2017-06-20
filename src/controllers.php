@@ -81,15 +81,15 @@ $app->get('/mesa/{nro}', function ($nro) use ($app) {
     return $app['twig']->render('mesa.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesa');
 
-$app->get('/mesastestigo/{provincia}', function ($provincia) use ($app) {
+$app->get('/mesastestigoprovincia/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require_once'Mesa.php';
-    $testigos = Mesa::testigos($provincia, $app);
+    $testigos = Mesa::testigosprovincia($provincia, $app);
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    return $app['twig']->render('mesastestigo.html.twig', array('provincia' => $provincia, 'testigos' => $testigos));
-})->bind('mesastestigo');
+    return $app['twig']->render('mesastestigoprovincia.html.twig', array('provincia' => $provincia, 'testigos' => $testigos));
+})->bind('mesastestigoprovincia');
 
 $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     require_once'Mesa.php';
@@ -106,6 +106,16 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     $mesas = Mesa::testigosporcircuito($circuito['id'], $app);
     return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas, 'seccionales' => $seccionales));
 })->bind('testigo_accion');
+
+$app->post('/mesacargo/{accion}', function ($accion) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    }
+   
+    Mesa::$accion($_POST['datos'], $app);
+    return json_encode("OK");
+})->bind('mesacargo');
+
 
 
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
@@ -225,6 +235,7 @@ $app->get('/configuracion', function () use ($app) {
     $configuracion = new Configuracion($app);
     $directorio = "upload";
     $gestor_dir = opendir($directorio);
+    $ficheros=array();
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
             $ficheros[] = $nombre_fichero;
@@ -242,6 +253,7 @@ $app->post('/configuracion', function () use ($app) {
     $configuracion->grabar($_POST);
     $directorio = "upload";
     $gestor_dir = opendir($directorio);
+        $ficheros=array();
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
             $ficheros[] = $nombre_fichero;
@@ -259,6 +271,7 @@ $app->get('/backup', function () use ($app) {
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
     $directorio = "upload";
+        $ficheros=array();
     $gestor_dir = opendir($directorio);
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
@@ -284,6 +297,7 @@ $app->get('/restore', function () use ($app) {
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
     $directorio = "upload";
+        $ficheros=array();
     $gestor_dir = opendir($directorio);
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)

@@ -5,7 +5,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Mesas testigo {{provincia.nombre}}</h1>
+                <h1 class="page-header">Mesas testigo con cargos provinciales para {{provincia.nombre}}</h1>
             </div>
         </div>
         <div class="row">
@@ -28,6 +28,8 @@
                                     <th>Seccional</th>
                                     <th>Electores P.</th>
                                     <th>Electores N.</th>
+                                    <th>Gobernaodr</th>
+                                    <th>Diputado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,6 +42,8 @@
                                         <td>{{item.sec_nombre}}</td>
                                         <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
+                                        <td>{%if item.gobernador==0%}NO{%else%}SI{%endif%}</td>
+                                        <td>{%if item.diputado==0%}NO{%else%}SI{%endif%}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

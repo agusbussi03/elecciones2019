@@ -54,18 +54,18 @@
                                     {{mensaje.texto}} 
                                 </div>
                             {% endif %}
-                            <form id="formu" method="POST">
-                                <input class="form-control inputs" id=nro name=nro value="" required type="number" size="3" min="0"  style='float:left;width:90%'>
+                            <div class="panel panel-default">
 
-                                <input type="submit" value="Cargar" class="btn btn-primary" style='float:right'>
+                                <div class="panel-body">
+                            <form id="formu" method="POST">
+                                <input class="form-control inputs" id=nro name=nro value="" required type="number" length="3" size="3" min="0"  style='float:left;width:50%'>
+
+                                <input type="submit" value="Cargar" class="btn btn-primary" style='float:left';>
                             </form>   
                             {% if  mesa is defined %}
 
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        Categorias provinciales
-                                    </div>
-                                    <div class="panel-body">
+                                
+                                <div><p>Mesa {{mesa.numero}}</p></div>
                                         {%if configuracion.intermedia==1%}
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
                                                     onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'G'}) }}';">
@@ -81,25 +81,18 @@
                                             {%if mesa.intendente==1%}  
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
                                                     onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'I'}) }}';">
-                                                Intendente</button>
-                                            {%endif%}
+                                                Intendente
+                                            </button>
+                                        {%endif%}
                                         <button type="button" class="btn btn-primary btn-lg btn-block"
                                                 onclick="window.location.href = '{{ path('mesacarga',{'nro':mesa.numero,'categoria': 'C'}) }}';">
-                                            Concejal</button>
-                                    </div>
-                                </div>
-
-
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        Categorias nacionales
-                                    </div>
-                                    <div class="panel-body">
-
+                                            Concejal
+                                        </button>
                                         <button type="button" class="btn btn-primary btn-lg btn-block"
                                                 onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.numero,'categoria': 'D'}) }}';">
-                                            Diputado Nacional</button>
-                                            {%if configuracion.senadores_nacionales==1%}
+                                            Diputado Nacional
+                                        </button>
+                                        {%if configuracion.senadores_nacionales==1%}
                                             <button type="button" class="btn btn-primary btn-lg btn-block"
                                                     onclick="window.location.href = '{{ path('mesanacionalcarga',{'nro':mesa.numero,'categoria': 'S'}) }}';">
                                                 Senador Nacional</button>
