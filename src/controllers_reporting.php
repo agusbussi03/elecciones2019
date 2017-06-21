@@ -7,16 +7,16 @@ $app->get('/rep_circuito', function () use ($app) {
     $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id";
     $resultado = $app['db']->fetchAll($sql);
     foreach ($resultado as $item) {
-        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and "
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and concejal=1 and "
                 . "id not in (select mesa_id from renglon where concejal>0)";
         $mesas_nocargadas_C = $app['db']->fetchAll($sql);
-        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and "
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and concejal=1 and "
                 . "id  in (select mesa_id from renglon where concejal>0)";
         $mesas_cargadas_C = $app['db']->fetchAll($sql);
-        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and "
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and intendente=1 and "
                 . "id not in (select mesa_id from renglon where intendente>0)";
         $mesas_nocargadas_I = $app['db']->fetchAll($sql);
-        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and "
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and intendente=1 and "
                 . "id  in (select mesa_id from renglon where intendente>0)";
         $mesas_cargadas_I = $app['db']->fetchAll($sql);
 

@@ -19,12 +19,10 @@
                             <thead>
                                 <tr>
                                     <th>Mesa</th>
-                                    <th>Provincia</th>
-                                    <th>Departamento</th>
                                     <th>Localidad</th>
                                     <th>Seccional</th>
-                                    <th>Electores P.</th>
-                                    <th>Electores N.</th>
+                                    <th>Elec P.</th>
+                                    <th>Elec N.</th>
                                     <th>Gob</th>
                                     <th>Dip</th>
                                     <th>Sen</th>
@@ -38,8 +36,7 @@
                                 {% for item in testigos%}
                                     <tr class="odd gradeX">
                                         <td>{{item.numero}}</td>
-                                        <td>{{item.p_nombre}}</td>
-                                        <td>{{item.s_nombre}}</td>
+                                        
                                         <td>{{item.c_nombre}}</td>
                                         <td>{{item.sec_nombre}}</td>
                                         <td>{{item.electores_provincia}}</td>

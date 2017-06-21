@@ -19,18 +19,18 @@ class Concejales {
     }
 
     function getResultados() {
-        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccional sec, partido_lista p, cargo_local car "
                 . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and concejal>=0 and car.lista_id=r.lista_id "
+                . "and m.circuito_id=? and r.concejal>0 and car.lista_id=r.lista_id "
                 . "and car.circuito_id=m.circuito_id and car.tipo='C' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         if ($this->seccionales == 0) {
-            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,
+            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,
                     count(m.id) as cuenta 
                     FROM renglon r, mesa m,partido_lista p, cargo_local car 
-                    WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=? and concejal>=0 and car.lista_id=r.lista_id 
+                    WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=? and r.concejal>=0 and car.lista_id=r.lista_id 
                     and car.circuito_id=m.circuito_id and car.tipo='C' group by 'LOCALIDAD','',p.id_partido,p.nombre_partido,
                     p.id,p.id_lista,p.nombre_lista ORDER BY `p`.`id_partido` ASC, p.nombre_lista asc ";
         }
@@ -48,16 +48,16 @@ class Concejales {
             $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
         }
         //especiales
-        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccional sec, partido_lista p "
                 . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and concejal>=0 and p.especial=1 "
+                . "and m.circuito_id=? and r.concejal>0 and p.especial=1 "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         if ($this->seccionales == 0) {
-            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(concejal) as suma,count(m.id) as cuenta "
+            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                     . "FROM renglon r, mesa m, partido_lista p "
-                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and concejal>=0 and p.especial=1 "
+                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and r.concejal>=0 and p.especial=1 "
                     . "group by 'LOCALIDAD','1',p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                     . "ORDER BY p.id_partido ASC, p.nombre_lista asc ";
         }
@@ -160,7 +160,7 @@ class Concejales {
         $total = 0;
         $resultado = array();
         if ($this->seccionales > 0) {
-            $sql = "SELECT * FROM seccional WHERE circuito_id=?";
+            $sql = "SELECT * FROM seccional WHERE circuito_id=? and id in (select seccionales_id from mesa where concejal>0)";
             $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
             foreach ($seccionales as $item) {
                 $total += $item['electores_provincia'];

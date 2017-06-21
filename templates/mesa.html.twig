@@ -39,13 +39,11 @@
                                     <tr>
                                         <th>Partido</th>
                                         {% if configuracion.tipo==0%}<th>Lista</th>{%endif%}
-                                            {%if configuracion.intermedia==1%}
-                                            <th>Gobernador</th>
-                                            <th>Diputados</th>
-                                            <th>Senador</th>
-                                            {%endif%}
-                                        <th>Intendente</th>
-                                        <th>Concejal</th>
+                                        {%if mesa.gobernador==1%}<th>Gobernador</th>{%endif%}
+                                        {%if mesa.diputado==1%}<th>Diputados</th>{%endif%}
+                                        {%if mesa.senador==1%}<th>Senador</th>{%endif%}
+                                        {%if mesa.intendente==1%}<th>Intendente</th>{%endif%}
+                                        {%if mesa.concejal==1%}<th>Concejal</th>{%endif%}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -61,36 +59,44 @@
 
                                                 </td>
                                             {%endif%} 
-                                            {%if configuracion.intermedia==1%}
+                                            {%if mesa.gobernador==1%}
                                                 <td>
                                                     {% if 'G' in item.cargos %}
                                                         {% set total_gobernador=total_gobernador+votos[item.datos.id].gobernador%}
                                                         {{votos[item.datos.id].gobernador}}{%else%}-{% endif %}
                                                     </td>
+                                                {%endif%}       
+                                                {%if mesa.diputado==1%}        
                                                     <td>
                                                         {% if 'D' in item.cargos %}
                                                             {% set total_diputado=total_diputado+votos[item.datos.id].diputado%}
                                                             {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
                                                         </td>
+                                                    {%endif%}       
+                                                    {%if mesa.senador==1%}        
                                                         <td>
                                                             {% if 'S' in item.cargos %}
                                                                 {% set total_senador=total_senador+votos[item.datos.id].senador%}
                                                                 {{votos[item.datos.id].senador}}{%else%}-{% endif %}
                                                             </td>
-                                                        {%endif%}
-
-                                                        <td>
-                                                            {% if 'I' in item.cargos %}
-                                                                {% set total_intendente=total_intendente+votos[item.datos.id].intendente%}
-                                                                {{votos[item.datos.id].intendente}}{%else%}-{% endif %}
-                                                            </td>                                              
+                                                        {%endif%}       
+                                                        {%if mesa.intendente==1%}        
 
                                                             <td>
-                                                                {% if 'C' in item.cargos %}
-                                                                    {% set total_concejal=total_concejal+votos[item.datos.id].concejal%}
-                                                                    {{votos[item.datos.id].concejal}}{%else%}-{% endif %}
-                                                                </td> 
-                                                            </tr>
+                                                                {% if 'I' in item.cargos %}
+                                                                    {% set total_intendente=total_intendente+votos[item.datos.id].intendente%}
+                                                                    {{votos[item.datos.id].intendente}}{%else%}-{% endif %}
+                                                                </td>                                              
+                                                            {%endif%}       
+                                                            {%if mesa.concejal==1%}        
+                                                                <td>
+                                                                    {% if 'C' in item.cargos %}
+                                                                        {% set total_concejal=total_concejal+votos[item.datos.id].concejal%}
+                                                                        {{votos[item.datos.id].concejal}}{%else%}-{% endif %}
+                                                                    </td> 
+                                                                </tr>
+
+                                                            {%endif%}               
                                                         {% endfor %}
 
                                                         <tr class="odd gradeX">
@@ -98,14 +104,12 @@
                                                             {% if configuracion.tipo==0%}
                                                                 <td></td>
                                                             {%endif%} 
-                                                            {%if configuracion.intermedia==1%}
-                                                                <td>{{total_gobernador}}</td>
-                                                                <td>{{total_diputado}}</td>
-                                                                <td>{{total_senador}}</td>
-                                                            {%endif%}
-                                                            <td>{{total_intendente}}</td>                                              
-                                                            <td>{{total_concejal}}
-                                                            </td> 
+                                                            {%if mesa.gobernador==1%}<td>{{total_gobernador}}</td>{%endif%}
+                                                            {%if mesa.diputado==1%}   <td>{{total_diputado}}</td>{%endif%}
+                                                            {%if mesa.senador==1%}   <td>{{total_senador}}</td>{%endif%}
+
+                                                            {%if mesa.intendente==1%}<td>{{total_intendente}}</td> {%endif%}                                             
+                                                            {%if mesa.concejal==1%}<td>{{total_concejal}}</td>{%endif%} 
                                                         </tr>
 
 

@@ -107,6 +107,63 @@ class Mesa {
         return $this->app;
     }
 
+    function getIntendente_elige() {
+        return $this->intendente_elige;
+    }
+
+    function getGobernador() {
+        return $this->gobernador;
+    }
+
+    function getDiputado() {
+        return $this->diputado;
+    }
+
+    function getSenador() {
+        return $this->senador;
+    }
+
+    function getConcejal() {
+        return $this->concejal;
+    }
+
+    function getDiputado_nacional() {
+        return $this->diputado_nacional;
+    }
+
+    function getSenador_nacional() {
+        return $this->senador_nacional;
+    }
+
+    function setIntendente_elige($intendente_elige) {
+        $this->intendente_elige = $intendente_elige;
+    }
+
+    function setGobernador($gobernador) {
+        $this->gobernador = $gobernador;
+    }
+
+    function setDiputado($diputado) {
+        $this->diputado = $diputado;
+    }
+
+    function setSenador($senador) {
+        $this->senador = $senador;
+    }
+
+    function setConcejal($concejal) {
+        $this->concejal = $concejal;
+    }
+
+    function setDiputado_nacional($diputado_nacional) {
+        $this->diputado_nacional = $diputado_nacional;
+    }
+
+    function setSenador_nacional($senador_nacional) {
+        $this->senador_nacional = $senador_nacional;
+    }
+
+        
     function getMascara() {
 
         $cargo_sql = "SELECT * FROM cargo_provincial c,partido_lista p WHERE c.provincia_id=? and c.lista_id=p.id ";
