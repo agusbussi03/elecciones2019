@@ -111,7 +111,7 @@ $app->post('/mesacargo/{accion}', function ($accion) use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-   
+
     Mesa::$accion($_POST['datos'], $app);
     return json_encode("OK");
 })->bind('mesacargo');
@@ -235,7 +235,7 @@ $app->get('/configuracion', function () use ($app) {
     $configuracion = new Configuracion($app);
     $directorio = "upload";
     $gestor_dir = opendir($directorio);
-    $ficheros=array();
+    $ficheros = array();
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
             $ficheros[] = $nombre_fichero;
@@ -253,7 +253,7 @@ $app->post('/configuracion', function () use ($app) {
     $configuracion->grabar($_POST);
     $directorio = "upload";
     $gestor_dir = opendir($directorio);
-        $ficheros=array();
+    $ficheros = array();
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
             $ficheros[] = $nombre_fichero;
@@ -271,7 +271,7 @@ $app->get('/backup', function () use ($app) {
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
     $directorio = "upload";
-        $ficheros=array();
+    $ficheros = array();
     $gestor_dir = opendir($directorio);
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
@@ -297,7 +297,7 @@ $app->get('/restore', function () use ($app) {
     $mensaje = 'Backup enviado';
     $configuracion = new Configuracion($app);
     $directorio = "upload";
-        $ficheros=array();
+    $ficheros = array();
     $gestor_dir = opendir($directorio);
     while (false !== ($nombre_fichero = readdir($gestor_dir))) {
         if (strpos($nombre_fichero, ".gz") > 0)
@@ -316,19 +316,26 @@ $app->get('/usuarios', function () use ($app) {
     require_once'Usuarios.php';
     $mensaje = '';
     $usuarios = Usuarios::getAll($app);
-    return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios, 'mensaje' => $mensaje));
+    $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
+    $secciones = $app['db']->fetchAll('SELECT seccion.*,provincia.nombre as provincia FROM seccion,provincia where provincia.id=seccion.provincia_id order by seccion.nombre');
+    $circuitos = $app['db']->fetchAll('SELECT circuito.*,seccion.nombre as seccion FROM seccion,circuito where seccion.id=circuito.seccion_id order by circuito.nombre');
+    $seccionales = $app['db']->fetchAll('SELECT seccional.*,circuito.nombre as circuito FROM seccional,circuito where circuito.id=seccional.circuito_id order by circuito.nombre,seccional.nombre');
+    return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios,
+                'provincia' => $provincia, 'secciones' => $secciones, 'circuitos' => $circuitos,
+                'seccionales' => $seccionales, 'mensaje' => $mensaje));
 })->bind('usuarios');
 
-$app->post('/usuario', function () use ($app) {
+$app->post('/usuarios', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require_once'Configuracion.php';
-    $mensaje = 'Datos almacenados';
-    $configuracion = new Configuracion($app);
-    $configuracion->grabar($_POST);
-    return $app['twig']->render('configuracion.html.twig', array('configuracion' => $configuracion, 'mensaje' => $mensaje));
-});
+    require_once 'Usuarios.php';
+    $usuario = new Usuarios($_POST['user_id'], $app);
+    $usuario->actualizar($_POST);
+    return $app->redirect($app['url_generator']->generate('usuarios'));
+})->bind('usuariosp');
+
+
 
 /* * ************** L O C A L E S *********************************** */
 

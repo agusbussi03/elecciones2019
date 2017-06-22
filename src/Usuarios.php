@@ -17,22 +17,19 @@ class Usuarios {
     private $provincia = 0;
     private $app;
 
-    function __construct($app) {
+    function __construct($id,$app) {
         $this->app = $app;
+        $this->id=$id;
+        
     }
 
-   /* function grabar($datos) {
-        $this->ano = $datos['ano'];
-        $this->tipo = $datos['tipo'];
-        $this->intermedia = $datos['intermedia'];
-        $this->partido_principal = $datos['partido_principal'];
-        $this->lista_principal = $datos['lista_principal'];
-        ;
-        $sql = "UPDATE configuracion SET ano=?,tipo=?,intermedia=?,partido_principal=?,lista_principal=?;";
-        $this->app['db']->executeQuery($sql, array((int) $this->ano, (int) $this->tipo, (int) $this->intermedia,
-            (int) $this->partido_principal, (int) $this->lista_principal));
+  function actualizar($datos) {
+       
+        $sql = "UPDATE usuarios SET nombreyapellido=?,admin=?,carga=?,lectura=? where id=?;";
+  $this->app['db']->executeQuery($sql, array($datos['nombreyapellido'], (int) $datos['admin'],
+      (int) $datos['carga'], (int) $datos['lectura'] ,(int) $this->id));
         return "Datos modificados";
-    }*/
+    }
 
     static function getAll($app) {
         return $app['db']->fetchAll("SELECT * FROM usuarios");

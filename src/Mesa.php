@@ -260,7 +260,7 @@ class Mesa {
             $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido_lista, (int) $this->id));
         }
         $sql = "insert into log (usuario,texto,datos) "
-                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->numero','" . print_r($votos, 1) . "');";
+                . "values ('" . $_SESSION['usuario'] . "','$this->numero','" . print_r($votos, 1) . "');";
         $this->app['db']->executeQuery($sql);
         return;
     }
@@ -276,6 +276,10 @@ class Mesa {
     }
 
     static function unsetTestigo($id, $app) {
+         $sql = "DELETE FROM renglon where mesa_id=$id";
+        $app['db']->executeQuery($sql);
+                 $sql = "DELETE FROM renglon_nacional where mesa_id=$id";
+        $app['db']->executeQuery($sql);
         $sql = "DELETE FROM mesa where id=$id";
         $app['db']->executeQuery($sql);
     }
