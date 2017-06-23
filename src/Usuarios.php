@@ -17,17 +17,43 @@ class Usuarios {
     private $provincia = 0;
     private $app;
 
-    function __construct($id,$app) {
+    function __construct($id, $app) {
         $this->app = $app;
-        $this->id=$id;
-        
+        $this->id = $id;
     }
 
-  function actualizar($datos) {
-       
-        $sql = "UPDATE usuarios SET nombreyapellido=?,admin=?,carga=?,lectura=? where id=?;";
-  $this->app['db']->executeQuery($sql, array($datos['nombreyapellido'], (int) $datos['admin'],
-      (int) $datos['carga'], (int) $datos['lectura'] ,(int) $this->id));
+    function actualizar($datos) {
+
+        $sql = "UPDATE usuarios SET nombreyapellido=?,admin=?,carga=?,lectura=?,provincia_id=? where id=?;";
+        $this->app['db']->executeQuery($sql, array($datos['nombreyapellido'], (int) $datos['admin'],
+            (int) $datos['carga'], (int) $datos['lectura'], (int) $datos['provincia'], (int) $this->id));
+
+        if ($datos['seccion'] == 0) {
+            $sql = "UPDATE usuarios SET seccion_id=NULL where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $this->id));
+        } else {
+            $sql = "UPDATE usuarios SET seccion_id=? where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $datos['seccion'], (int) $this->id));
+        }
+        if ($datos['ciudad'] == 0) {
+            $sql = "UPDATE usuarios SET circuito_id=NULL where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $this->id));
+        } else {
+            $sql = "UPDATE usuarios SET circuito_id=? where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $datos['ciudad'], (int) $this->id));
+        }
+        if ($datos['seccional'] == 0) {
+            $sql = "UPDATE usuarios SET seccional_id=NULL where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $this->id));
+        } else {
+            $sql = "UPDATE usuarios SET seccional_id=? where id=?;";
+            $this->app['db']->executeQuery($sql, array((int) $datos['seccional'], (int) $this->id));
+        }
+        if ($datos['password'] != "") {
+            $sql = "UPDATE usuarios SET password=md5(?) where id=?;";
+            $this->app['db']->executeQuery($sql, array($datos['password'], (int) $this->id));
+        }
+
         return "Datos modificados";
     }
 
@@ -81,9 +107,9 @@ class Usuarios {
     function getPassword() {
         return $this->password;
     }
+
     function getProvincia() {
         return $this->provincia;
     }
-
 
 }

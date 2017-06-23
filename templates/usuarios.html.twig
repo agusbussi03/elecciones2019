@@ -22,13 +22,10 @@
                                 <tr>
                                     <th>Usuario</th>
                                     <th>Nombre</th>
-                                    <th>Admin</th>
-                                    <th>Carga</th>
-                                    <th>Lectura</th>
-                                    <th>Provincia</th>
-                                    <th>Departamento</th>
-                                    <th>Ciudad</th>
-                                    <th>Seccional</th>
+                                    <th>Admin/Carga/Lectura</th>
+                                    
+                                    <th>Pcia./Depto/Ciudad/Secc</th>
+                                  
                                     <th>Password</th>
                                     <th></th>
                                 </tr>
@@ -45,14 +42,12 @@
                                             <option value="0" {%if item.admin=='0'%}selected{%endif%}>NO</option>
                                             <option value="1" {%if item.admin=='1'%}selected{%endif%}>SI</option>                                              
                                         </select>
-                                    </td>
-                                    <td>
+                                   
                                         <select name="carga">
                                             <option value="0" {%if item.carga=='0'%}selected{%endif%}>NO</option>
                                             <option value="1" {%if item.carga=='1'%}selected{%endif%}>SI</option>        
                                         </select>
-                                    </td>
-                                    <td>
+                                    
                                         <select name="lectura">
                                             <option value="0" {%if item.lectura=='0'%}selected{%endif%}>NO</option>
                                             <option value="1" {%if item.lectura=='1'%}selected{%endif%}>SI</option>                                              
@@ -64,25 +59,21 @@
                                                 <option value="{{item2.id}}" {%if item.provincia_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
                                             {%endfor%} 
                                         </select>
-                                    </td>
-                                    <td>
+                                   
                                         <select name="seccion">
                                             <option value="0">Cualquiera</option>
                                             {%for item2 in secciones%}
                                                 <option value="{{item2.id}}" {%if item.seccion_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
                                             {%endfor%} 
                                         </select>
-                                    </td>
-
-                                    <td>
+                                   
                                         <select name="ciudad">
                                             <option value="0">Cualquiera</option>
                                             {%for item2 in circuitos%}
                                                 <option value="{{item2.id}}" {%if item.circuito_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
                                             {%endfor%} 
                                         </select>
-                                    </td>
-                                    <td>
+                                   
                                         <select name="seccional">
                                             <option value="0">Cualquiera</option>
                                             {%for item2 in seccionales%}
@@ -91,7 +82,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input name="password" type="password" />
+                                        <input name="password" type="password" size="4"/>
                                     </td>
                                     <td>
                                         <input type="submit" class="btn btn-primary" value="Grabar" name="grabar" onclick="$('#f{{item.id}}').submit()">

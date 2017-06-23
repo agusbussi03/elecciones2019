@@ -34,7 +34,7 @@ $app->get('/logout', function () use ($app) {
 $app->post('/login', function () use ($app) {
     require_once'Usuarios.php';
     $mensaje = '';
-    $usuario = new Usuarios($app);
+    $usuario = new Usuarios(0,$app);
     $resultado = $usuario->getByUsername($_POST['usuario']);
     if ($resultado != '')
         $mensaje = $resultado;
