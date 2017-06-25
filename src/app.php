@@ -37,7 +37,7 @@ $app['twig'] = $app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
     $twig->addGlobal('session', $_SESSION);
     $twig->addGlobal('config', new Configuracion($app));
-    
+   
     return $twig;
 });
 

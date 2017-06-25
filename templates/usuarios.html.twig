@@ -23,79 +23,108 @@
                                     <th>Usuario</th>
                                     <th>Nombre</th>
                                     <th>Admin/Carga/Lectura</th>
-                                    
+
                                     <th>Pcia./Depto/Ciudad/Secc</th>
-                                  
-                                    <th>Password</th>
+
+                                    <th>Password</th><th>Mesas</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for item in usuarios%}
-                                
+
                                     <tr class="odd gradeX"> 
-                                    <td> <form action='{{ path('usuarios') }}' id="f{{item.id}}" method="POST"><input type="hidden" name="user_id" value="{{item.id}}">
-                                        {{item.usuario}}</td>
-                                    <td><input name=nombreyapellido type="text" value="{{item.nombreyapellido}}"/></td>
-                                    <td>
-                                        <select name="admin">
-                                            <option value="0" {%if item.admin=='0'%}selected{%endif%}>NO</option>
-                                            <option value="1" {%if item.admin=='1'%}selected{%endif%}>SI</option>                                              
-                                        </select>
-                                   
-                                        <select name="carga">
-                                            <option value="0" {%if item.carga=='0'%}selected{%endif%}>NO</option>
-                                            <option value="1" {%if item.carga=='1'%}selected{%endif%}>SI</option>        
-                                        </select>
-                                    
-                                        <select name="lectura">
-                                            <option value="0" {%if item.lectura=='0'%}selected{%endif%}>NO</option>
-                                            <option value="1" {%if item.lectura=='1'%}selected{%endif%}>SI</option>                                              
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select name="provincia">
-                                            {%for item2 in provincia%}
-                                                <option value="{{item2.id}}" {%if item.provincia_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
+                                        <td> <form action='{{ path('usuarios') }}' id="f{{item.id}}" method="POST"><input type="hidden" name="user_id" value="{{item.id}}">
+                                                {{item.usuario}}</td>
+                                                <td><input name=nombreyapellido type="text" value="{{item.nombreyapellido}}"/></td>
+                                                <td>
+                                                    <select name="admin">
+                                                        <option value="0" {%if item.admin=='0'%}selected{%endif%}>NO</option>
+                                                        <option value="1" {%if item.admin=='1'%}selected{%endif%}>SI</option>                                              
+                                                    </select>
+
+                                                    <select name="carga">
+                                                        <option value="0" {%if item.carga=='0'%}selected{%endif%}>NO</option>
+                                                        <option value="1" {%if item.carga=='1'%}selected{%endif%}>SI</option>        
+                                                    </select>
+
+                                                    <select name="lectura">
+                                                        <option value="0" {%if item.lectura=='0'%}selected{%endif%}>NO</option>
+                                                        <option value="1" {%if item.lectura=='1'%}selected{%endif%}>SI</option>                                              
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select name="provincia">
+                                                        {%for item2 in provincia%}
+                                                            <option value="{{item2.id}}" {%if item.provincia_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
+                                                        {%endfor%} 
+                                                    </select>
+
+                                                    <select name="seccion">
+                                                        <option value="0">Cualquiera</option>
+                                                        {%for item2 in secciones%}
+                                                            <option value="{{item2.id}}" {%if item.seccion_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
+                                                        {%endfor%} 
+                                                    </select>
+
+                                                    <select name="ciudad">
+                                                        <option value="0">Cualquiera</option>
+                                                        {%for item2 in circuitos%}
+                                                            <option value="{{item2.id}}" {%if item.circuito_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
+                                                        {%endfor%} 
+                                                    </select>
+
+                                                    <select name="seccional">
+                                                        <option value="0">Cualquiera</option>
+                                                        {%for item2 in seccionales%}
+                                                            <option value="{{item2.id}}" {%if item.seccional_id==item2.id%}selected{%endif%}>{{item2.circuito}}-{{item2.nombre}}</option>
+                                                        {%endfor%} 
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input name="password" type="password" size="4"/>
+                                                </td>
+                                                <td>
+                                                    <input type="submit" class="btn btn-primary" value="Grabar" name="grabar" onclick="$('#f{{item.id}}').submit()">
+                                                    <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('usuarios') }}';">Borrar</button>
+                                            </form> 
+                                        </td>
+                                        <td>
+                                            <form action='{{ path('usuarios') }}' id="mesa{{item.id}}" method="POST">
+                                                <input type="hidden" name="user_id" value="{{item.id}}">
+                                                <input type="text" name="add" size='2'>
+                                                <input type="submit" class="btn btn-primary" value="Grabar" name="grabar" onclick="$('#mesa{{item.id}}').submit()">
+                                            </form>
+                                            {%for item2 in mesausuario %}
+                                                {%if item2.usuario_id==item.id%} <p>{{item2.numero}} <a href='{{ path('usuarios',{'quitarmesa_id':item2.id}) }}'>(-)</a></p>{%endif%}
                                             {%endfor%} 
-                                        </select>
-                                   
-                                        <select name="seccion">
-                                            <option value="0">Cualquiera</option>
-                                            {%for item2 in secciones%}
-                                                <option value="{{item2.id}}" {%if item.seccion_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
-                                            {%endfor%} 
-                                        </select>
-                                   
-                                        <select name="ciudad">
-                                            <option value="0">Cualquiera</option>
-                                            {%for item2 in circuitos%}
-                                                <option value="{{item2.id}}" {%if item.circuito_id==item2.id%}selected{%endif%}>{{item2.nombre}}</option>
-                                            {%endfor%} 
-                                        </select>
-                                   
-                                        <select name="seccional">
-                                            <option value="0">Cualquiera</option>
-                                            {%for item2 in seccionales%}
-                                                <option value="{{item2.id}}" {%if item.seccional_id==item2.id%}selected{%endif%}>{{item2.circuito}}-{{item2.nombre}}</option>
-                                            {%endfor%} 
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input name="password" type="password" size="4"/>
-                                    </td>
-                                    <td>
-                                        <input type="submit" class="btn btn-primary" value="Grabar" name="grabar" onclick="$('#f{{item.id}}').submit()">
-                                        <button type="button" class="btn btn-primary" onclick="window.location.href = '{{ path('usuarios') }}';">Borrar</button>
-                                    </form> 
-                                    </td>
-                                
-                                </tr>
- 
-                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Nuevo usuario
+                </div>
+                <div class="panel-body">   
+                    <form role="form" action="{{path('usuario_agregar')}}" method="POST">
+                        <div class="form-group">
+                            <label>Usuario</label>
+                            <input class="form-control" name="usuario" type="text" size="20">
+                            <label>Apellido Nombre</label>
+                            <input class="form-control" name="nombre" type="text" size="40">
+                            <label>Password</label>
+                            <input class="form-control" name="password" type="password" size="20">
+
+                            <input type="submit"  class="btn btn-primary" value="Crear nueva">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -111,29 +140,29 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-                                                $(document).ready(function () {
-                                                    $('#dataTables-example').DataTable({
-                                                        responsive: true
+                                                    $(document).ready(function () {
+                                                        $('#dataTables-example').DataTable({
+                                                            responsive: true
+                                                        });
                                                     });
-                                                });
 
-                                                $(".btn-circle").click(function () {
-                                                    if (this.value == 1) {
-                                                        $.post("{{ path('usuarios',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                                            // validar retorno
-                                                        });
-                                                        this.value = 0;
-                                                        $(this).attr("class", 'btn btn-warning btn-circle');
-                                                        $(this).children().attr("class", "fa fa-times");
-                                                    } else {
-                                                        $.post("{{ path('usuarios',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
-                                                            //validar retorno
-                                                        });
-                                                        this.value = 1;
-                                                        $(this).attr("class", 'btn btn-info btn-circle');
-                                                        $(this).children().attr("class", "fa fa-check");
-                                                    }
-                                                });
+                                                    $(".btn-circle").click(function () {
+                                                        if (this.value == 1) {
+                                                            $.post("{{ path('usuarios',{'accion': 'agregar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                                // validar retorno
+                                                            });
+                                                            this.value = 0;
+                                                            $(this).attr("class", 'btn btn-warning btn-circle');
+                                                            $(this).children().attr("class", "fa fa-times");
+                                                        } else {
+                                                            $.post("{{ path('usuarios',{'accion': 'quitar'}) }}", {'datos': this.name}, function (data, textStatus, jqxhr) {
+                                                                //validar retorno
+                                                            });
+                                                            this.value = 1;
+                                                            $(this).attr("class", 'btn btn-info btn-circle');
+                                                            $(this).children().attr("class", "fa fa-check");
+                                                        }
+                                                    });
     </script>
 
 

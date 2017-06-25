@@ -111,7 +111,7 @@ class MesaNacional {
             $this->app['db']->executeQuery($sql, array((int) $valor, (int) $partido_lista, (int) $this->id));
         }
         $sql = "insert into log (usuario,texto,datos) "
-                . "values ('" . $_SESSION['usuario'] . "','actualiza mesa $this->numero','" . print_r($votos, 1) . "');";
+                . "values ('" . $_SESSION['usuario'] . "','$this->numero','" . print_r($votos, 1) . "');";
         $this->app['db']->executeQuery($sql);
         return;
     }

@@ -53,6 +53,7 @@ class Mesa {
         $this->concejal = $datos['concejal'];
         $this->diputado_nacional = $datos['diputado_nacional'];
         $this->senador_nacional = $datos['senador_nacional'];
+        $this->seccional= $datos['seccionales_id'];
     }
 
     function getId() {

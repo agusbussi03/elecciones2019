@@ -1,5 +1,4 @@
 <?php
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,8 +9,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $app->get('/', function () use ($app) {
     require_once'Estado.php';
-    if (!validar('admin')) {
+    if (!(validar('admin') || validar('carga') || validar('lectura'))) {
         return $app->redirect('login');
+    }
+    if (validar('carga')) {
+        return $app->redirect('mesacarga_elige');
     }
     return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     //  return $app->redirect($app['url_generator']->generate(''));
@@ -21,6 +23,7 @@ $app->get('/', function () use ($app) {
 
 
 $app->get('/login', function () use ($app) {
+    //print_r($_SESSION);
     $mensaje = '';
     return $app['twig']->render('login.html.twig', array('mensaje' => $mensaje));
 })->bind('login');
@@ -34,7 +37,7 @@ $app->get('/logout', function () use ($app) {
 $app->post('/login', function () use ($app) {
     require_once'Usuarios.php';
     $mensaje = '';
-    $usuario = new Usuarios(0,$app);
+    $usuario = new Usuarios(0, $app);
     $resultado = $usuario->getByUsername($_POST['usuario']);
     if ($resultado != '')
         $mensaje = $resultado;
@@ -52,6 +55,9 @@ $app->post('/login', function () use ($app) {
         $_SESSION['lectura'] = $usuario->getLectura();
         $_SESSION['provincia'] = $usuario->getProvincia();
         $app['twig']->addGlobal('session', $_SESSION);
+        if (!(validar('admin') || validar('carga') || validar('lectura'))) {
+            return $app->redirect('login');
+        }
         return $app->redirect($app['url_generator']->generate('homepage'));
 //  return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     }
@@ -119,6 +125,9 @@ $app->post('/mesacargo/{accion}', function ($accion) use ($app) {
 
 
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
+    if (!(validar('admin') || validar('carga'))) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
     require_once'Mesa.php';
     require_once 'Configuracion.php';
     $mensaje = "";
@@ -161,6 +170,14 @@ $app->post('/mesacarga_elige', function () use ($app) {
     } catch (Exception $ex) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => $ex->getMessage())));
     }
+    require_once 'Usuarios.php';
+    
+    $usuario=new Usuarios(0, $app);
+    $usuario->getByUsername($_SESSION['usuario']);
+    if (!$usuario->mesapermitida($mesa)){
+        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => "No permitido")));
+    
+    }
     $mesa->sumavotos();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));
 })->bind('mesacarga_elige_p');
@@ -177,8 +194,6 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     $mesa->sumavotos();
     $votos = $mesa->votos();
     $mascara = $mesa->getMascara();
-    //print_r($mascara);
-    //print_r($votos);
     return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
@@ -314,26 +329,51 @@ $app->get('/usuarios', function () use ($app) {
         return $app->redirect('login');
     }
     require_once'Usuarios.php';
+    if(isset($_GET['quitarmesa_id'])){
+        Usuarios::quitarmesausuario($_GET['quitarmesa_id'], $app);
+    }
+    
     $mensaje = '';
     $usuarios = Usuarios::getAll($app);
     $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
     $secciones = $app['db']->fetchAll('SELECT seccion.*,provincia.nombre as provincia FROM seccion,provincia where provincia.id=seccion.provincia_id order by seccion.nombre');
     $circuitos = $app['db']->fetchAll('SELECT circuito.*,seccion.nombre as seccion FROM seccion,circuito where seccion.id=circuito.seccion_id order by circuito.nombre');
     $seccionales = $app['db']->fetchAll('SELECT seccional.*,circuito.nombre as circuito FROM seccional,circuito where circuito.id=seccional.circuito_id order by circuito.nombre,seccional.nombre');
+    $mesausuario= $app['db']->fetchAll('SELECT *,u.id as id FROM mesa_usuario u,mesa m where m.id=u.mesa_id and usuario_id order by numero asc');
     return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios,
                 'provincia' => $provincia, 'secciones' => $secciones, 'circuitos' => $circuitos,
-                'seccionales' => $seccionales, 'mensaje' => $mensaje));
+                'seccionales' => $seccionales, 'mensaje' => $mensaje,'mesausuario'=>$mesausuario));
 })->bind('usuarios');
 
 $app->post('/usuarios', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
-    }
+    } 
     require_once 'Usuarios.php';
+    if (isset($_POST['add'])){
+        require 'Mesa.php';
+        try {
+             $mesa=new Mesa($_POST['add'],$app);
+             Usuarios::agregarmesausuario($_POST['user_id'],$mesa->getId() , $app);
+        } catch (Exception $exc) {
+           
+        }
+        return $app->redirect($app['url_generator']->generate('usuarios'));
+        
+    }
     $usuario = new Usuarios($_POST['user_id'], $app);
     $usuario->actualizar($_POST);
     return $app->redirect($app['url_generator']->generate('usuarios'));
 })->bind('usuariosp');
+
+$app->post('/usuario_agregar', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect('login');
+    } 
+    require_once 'Usuarios.php';
+    Usuarios::crearusuario($_POST['usuario'], $_POST['nombre'], $_POST['password'], $app);
+    return $app->redirect($app['url_generator']->generate('usuarios'));
+})->bind('usuario_agregar');
 
 
 
