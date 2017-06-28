@@ -23,10 +23,10 @@
                                     <th>INTENDENTE faltantes</th>
                                     <th>INTENDENTE %</th>
                                     <th>CONCEJALES cargadas</th>
-                                    <th>CONCEJALES faltantes</th>                                    
+                                    <th>CONCEJALES faltantes</th>
                                     <th>CONCEJALES %</th>
                                     <th>Reporte</th>
-                                    
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,15 +43,15 @@
                                                 <div id="collapse_I_C{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
                                                         {% for item2 in item.intendente.cargadas %}
-                                                            <button type="button" class="btn btn-primary" 
+                                                            <button type="button" class="btn btn-primary"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
-                                                        {%endfor%}        
+                                                        {%endfor%}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
 
-                                        <td>          
+                                        <td>
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title" style="text-align:right;">
@@ -63,7 +63,7 @@
                                                         {% for item2 in item.intendente.nocargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
-                                                        {%endfor%}  
+                                                        {%endfor%}
                                                     </div>
                                                 </div>
                                             </div>
@@ -86,7 +86,7 @@
                                                         {% for item2 in item.concejal.cargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
-                                                        {%endfor%}        
+                                                        {%endfor%}
                                                     </div>
                                                 </div>
                                             </div>
@@ -103,19 +103,21 @@
                                                         {% for item2 in item.concejal.nocargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
-                                                        {%endfor%}  
+                                                        {%endfor%}
                                                     </div>
                                                 </div>
-                                            </div>                                        
+                                            </div>
 
                                         <td><h4>
                                                 {%if (item.concejal.cargadas|length + item.concejal.nocargadas|length )>0%}
                                                     {{(item.concejal.cargadas|length / (item.concejal.cargadas|length + item.concejal.nocargadas|length )*100)|number_format(2, '.', ',') }}%
                                                 {%endif%}
                                             </h4></td>
-                                        <td><button type="button" class="btn btn-outline btn-primary btn-xs" 
+                                        <td><button type="button" class="btn btn-outline btn-primary btn-xs"
                                                     onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos',id:item.datos.id})}}'">Resultados concejal</button>
-                                        </td>
+                                                    <button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                                onclick="window.location.href = '{{path('avance_circuito',{circuito:item.datos.id})}}'">Reporte de Avance</button>
+                                                    </td>
                                     </tr>
                                 {% endfor %}
 
@@ -125,8 +127,8 @@
                 </div>
             </div>
         </div>
-    </div>    
-{% endblock %}    
+    </div>
+{% endblock %}
 {% block final %}
     <!-- DataTables JavaScript -->
     <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
@@ -140,5 +142,3 @@
                                                         });
     </script>
 {% endblock %}
-
-
