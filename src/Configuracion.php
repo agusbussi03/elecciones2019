@@ -79,21 +79,32 @@ class Configuracion {
         session_start();
         return $_SESSION['usuario'];
     }
+
     function getUltimaactualizacion() {
-       $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%m') as hora FROM log order by tiempo desc LIMIT 1 ");
-       return $hora['hora'];
+        $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%m') as hora FROM log order by tiempo desc LIMIT 1 ");
+        return $hora['hora'];
     }
-    
-    function getObtieneconcejal($nombre){
+
+    function getObtieneconcejal($nombre) {
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista l where tipo='C' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
-      if ($candidato['apellido']=="")  return "Candidato no cargado";
-      return $candidato['apellido']; 
+        if ($candidato['apellido'] == "")
+            return "Candidato no cargado";
+        return $candidato['apellido'];
     }
-        function getObtieneconcejalfoto($nombre){
+
+    function getObtieneconcejalfoto($nombre) {
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista l where tipo='C' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
-      if ($candidato['apellido']=="")  return base64_encode(file_get_contents("imagenes/default.jpg"));
-      return base64_encode($candidato['foto']); 
+        if ($candidato['apellido'] == "")
+            return base64_encode(file_get_contents("imagenes/default.jpg"));
+        return base64_encode($candidato['foto']);
     }
+
+    function getLocalmesa($numero) {
+        require_once 'Mesa.php';
+        $mesa = new Mesa($numero, $this->app);
+        return $mesa->getLocal();
+    }
+
 }

@@ -122,8 +122,6 @@ $app->post('/mesacargo/{accion}', function ($accion) use ($app) {
     return json_encode("OK");
 })->bind('mesacargo');
 
-
-
 $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     if (!(validar('admin') || validar('carga'))) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -135,6 +133,9 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     $categoria = 'G';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
+    if ($mesa->votosporcargo($categoria)>0 && !validar('admin') ){
+        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
+    }
     $mascara = $mesa->getMascara();
     return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesacarga');
@@ -176,7 +177,6 @@ $app->post('/mesacarga_elige', function () use ($app) {
     $usuario->getByUsername($_SESSION['usuario']);
     if (!$usuario->mesapermitida($mesa)){
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => "No permitido")));
-    
     }
     $mesa->sumavotos();
     return $app['twig']->render('mesa_carga_elige.html.twig', array('configuracion' => new Configuracion($app), 'mensaje' => $mensaje, 'categorias' => $categorias, 'mesa' => $mesa));

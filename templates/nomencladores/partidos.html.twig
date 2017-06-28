@@ -30,10 +30,10 @@
                                     <tr>
                                         <th>Nro. P.</th>
                                         <th>Partido</th>
-                                        {%if config.tipo==0%}
-                                        <th>Nro. L.</th>
-                                        <th>Lista</th>
-                                        {%endif%}
+                                            {%if config.tipo==0%}
+                                            <th>Nro. L.</th>
+                                            <th>Lista</th>
+                                            {%endif%}
                                         <th></th> <th></th><th></th>
                                     </tr>
                                 </thead>
@@ -43,8 +43,8 @@
                                             <td>{{item.id_partido}}</td>
                                             <td>{{item.nombre_partido}}</td>
                                             {%if config.tipo==0%}
-                                            <td>{{item.id_lista}}</td>
-                                            <td>{{item.nombre_lista}}</td>
+                                                <td>{{item.id_lista}}</td>
+                                                <td>{{item.nombre_lista}}</td>
                                             {%endif%}
                                             <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}"{%endif%}</td>
 
@@ -67,40 +67,39 @@
                     </div>
                 </div>
             </div>
-                                    
-                                    
-                                    <div class="row">
+
+
+            <div class="row">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Nuevo Partido Lista
                     </div>
-                                               
                     <div class="panel-body"> 
                         {%if config.cerrada==0%}
-                        <form role="form" action="{{path('partidos',{'provincia':provincia.id})}}" method="POST">
-                            <div class="form-group">
-                                <label>Nro. Partido</label>
-                                <input class="form-control" name="id_partido" type="number" size="4" min="1">
-                                <label>Nombre Partido</label>
-                                <input class="form-control" name="nombre_partido" type="text" size="40">
-                                <div {%if config.tipo!=0%} style='display: none;'{%endif%} >
-                                <label>Nro. Lista</label>
-                                <input class="form-control" name="id_lista" value='0' type="number" size="4" min="0">
-                                <label>Nombre lista</label>
-                                <input class="form-control" name="nombre_lista" type="text" size="40" >
+                            <form role="form" action="{{path('partidos',{'provincia':provincia.id})}}" method="POST">
+                                <div class="form-group">
+                                    <label>Nro. Partido</label>
+                                    <input class="form-control" name="id_partido" type="number" size="4" min="1">
+                                    <label>Nombre Partido</label>
+                                    <input class="form-control" name="nombre_partido" type="text" size="40">
+                                    <div {%if config.tipo!=0%} style='display: none;'{%endif%} >
+                                        <label>Nro. Lista</label>
+                                        <input class="form-control" name="id_lista" value='0' type="number" size="4" min="0">
+                                        <label>Nombre lista</label>
+                                        <input class="form-control" name="nombre_lista" type="text" size="40" >
+                                    </div>
+                                    <input type="submit"  class="btn btn-primary" value="Crear nuevo">
+
                                 </div>
-                                <input type="submit"  class="btn btn-primary" value="Crear nuevo">
-                                
-                            </div>
-                        </form>
+                            </form>
                         {%else%}
                             Configuracion cerrada
                         {%endif%}
                     </div>
-                           
+
                 </div>
             </div>
-                                    
+
         </div>
         {% endblock %}    
             {% block final %}

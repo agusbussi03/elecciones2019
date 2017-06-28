@@ -48,11 +48,11 @@
                                             <td>{{item.mesadesde}}-{{item.mesahasta}}</td>
                                             <td>{{item.lat}},{{item.lon}}</td>
                                             <td>
-                                          {%if config.cerrada==0%}              
-                                                <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('local_edit',{'id':item.id}) }}';">Editar</button>
-                                                <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('local_delete',{'id':item.id}) }}';">Borrar</button>
-                                           {%endif%}
-                                          </td>
+                                                {%if config.cerrada==0%}              
+                                                    <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('local_edit',{'id':item.id}) }}';">Editar</button>
+                                                    <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('local_delete',{'id':item.id}) }}';">Borrar</button>
+                                                {%endif%}
+                                            </td>
                                         </tr>
                                     {% endfor %}
 
@@ -69,22 +69,25 @@
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
-                        <form role="form" action="{{path('provincia_add')}}" method="POST">
+                        <form role="form" action="{{path('local_add')}}" method="POST">
                             <div class="form-group">
                                 <label>Nombre</label>
                                 <input class="form-control" name="nombre" type="text" size="40">
-                                <label>Seccion</label>
-                                <input class="form-control" name="sec" type="number" size="4" min="1" >
+                                <label>Direccion</label>
+                                <input class="form-control" name="direccion" type="text" size="40">
+                                <label>Telefono</label>
+                                <input class="form-control" name="telefono" type="text" size="40">
+                                <label>Contacto</label>
+                                <input class="form-control" name="contacto" type="text" size="40">
                                 <label>Mesa desde</label>
                                 <input class="form-control" name="mesa_desde" type="number" size="4" min="1">
                                 <label>Mesa hasta</label>
                                 <input class="form-control" name="mesa_hasta" type="number" size="4" min="1">
                                 <label>Latitud</label>
-                                <input class="form-control" name="lat" type="number" size="4" min="1">
+                                <input class="form-control" name="lat"  size="4" >
                                 <label>Longitud</label>
-                                <input class="form-control" name="long" type="number" size="4" min="1">
-
-                                <input type="submit" disabled  class="btn btn-primary" value="Crear nueva">
+                                <input class="form-control" name="lon"size="4" >
+                                <input type="submit" class="btn btn-primary" value="Crear nueva">
                             </div>
                         </form>
                     </div>
@@ -102,11 +105,11 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                                                    $(document).ready(function () {
-                                                        $('#dataTables-example').DataTable({
-                                                            responsive: true
+                                                        $(document).ready(function () {
+                                                            $('#dataTables-example').DataTable({
+                                                                responsive: true
+                                                            });
                                                         });
-                                                    });
                 </script>
 
 

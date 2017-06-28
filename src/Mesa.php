@@ -53,7 +53,7 @@ class Mesa {
         $this->concejal = $datos['concejal'];
         $this->diputado_nacional = $datos['diputado_nacional'];
         $this->senador_nacional = $datos['senador_nacional'];
-        $this->seccional= $datos['seccionales_id'];
+        $this->seccional = $datos['seccionales_id'];
     }
 
     function getId() {
@@ -164,9 +164,7 @@ class Mesa {
         $this->senador_nacional = $senador_nacional;
     }
 
-        
     function getMascara() {
-
         $cargo_sql = "SELECT * FROM cargo_provincial c,partido_lista p WHERE c.provincia_id=? and c.lista_id=p.id ";
         $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->provincia));
         $mascara = array();
@@ -226,7 +224,13 @@ class Mesa {
         }
         return $sumavotos;
     }
-
+function getLocal() {
+        $sql = "SELECT * from locales WHERE mesahasta>=? and mesadesde<=?";
+       $resultado = $this->app['db']->fetchAssoc($sql, array((int) $this->numero,(int) $this->numero));
+        
+        if (isset($resultado['nombre']))  return $resultado['nombre'];
+        return "";
+    }
     function regenera() {
         $mascara = $this->getMascara();
         $sql = "DELETE FROM renglon WHERE mesa_id=?";
@@ -243,11 +247,18 @@ class Mesa {
         $sql = "SELECT * from renglon WHERE mesa_id=?";
         $votos = array();
         $resultado = $this->app['db']->fetchAll($sql, array((int) $this->id));
-
         foreach ($resultado as $item) {
             $votos[$item['lista_id']] = $item;
         }
         return $votos;
+    }
+
+    function votosporcargo($cargo) {
+        $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador', 'I' => 'intendente', 'C' => 'concejal');
+        $cargo = $columnas[$cargo];
+        $sql = "SELECT sum($cargo) as suma from renglon WHERE mesa_id=?";
+        $resultado = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        return $resultado['suma'];
     }
 
     function actualiza($votos) {
@@ -277,9 +288,9 @@ class Mesa {
     }
 
     static function unsetTestigo($id, $app) {
-         $sql = "DELETE FROM renglon where mesa_id=$id";
+        $sql = "DELETE FROM renglon where mesa_id=$id";
         $app['db']->executeQuery($sql);
-                 $sql = "DELETE FROM renglon_nacional where mesa_id=$id";
+        $sql = "DELETE FROM renglon_nacional where mesa_id=$id";
         $app['db']->executeQuery($sql);
         $sql = "DELETE FROM mesa where id=$id";
         $app['db']->executeQuery($sql);
@@ -316,9 +327,10 @@ class Mesa {
         $columna = $columnas[$dato[0]];
         $id = $dato[1];
         $sql = "UPDATE mesa set $columna=1 where id=?";
-        $app['db']->executeQuery($sql,array((int) $id));
+        $app['db']->executeQuery($sql, array((int) $id));
         return json_encode("OK");
     }
+
     static function cargoquitar($datos, $app) {
         $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador',
             'I' => 'intendente', 'C' => 'concejal', 'DN' => 'diputado_nacional', 'SN' => 'senador_nacional');
@@ -329,4 +341,5 @@ class Mesa {
         $app['db']->executeQuery($sql, array((int) $id));
         return json_encode("OK");
     }
+
 }

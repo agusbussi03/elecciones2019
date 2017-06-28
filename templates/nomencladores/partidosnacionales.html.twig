@@ -35,6 +35,7 @@
                                             <th>Lista</th>
                                             <th>Diputado</th>
                                             <th>Senador</th>
+                                             <th></th>
                                         </tr>
                                     </thead> 
 
@@ -48,6 +49,10 @@
                                                 <td>{{item.nombre_lista}}</td>
                                                 <td><input type="checkbox" name="D,{{item.id}}" {%if item.diputado=='D'%}checked{%endif%} class="btn btn-primary"></td>
                                                 <td><input type="checkbox" name="S,{{item.id}}"  {%if item.senador=='S'%}checked{%endif%} class="btn btn-primary"></td>
+                                                <td>                                     
+                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se eliminarán los datos relacionados a cargos y renglones de este partido. Continua?'))
+                                                            window.location.href = '{{ path('partidosnacionales',{'provincia':item.provincia_id,'borrar':item.id}) }}';">Borrar</button>
+                                            </td>
                                             </tr>
                                         {% endfor %}
 
@@ -60,6 +65,37 @@
                     </div>
                 </div>
             </div>
+    <div class="row">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Nuevo Partido Lista
+                    </div>
+                    <div class="panel-body"> 
+                        {%if config.cerrada==0%}
+                            <form role="form" action="{{path('partidosnacionales',{'provincia':provincia.id})}}" method="POST">
+                                <div class="form-group">
+                                    <label>Nro. Partido</label>
+                                    <input class="form-control" name="id_partido" type="number" size="4" min="1">
+                                    <label>Nombre Partido</label>
+                                    <input class="form-control" name="nombre_partido" type="text" size="40">
+                                    <div {%if config.tipo!=0%} style='display: none;'{%endif%} >
+                                        <label>Nro. Lista</label>
+                                        <input class="form-control" name="id_lista" value='0' type="number" size="4" min="0">
+                                        <label>Nombre lista</label>
+                                        <input class="form-control" name="nombre_lista" type="text" size="40" >
+                                    </div>
+                                    <input type="submit"  class="btn btn-primary" value="Crear nuevo">
+
+                                </div>
+                            </form>
+                        {%else%}
+                            Configuracion cerrada
+                        {%endif%}
+                    </div>
+
+                </div>
+            </div>
+
         </div>
         {% endblock %}    
             {% block final %}

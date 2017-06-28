@@ -23,12 +23,12 @@
                                 <tr>
                                     <th>Mesa</th>
                                     <th>Provincia</th>
-                                    <th>Departamento</th>
                                     <th>Localidad</th>
                                     <th>Seccional</th>
+                                    <th>Escuela</th>
                                     <th>Electores P.</th>
                                     <th>Electores N.</th>
-                                    <th>Gobernaodr</th>
+                                    <th>Gobernador</th>
                                     <th>Diputado</th>
                                 </tr>
                             </thead>
@@ -37,9 +37,11 @@
                                     <tr class="odd gradeX">
                                         <td>{{item.numero}}</td>
                                         <td>{{item.p_nombre}}</td>
-                                        <td><a href="{{path('circuitos',{'seccion':item.s_id})}}">{{item.s_nombre}}</a></td>
+                                        {#<td><a href="{{path('circuitos',{'seccion':item.s_id})}}">{{item.s_nombre}}</a></td>
+                                        #}
                                         <td>{{item.c_nombre}}</a></td>
                                         <td>{{item.sec_nombre}}</td>
+                                        <td>{{config.localmesa(item.numero)}}</td>
                                         <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
                                         <td>{%if item.gobernador==0%}NO{%else%}SI{%endif%}</td>
