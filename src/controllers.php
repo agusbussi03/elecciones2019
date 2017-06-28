@@ -109,6 +109,9 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     if (isset($_GET['borrar'])) {
         Mesa::unsetTestigo($_GET['borrar'], $app);
     }
+    if (isset($_GET['responsable'])) {
+        Mesa::setResponsable($_GET['mesa'],$_GET['responsable'], $app);
+    }
     $mesas = Mesa::testigosporcircuito($circuito['id'], $app);
     return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas, 'seccionales' => $seccionales));
 })->bind('testigo_accion');
@@ -172,7 +175,7 @@ $app->post('/mesacarga_elige', function () use ($app) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => $ex->getMessage())));
     }
     require_once 'Usuarios.php';
-    
+
     $usuario=new Usuarios(0, $app);
     $usuario->getByUsername($_SESSION['usuario']);
     if (!$usuario->mesapermitida($mesa)){
@@ -332,7 +335,7 @@ $app->get('/usuarios', function () use ($app) {
     if(isset($_GET['quitarmesa_id'])){
         Usuarios::quitarmesausuario($_GET['quitarmesa_id'], $app);
     }
-    
+
     $mensaje = '';
     $usuarios = Usuarios::getAll($app);
     $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
@@ -348,7 +351,7 @@ $app->get('/usuarios', function () use ($app) {
 $app->post('/usuarios', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
-    } 
+    }
     require_once 'Usuarios.php';
     if (isset($_POST['add'])){
         require 'Mesa.php';
@@ -356,10 +359,10 @@ $app->post('/usuarios', function () use ($app) {
              $mesa=new Mesa($_POST['add'],$app);
              Usuarios::agregarmesausuario($_POST['user_id'],$mesa->getId() , $app);
         } catch (Exception $exc) {
-           
+
         }
         return $app->redirect($app['url_generator']->generate('usuarios'));
-        
+
     }
     $usuario = new Usuarios($_POST['user_id'], $app);
     $usuario->actualizar($_POST);
@@ -369,7 +372,7 @@ $app->post('/usuarios', function () use ($app) {
 $app->post('/usuario_agregar', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
-    } 
+    }
     require_once 'Usuarios.php';
     Usuarios::crearusuario($_POST['usuario'], $_POST['nombre'], $_POST['password'], $app);
     return $app->redirect($app['url_generator']->generate('usuarios'));

@@ -227,7 +227,7 @@ class Mesa {
 function getLocal() {
         $sql = "SELECT * from locales WHERE mesahasta>=? and mesadesde<=?";
        $resultado = $this->app['db']->fetchAssoc($sql, array((int) $this->numero,(int) $this->numero));
-        
+
         if (isset($resultado['nombre']))  return $resultado['nombre'];
         return "";
     }
@@ -330,7 +330,11 @@ function getLocal() {
         $app['db']->executeQuery($sql, array((int) $id));
         return json_encode("OK");
     }
-
+    static function setResponsable($mesa,$responsable, $app) {
+        $sql = "UPDATE mesa set responsable=? where id=?";
+        $app['db']->executeQuery($sql, array($responsable,(int) $mesa));
+        return;
+    }
     static function cargoquitar($datos, $app) {
         $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador',
             'I' => 'intendente', 'C' => 'concejal', 'DN' => 'diputado_nacional', 'SN' => 'senador_nacional');
