@@ -96,7 +96,8 @@
                     {%endfor%}
                     </div>
                     <div style="width:45%;float:left;">
-                        {% for clave,item in totales %}
+                        {%set candidatos=config.ordenacandidatos(totales)%}
+                        {% for clave,item in candidatos %}
                             {%if loop.index>0%}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">

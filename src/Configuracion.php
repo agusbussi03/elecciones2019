@@ -86,11 +86,12 @@ class Configuracion {
     }
 
     function getObtieneconcejal($nombre) {
+        $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista l where tipo='C' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
         if ($candidato['apellido'] == "")
-            return "Candidato no cargado";
-        return $candidato['apellido'];
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
     }
 
     function getObtieneconcejalfoto($nombre) {
@@ -107,4 +108,30 @@ class Configuracion {
         return $mesa->getLocal();
     }
 
+    function getOrdenaCandidatos($arreglo) {
+        $divididos = array();
+        //print_r($arreglo);
+        foreach ($arreglo as $clave => $valor) {
+            $partido = explode("-", $clave);
+            $divididos[$partido[0]][$clave] = $valor;
+            uasort($divididos[$partido[0]], 'cmp');
+        }
+        //print_r($divididos);
+        $unidos = array();
+        foreach ($divididos as $item) {
+            foreach ($item as $clave2 => $item2) {
+                $unidos[$clave2] = $item2;
+            }
+        }
+        //print_r($unidos);die;
+        return $unidos;
+    }
+
+}
+
+function cmp($a, $b) {
+    if ($a['porcentaje'] == $b['porcentaje']) {
+        return 0;
+    }
+    return ($a['porcentaje'] > $b['porcentaje']) ? -1 : 1;
 }
