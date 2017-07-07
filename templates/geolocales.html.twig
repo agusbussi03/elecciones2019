@@ -34,10 +34,11 @@ jQuery(function($) {
     script.src = "//maps.googleapis.com/maps/api/js?key=AIzaSyCLKpRut6NYE57XBQIiSdLmTcKKPVmb9Xc&sensor=false&callback=initialize";
     document.body.appendChild(script);
 });
-
+var map;
 function initialize() {
-    var map;
+    //var map;
     var bounds = new google.maps.LatLngBounds();
+
     var mapOptions = {
         mapTypeId: 'roadmap'
     };
@@ -91,11 +92,12 @@ function initialize() {
 
     // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
     var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
-        this.setZoom(14);
+        this.setZoom(8);
+         map.setCenter({lat: -31.0591, lng: -60.7456});
         google.maps.event.removeListener(boundsListener);
     });
-    
 }
+     map.setCenter({lat: -31.0591, lng: -60.7456});
 
     </script>
 

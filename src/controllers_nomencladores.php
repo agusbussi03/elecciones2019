@@ -410,9 +410,21 @@ $app->get('/cargosintendente/{circuito}', function ($circuito) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local
+    if (isset($_GET['apellido'])) {
+        $sql = "INSERT INTO candidato VALUES (NULL,?,?,0,NULL);";
+        $app['db']->executeQuery($sql, array( $_GET['apellido'],  $_GET['nombre']));
+        $candidato_id = $app['db']->lastInsertId();
+        $sql = "UPDATE cargo_local set candidato_id=$candidato_id where id=" . $_GET['cargo'];
+        $app['db']->executeQuery($sql);
+    }
+    $cargos = array();
+    $cargos2 = $app['db']->fetchAll("SELECT *,cargo_local.id as id_cargo FROM partido_lista,cargo_local  left join candidato on candidato.id=candidato_id 
              WHERE circuito_id=$circuito and tipo='I' and lista_id=partido_lista.id order by id_partido,id_lista");
     $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
+    foreach ($cargos2 as $item) {
+        $item['foto'] = base64_encode($item['foto']);
+        $cargos[] = $item;
+    }
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente');
@@ -450,13 +462,26 @@ $app->post('/cargosintendente_add/{id}', function ($id) use ($app) {
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente_add');
 
+$app->post('/cargosintendente_logo/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+     if (isset($_FILES['logo']['tmp_name'])) {
+            $logo = file_get_contents($_FILES['logo']['tmp_name']);
+            $sql = "UPDATE candidato SET foto=? WHERE id=?";
+            $app['db']->executeQuery($sql, array($logo, (int) $_POST['candidato_id']));
+    }
+        return $app->redirect($app['url_generator']->generate('cargosintendente', array('circuito' => $id)));
+
+})->bind('cargosintendente_logo');
+
 
 $app->get('/cargosconcejal/{circuito}', function ($circuito) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     if (isset($_GET['apellido'])) {
-        $sql = "INSERT INTO candidato VALUES (NULL,?,?,NULL);";
+        $sql = "INSERT INTO candidato VALUES (NULL,?,?,0,NULL);";
         $app['db']->executeQuery($sql, array( $_GET['apellido'],  $_GET['nombre']));
         $candidato_id = $app['db']->lastInsertId();
         $sql = "UPDATE cargo_local set candidato_id=$candidato_id where id=" . $_GET['cargo'];
@@ -471,6 +496,20 @@ $app->get('/cargosconcejal/{circuito}', function ($circuito) use ($app) {
         $cargos[] = $item;
     }
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
+    if (isset($_GET['xls'])){
+        $texto="";
+        foreach($cargos as $cargo) {
+            $texto.='"'.$circuito['nombre'].'",';
+            $texto.='"'.$cargo['nombre_partido'].'","'.$cargo['nombre_lista'].'",';
+            $candidato = $app['db']->fetchAssoc("SELECT * FROM candidato where id=".$cargo['candidato_id']);
+            $texto.='"'.$candidato['apellido']." ".$candidato['nombre'].'"'."\n\r";
+            
+        }
+        header('Content-Description: File Transfer');header("Content-type: application/vnd.ms-excel");
+        header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+        echo $texto;
+        die;
+    }
     return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosconcejal');
 

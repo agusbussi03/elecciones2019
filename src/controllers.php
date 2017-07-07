@@ -387,6 +387,7 @@ $app->get('/geolocales', function () use ($app) {
         return $app->redirect('login');
     }
     $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde)";
+    
     $locales = $app['db']->fetchAll($sql, array());
 
     return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));
