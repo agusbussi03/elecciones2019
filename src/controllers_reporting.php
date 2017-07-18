@@ -78,7 +78,7 @@ $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
     foreach ($circuitos[0]['concejal']['nocargadas'] as $item) {
         $pdf->Row_b(array($item['numero'],utf8_decode($configuracion->getLocalmesa($item['numero'])),$item['responsable']));
     }
-    $pdf->Ln();
+    $pdf->AddPage();
     $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetWidths(array(200));
     $titulo = 'Faltantes intendente:  '.$circuitos[0]['datos']['nombre'];
@@ -106,6 +106,9 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
+    if (isset($_GET['tiporeporte'])) $_SESSION['tiporeporte']=$_GET['tiporeporte'];
+    else $_SESSION['tiporeporte']="EMITIDOS";
+    $app['twig']->addGlobal('session', $_SESSION);
     require_once 'Concejales.php';
     $concejales = new Concejales($id, $app);
     //print_r($concejales->getSeccionales());
@@ -117,6 +120,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     }
     if ($tipo == 'porcentajes') {
         $resultado = $concejales->getPorcentajes();
+        //print_r($resultado);
         return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $concejales->getSeccionales()));
     }
@@ -146,11 +150,31 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
 function suma($item)
 {
     $suma = 0;
-    foreach ($item as $i) {
-        $suma += $i['votos'];
+    foreach ($item as $clave=>$valor) {
+        $suma += $valor['votos'];
     }
     return$suma;
 }
+
+function sumavalidos($item)
+{
+    $suma = 0;
+    foreach ($item as $clave=>$valor) {
+        if ($clave!="NULOS--") $suma += $valor['votos'];
+    }
+    return$suma;
+}
+
+function sumaafirmativos($item)
+{
+    $suma = 0;
+    foreach ($item as $clave=>$valor) {
+        if ($clave!="NULOS--" && $clave!="BLANCOS--") $suma += $valor['votos'];
+    }
+    return$suma;
+}
+
+
 function ordena($a, $b)
 {
     if ($a['porcentaje'] == $b['porcentaje']) {

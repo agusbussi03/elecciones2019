@@ -35,6 +35,8 @@
                                         <th>Cons. S.</th>
                                         <th>Electores N.</th>
                                         <th>Electores P.</th>
+                                        <th>Mesa desde</th>
+                                        <th>Mesa hasta</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -47,6 +49,8 @@
                                             <td>{{item.conc_suplentes}}</td>
                                             <td>{{item.electores_nacion}}</td>
                                             <td>{{item.electores_provincia}}</td>
+                                             <td>{{item.mesadesde}}</td>
+                                              <td>{{item.mesahasta}}</td>
                                             <td> 
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosintendente',{'circuito':item.id}) }}';">C. Intendente</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosconcejal',{'circuito':item.id}) }}';">C. Concejal</button>
@@ -88,6 +92,10 @@
                                     <input class="form-control" name="conc_titulares" type="number" size="4" min="1">
                                     <label>Concejales suplentes</label>
                                     <input class="form-control" name="conc_suplentes" type="number" size="4" min="1">
+                                    <label>Mesa desde</label>
+                                    <input class="form-control" name="mesadesde" type="number" size="4" min="1">
+                                    <label>Mesa hasta</label>
+                                    <input class="form-control" name="mesahasta" type="number" size="4" min="1">
                                     <input type="submit"  class="btn btn-primary" value="Crear nueva">
                                 </div>
                             </form>

@@ -155,12 +155,12 @@ $app->post('/circuito_add/{seccion}', function ($seccion) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "INSERT INTO circuito VALUES (NULL,?,?,?,?,?,?,?)";
+    $sql = "INSERT INTO circuito VALUES (NULL,?,?,?,?,?,?,?,?,?)";
     $app['db']->executeQuery($sql, array($_POST['nombre'],
         (int) $_POST['electores_nacion'], (int) $_POST['electores_provincia'],
         (int) $_POST['intendente'],
         (int) $_POST['conc_titulares'], (int) $_POST['conc_suplentes'],
-        $seccion));
+        $seccion,(int) $_POST['mesadesde'], (int) $_POST['mesahasta']));
     $breadcumb = $app['db']->fetchAssoc("SELECT p.id as provincia_id,p.nombre as provincia_nombre,"
             . "s.id as seccion_id, s.nombre as seccion_nombre FROM provincia p,seccion s where p.id=s.provincia_id and  s.id=$seccion");
 
@@ -205,10 +205,12 @@ $app->post('/circuito_edit/{id}', function ($id) use ($app) {
     $mensaje = array('codigo' => 0, 'texto' => "El circuito fue modificado");
     try {
         $sql = "UPDATE circuito SET nombre=?,electores_nacion=?,electores_provincia=?,"
-                . "intendente=?,conc_titulares=?,conc_suplentes=? WHERE id=?";
+                . "intendente=?,conc_titulares=?,conc_suplentes=?,"
+                . "mesadesde=?,mesahasta=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
             (int) $_POST['electores_provincia'], (int) $_POST['intendente'],
-            (int) $_POST['conc_titulares'], (int) $_POST['conc_suplentes'], (int) $id));
+            (int) $_POST['conc_titulares'], (int) $_POST['conc_suplentes'],
+            (int) $_POST['mesadesde'], (int) $_POST['mesahasta'],(int) $id));
         $circuito = $app['db']->fetchAssoc("SELECT seccion_id FROM circuito where id=$id");
         $seccion = $circuito['seccion_id'];
     } catch (Exception $ex) {
@@ -790,8 +792,8 @@ $app->post('/partido_logo/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM partido_lista where id=$id");
-    $provincia = $provincia['id'];
-
+    $provincia = $provincia['provincia_id'];
+//echo "SSSSSS.$provincia";
     if (isset($_FILES['logo']['tmp_name'])) {
 
         try {

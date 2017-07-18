@@ -21,7 +21,7 @@
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
            <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('homepage') }}';">Home</button>
+                        onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -43,7 +43,7 @@
                         </td>
                         {#{dump(votos)}#}
                         {% for clave,item in votos|first %}
-                            <td style="font-size:12px;">
+                            <td style="font-size:10px; word-wrap: break-word;margin:0;width:50px">
                                 {{clave}}
                             </td>
                         {%endfor%}

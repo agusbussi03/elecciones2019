@@ -146,11 +146,11 @@
                               <div class="form-group">
                                 <label>Mesa
                                 </label>
-                                <input class="form-control" name="numero" type="number" size="4" min="1">
+                                <input class="form-control" name="numero" type="number" required size="4" min="{{circuito.mesadesde}}" max="{{circuito.mesahasta}}">
                                 <label>Electores provincia</label>
-                                <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
+                                <input class="form-control" name="electores_provincia" required type="number" size="4" min="1">
                                 <label>Electores nacion</label>
-                                <input class="form-control" name="electores_nacion" type="number" size="4" min="1">
+                                <input class="form-control" name="electores_nacion" required type="number" size="4" min="1">
                                 {%if seccionales|length >0%}
                                   <select name="seccional_id">
                                     {% for item in seccionales %}

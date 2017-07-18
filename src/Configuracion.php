@@ -85,6 +85,12 @@ class Configuracion {
         return $hora['hora'];
     }
 
+    function getNombreSeccional($id) {
+        if (!($id>0)) return "";
+        $seccional = $this->app['db']->fetchAssoc("SELECT * FROM seccional where id=".$id);
+        return $seccional['nombre'];
+    }
+    
     function getObtieneconcejal($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"

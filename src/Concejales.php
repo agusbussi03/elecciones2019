@@ -80,7 +80,9 @@ class Concejales {
         $general = 0;
         $resultado = $this->getResultados();
         foreach ($resultado['votos'] as $clave => $valor) {
-            $suma = suma($valor);
+            if ($_SESSION['tiporeporte']=='VALIDOS') $suma = sumavalidos($valor);
+            elseif ($_SESSION['tiporeporte']=='AFIRMATIVOS') $suma = sumaafirmativos($valor);
+            else $suma = suma($valor);
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {

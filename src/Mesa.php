@@ -277,6 +277,8 @@ function getLocal() {
         return;
     }
 
+     
+    
     static function setTestigo($numero, $electores_provincia, $electores_nacion, $circuito, $seccional, $app) {
         if ($seccional > 0) {
             $sql = "INSERT INTO mesa (id,numero,electores_provincia,electores_nacion,circuito_id,seccionales_id) VALUES (NULL,?,?,?,?,?)";
