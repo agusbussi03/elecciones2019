@@ -1,16 +1,13 @@
 {% extends "layout.html.twig" %}
-
 {% block content %}
     <meta http-equiv="refresh" content="15">
+
+    {#% include "navigator.html.twig" %#}
     <div {#class="container"#}>
         <div>
-           <div style='width: 65%;float: left'>
-                <h1 class="page-header">Concejales {{circuito.nombre}}- PORC. PONDERADO ({{session.tiporeporte}})</h1>
+            <div style='width: 65%;float: left'>
+                <h1 class="page-header">Diputados nacionales {{circuito.nombre}}- VOTOS</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
-                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
-                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
-                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
-
             </div>
             <div style='float: right;width:35%'>
                 <button type="button" class="btn btn-sm btn-default"
@@ -23,9 +20,8 @@
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
-             <button type="button" class="btn btn-sm btn-default"
+           <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
-            
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -45,55 +41,51 @@
                         <td style="font-size:12px;width:400px;">
                             Seccional
                         </td>
-                        <td>Peso</td>
                         {#{dump(votos)}#}
                         {% for clave,item in votos|first %}
-                            <td style="font-size:10px;">
+                            <td style="font-size:10px; word-wrap: break-word;margin:0;width:50px">
                                 {{clave}}
                             </td>
                         {%endfor%}
-                       
+                        <td style="font-size:12px;">
+                            Total
+                        </td>
                     </tr>
                     <!--/thead-->
 
                     {% for clave,item in votos %}
                         <tr class="odd gradeX" id="r_{{loop.index}}">
                             <td style="width:400px;">
-                                {{  seccionales[clave].nombre  }}
-                            </td> 
-                            <td >
-                                {{ seccionales[clave].electores }} ({{ seccionales[clave].peso }}%)
+                                {{ seccionales[clave].nombre }}
                             </td> 
                             {% set total=0 %}
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
-                                    {%if loop.index>1%}{{(item2.porcentaje * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%
-                                     {%else%}{{item2}}{%endif%}
+                                    {{item2.votos}}
                                 </td>
-                                 {%if loop.index>1%}{%set total=total+item2.porcentaje %}{%endif%}
+                                {%set total=total+item2.votos %}
                             {%endfor%}
-                            
+                            <td style="text-align: right">{{total}}</td>
                         </tr>
                     {% endfor %}
                     <tr class="odd gradeX" id="tr_TOTAL">
                         <td style="width:300px;">
                             <b>TOTAL</b>
                         </td> 
-                        <td></td><td></td>
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 
-                                <b>{{item2.porcentaje|number_format(2, '.', ',')}}%</b>
+                                <b>{{item2.votos}}</b>
                             </td>
-                            {%set total=total+item2.porcentaje %}
+                            {%set total=total+item2.votos %}
                         {%endfor%}
-                        
+                        <td style="text-align: right;"><b>{{total}}</b></td>
                     </tr>
                 </table>
             </div>
         </div>
         {%endif%}
-
+   
         {% endblock %}    
             {% block final %}
             {% endblock %}

@@ -4,13 +4,13 @@
     <meta http-equiv="refresh" content="15">
     <div {#class="container"#}>
         <div>
-           <div style='width: 65%;float: left'>
-                <h1 class="page-header">Concejales {{circuito.nombre}}- PORC. PONDERADO ({{session.tiporeporte}})</h1>
-                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
-                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
+            <div style='width: 65%;float: left'>
+                <h1 class="page-header">Concejales {{circuito.nombre}}- PORCENTAJES ({{session.tiporeporte}})</h1>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
 
+                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
             <div style='float: right;width:35%'>
                 <button type="button" class="btn btn-sm btn-default"
@@ -23,9 +23,8 @@
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
-             <button type="button" class="btn btn-sm btn-default"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
-            
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -52,7 +51,7 @@
                                 {{clave}}
                             </td>
                         {%endfor%}
-                       
+
                     </tr>
                     <!--/thead-->
 
@@ -67,35 +66,34 @@
                             {% set total=0 %}
                             {% for item2 in item %}
                                 <td style="text-align: right"> 
-                                    {%if loop.index>1%}{{(item2.porcentaje * seccionales[clave].peso/100)|number_format(2, '.', ',')}}%
-                                     {%else%}{{item2}}{%endif%}
+                                    {%if loop.index>1%}{{item2.porcentaje|number_format(2, '.', ',')}}% 
+                                    {%else%}{{item2}}{%endif%}
                                 </td>
-                                 {%if loop.index>1%}{%set total=total+item2.porcentaje %}{%endif%}
+                                {%if loop.index>1%} {%set total=total+item2.porcentaje %}{%endif%}
                             {%endfor%}
-                            
                         </tr>
                     {% endfor %}
                     <tr class="odd gradeX" id="tr_TOTAL">
                         <td style="width:300px;">
                             <b>TOTAL</b>
                         </td> 
-                        <td></td><td></td>
+                        <td></td>
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 
-                                <b>{{item2.porcentaje|number_format(2, '.', ',')}}%</b>
+                                <b>{%if loop.index>1%}{{item2.porcentaje|number_format(2, '.', ',')}}%{%else%}{{item2}}{%endif%}</b>
                             </td>
-                            {%set total=total+item2.porcentaje %}
+                            {%if loop.index>1%} {%set total=total+item2.porcentaje %}{%endif%}
                         {%endfor%}
-                        
+
                     </tr>
                 </table>
             </div>
         </div>
         {%endif%}
 
-        {% endblock %}    
-            {% block final %}
-            {% endblock %}
+            {% endblock %}    
+                {% block final %}
+                {% endblock %}
 
 

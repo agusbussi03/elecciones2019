@@ -578,7 +578,7 @@ $app->post('/cargosnacionales/{provincia}', function ($provincia) use ($app) {
     foreach ($_POST as $clave => $item) {
         $datos = explode(",", $clave);
         if ($datos[0] == "D" || $datos[0] == "S") {
-            $sql = "INSERT into cargo_nacional values(NULL,?,?,?)";
+            $sql = "INSERT into cargo_nacional values(NULL,?,?,?,NULL)";
             $app['db']->executeQuery($sql, array($datos[0], $datos[1], (int) $provincia));
         }
     }
