@@ -5,7 +5,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Carga por Ciudad</h1>
+                <h1 class="page-header">Carga Nacional</h1>
             </div>
         </div>
         <div class="row">
@@ -19,30 +19,29 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>INTENDENTE cargadas</th>
-                                    <th>INTENDENTE faltantes</th>
-                                    <th>INTENDENTE %</th>
-                                    <th>CONCEJALES cargadas</th>
-                                    <th>CONCEJALES faltantes</th>
-                                    <th>CONCEJALES %</th>
+                                    <th>DIP. NACIONAL cargadas</th>
+                                    <th>DIP. NACIONAL faltantes</th>
+                                    <th>DIP. NACIONAL %</th>
+                                    <th>SEN. NACIONAL cargadas</th>
+                                    <th>SEN. NACIONAL faltantes</th>
+                                    <th>SEN. NACIONAL %</th>
                                     <th>Reporte</th>
 
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in circuitos%}
                                     <tr class="odd gradeX">
-                                        <td>{{item.datos.nombre}}</td>
+                                        <td>Nacionales</td>
                                         <td>
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title" style="text-align:right;">
-                                                        <a data-toggle="collapse" data-parent="#concejal_I_C{{item.datos.id}}" href="#collapse_I_C{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.intendente.cargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_C{{provincia.datos.id}}" href="#collapse_I_C{{provincia.datos.id}}" aria-expanded="false" class="collapsed">{{provincia.dipnac.cargadas|length}}</a>
                                                     </h4>
                                                 </div>
-                                                <div id="collapse_I_C{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                <div id="collapse_I_C{{provincia.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                        {% for item2 in item.intendente.cargadas %}
+                                                        {% for item2 in provincia.dipnac.cargadas %}
                                                             <button type="button" class="btn btn-primary"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
                                                         {%endfor%}
@@ -55,12 +54,12 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title" style="text-align:right;">
-                                                        <a data-toggle="collapse" data-parent="#concejal_I_N{{item.datos.id}}" href="#collapse_I_N{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.intendente.nocargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_I_N{{provincia.datos.id}}" href="#collapse_I_N{{provincia.datos.id}}" aria-expanded="false" class="collapsed">{{provincia.dipnac.nocargadas|length}}</a>
                                                     </h4>
                                                 </div>
-                                                <div id="collapse_I_N{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                <div id="collapse_I_N{{provincia.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                        {% for item2 in item.intendente.nocargadas %}
+                                                        {% for item2 in provincia.dipnac.nocargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
                                                         {%endfor%}
@@ -70,20 +69,20 @@
 
                                         </td>
                                         <td><h4>
-                                                {%if (item.intendente.cargadas|length + item.intendente.nocargadas|length )>0%}
-                                                    {{(item.intendente.cargadas|length / (item.intendente.cargadas|length + item.intendente.nocargadas|length )*100)|number_format(2, '.', ',') }}%
+                                                {%if (provincia.dipnac.cargadas|length + provincia.dipnac.nocargadas|length )>0%}
+                                                    {{(provincia.dipnac.cargadas|length / (provincia.dipnac.cargadas|length + provincia.dipnac.nocargadas|length )*100)|number_format(2, '.', ',') }}%
                                                 </h4></td>
-                                            {%endif%}
+                                                {%endif%}
                                         <td>
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title" style="text-align:right;">
-                                                        <a data-toggle="collapse" data-parent="#concejal_C_C{{item.datos.id}}" href="#collapse_C_C{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.concejal.cargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_C_C{{provincia.datos.id}}" href="#collapse_C_C{{provincia.datos.id}}" aria-expanded="false" class="collapsed">{{provincia.sennac.cargadas|length}}</a>
                                                     </h4>
                                                 </div>
-                                                <div id="collapse_C_C{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                <div id="collapse_C_C{{provincia.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                        {% for item2 in item.concejal.cargadas %}
+                                                        {% for item2 in provincia.sennac.cargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
                                                         {%endfor%}
@@ -95,12 +94,12 @@
                                             <div class="panel panel-default">
                                                 <div class="panel-heading">
                                                     <h4 class="panel-title" style="text-align:right;">
-                                                        <a data-toggle="collapse" data-parent="#concejal_C_N{{item.datos.id}}" href="#collapse_C_N{{item.datos.id}}" aria-expanded="false" class="collapsed">{{item.concejal.nocargadas|length}}</a>
+                                                        <a data-toggle="collapse" data-parent="#concejal_C_N{{provincia.datos.id}}" href="#collapse_C_N{{provincia.datos.id}}" aria-expanded="false" class="collapsed">{{provincia.sennac.nocargadas|length}}</a>
                                                     </h4>
                                                 </div>
-                                                <div id="collapse_C_N{{item.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                                                <div id="collapse_C_N{{provincia.datos.id}}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
                                                     <div class="panel-body">
-                                                        {% for item2 in item.concejal.nocargadas %}
+                                                        {% for item2 in provincia.sennac.nocargadas %}
                                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                     onclick="window.location.href = '{{path('mesa',{nro:item2.numero})}}'">{{item2.numero}}</button>
                                                         {%endfor%}
@@ -109,21 +108,16 @@
                                             </div>
 
                                         <td><h4>
-                                                {%if (item.concejal.cargadas|length + item.concejal.nocargadas|length )>0%}
-                                                    {{(item.concejal.cargadas|length / (item.concejal.cargadas|length + item.concejal.nocargadas|length )*100)|number_format(2, '.', ',') }}%
+                                                {%if (provincia.sennac.cargadas|length + provincia.sennac.nocargadas|length )>0%}
+                                                    {{(provincia.sennac.cargadas|length / (provincia.sennac.cargadas|length + provincia.sennac.nocargadas|length )*100)|number_format(2, '.', ',') }}%
                                                 {%endif%}
                                             </h4></td>
                                         <td><button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos',id:item.datos.id})}}'">Resultados concejal</button>
-                                            <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos_grafico',id:item.datos.id})}}'">Grafico Seccionales</button>
-                                            
+                                                    onclick="window.location.href = '{{path('rep_dipnac_seccion',{tipo:'votos',id:provincia.datos.id})}}'">Resultados diputados</button>
                                                     <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('avance_circuito',{circuito:item.datos.id})}}'">Reporte de Avance</button>
-                                        </td>
+                                                                onclick="window.location.href = '{{path('avance_circuito',{circuito:provincia.datos.id})}}'">Reporte de Avance</button>
+                                                    </td>
                                     </tr>
-                                {% endfor %}
-
                             </tbody>
                         </table>
                     </div>
@@ -138,10 +132,10 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-                                                                    $(document).ready(function () {
-                                                                        $('#dataTables-example').DataTable({
-                                                                            responsive: true
-                                                                        });
-                                                                    });
+                                                        $(document).ready(function () {
+                                                            $('#dataTables-example').DataTable({
+                                                                responsive: true
+                                                            });
+                                                        });
     </script>
 {% endblock %}

@@ -27,6 +27,30 @@ $app->get('/rep_circuito', function () use ($app) {
     return $app['twig']->render('rep_circuitos.html.twig', array('circuitos' => $circuitos));
 })->bind('rep_circuito');
 
+$app->get('/rep_nacional', function () use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+                . "id not in (select mesa_id from renglon_nacional where diputado_nacional>0)";
+        $mesas_nocargadas_D = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+                . "id  in (select mesa_id from renglon_nacional where diputado_nacional>0)";
+        $mesas_cargadas_D = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where senador_nacional=1 and "
+                . "id not in (select mesa_id from renglon_nacional where senador_nacional>0)";
+        $mesas_nocargadas_S = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where  senador_nacional=1 and "
+                . "id  in (select mesa_id from renglon_nacional where senador_nacional>0)";
+        $mesas_cargadas_S = $app['db']->fetchAll($sql);
+
+        $provincia = array(
+            'datos'=> array('id'=>1),
+            'dipnac' => array('cargadas' => $mesas_cargadas_D, 'nocargadas' => $mesas_nocargadas_D),
+            'sennac' => array('cargadas' => $mesas_cargadas_S, 'nocargadas' => $mesas_nocargadas_S,));
+        //print_r($provincia);
+    return $app['twig']->render('rep_nacional.html.twig', array('provincia' => $provincia));
+})->bind('rep_nacional');
 
 $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
     if (!validar('admin')) {
@@ -140,7 +164,65 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         $resultado = $concejales->getDistribucion();
         return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));
     }
+       if ($tipo == 'votos_grafico') {
+        $resultado = $concejales->getResultados();
+        $datos=array();
+        $seccionales=array();
+        $temp=$concejales->getSeccionales();
+        foreach($resultado['votos'] as $clave=>$item){
+            $seccionales[]=$temp[$clave]['nombre'];
+            foreach ($item as $clave2=>$item2){
+                $datos[$clave2][]=$item2['votos'];
+            }
+        }
+       // print_r($seccionales);
+       // print_r($datos);die;
+        return $app['twig']->render('reporting/res_concejales_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales,'datos'=>$datos));
+    }
 })->bind('rep_concejales_seccional');
+
+
+$app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    if (isset($_GET['tiporeporte'])) $_SESSION['tiporeporte']=$_GET['tiporeporte'];
+    else $_SESSION['tiporeporte']="EMITIDOS";
+    $app['twig']->addGlobal('session', $_SESSION);
+    require_once 'DiputadosNacionales.php';
+    $diputados = new DiputadosNacionales($id, $app);
+    //print_r($concejales->getSeccionales());
+    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
+
+    if ($tipo == 'votos') {
+        $resultado = $diputados->getResultados();
+        return $app['twig']->render('reporting/res_dipnac_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'departamentos' => $diputados->getDepartamentos()));
+    }
+    if ($tipo == 'porcentajes') {
+        $resultado = $diputados->getPorcentajes();
+        //print_r($resultado);
+        return $app['twig']->render('reporting/res_dipnac_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $resultado['totales_porcentajes'], 'seccionales' => $diputados->getDepartamentos()));
+    }
+    if ($tipo == 'porcentajes_ponderado') {
+        $total_ponderado = $diputados->getPorcentajeponderado();
+        $resultado = $diputados->getPorcentajes();
+        return $app['twig']->render('reporting/res_dipnac_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $total_ponderado, 'seccionales' => $diputados->getDepartamentos()));
+    }
+    if ($tipo == 'graficos') {
+        $resultado = $diputados->getPorcentajeponderado();
+        $partidos = $diputados->getPartidos();
+        uasort($resultado, 'ordena');
+        return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado, 'circuito' => $circuito, 'partidos' => $partidos));
+    }
+    if ($tipo == 'distribucion') {
+        $resultado = $diputados->getDistribucion();
+        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));
+    }
+  
+})->bind('rep_dipnac_seccion');
+
 
 
 

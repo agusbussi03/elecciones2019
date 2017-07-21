@@ -19,23 +19,16 @@ class DiputadosNacionales {
     }
 
     function getResultados() {
-        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
-                . "FROM renglon_nacional r, mesa m, seccion sec, partido_lista_nacional p, cargo_nacional car "
-                . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and r.concejal>0 and car.lista_id=r.lista_id "
-                . "and car.circuito_id=m.circuito_id and car.tipo='C' "
+        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
+                . "p.nombre_lista,sum(r.diputado) as suma,count(m.id) as cuenta "
+                . "FROM renglon_nacional r, mesa m, seccion sec, partido_lista_nacional p, "
+                . "cargo_nacional car "
+                . "WHERE r.mesa_id=m.id and r.lista_nacional_id=p.id and "
+                . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
+                . "r.diputado>0 and car.lista_nacional_id=r.lista_nacional_id and car.tipo='D' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
-        if ($this->seccionales == 0) {
-            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,
-                    count(m.id) as cuenta 
-                    FROM renglon r, mesa m,partido_lista p, cargo_local car 
-                    WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=? and r.concejal>=0 and car.lista_id=r.lista_id 
-                    and car.circuito_id=m.circuito_id and car.tipo='C' group by 'LOCALIDAD','',p.id_partido,p.nombre_partido,
-                    p.id,p.id_lista,p.nombre_lista ORDER BY `p`.`id_partido` ASC, p.nombre_lista asc ";
-        }
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
-        //print_r($votos);
         $resultado = $totales = array();
         foreach ($votos as $item) {
             $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
@@ -48,19 +41,16 @@ class DiputadosNacionales {
             $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
         }
         //especiales
-        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
-                . "FROM renglon r, mesa m, seccional sec, partido_lista p "
-                . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and r.concejal>0 and p.especial=1 "
-                . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
-                . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
-        if ($this->seccionales == 0) {
-            $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
-                    . "FROM renglon r, mesa m, partido_lista p "
-                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and r.concejal>=0 and p.especial=1 "
-                    . "group by 'LOCALIDAD','1',p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
-                    . "ORDER BY p.id_partido ASC, p.nombre_lista asc ";
-        }
+        $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
+                . "p.nombre_lista,sum(r.diputado) as suma,count(m.id) as cuenta "
+                . "FROM renglon_nacional r, mesa m,seccion sec, partido_lista_nacional p "
+                . "WHERE r.mesa_id=m.id and r.lista_nacional_id=p.id and "
+                . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
+                . "r.diputado>0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
+                . "p.id,p.id_lista,p.nombre_lista ORDER BY sec.nombre asc,`p`.`id_partido` ASC,"
+                . " p.nombre_lista asc ";
+        
+        
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($votos as $item) {
             $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
@@ -80,9 +70,12 @@ class DiputadosNacionales {
         $general = 0;
         $resultado = $this->getResultados();
         foreach ($resultado['votos'] as $clave => $valor) {
-            if ($_SESSION['tiporeporte']=='VALIDOS') $suma = sumavalidos($valor);
-            elseif ($_SESSION['tiporeporte']=='AFIRMATIVOS') $suma = sumaafirmativos($valor);
-            else $suma = suma($valor);
+            if ($_SESSION['tiporeporte'] == 'VALIDOS')
+                $suma = sumavalidos($valor);
+            elseif ($_SESSION['tiporeporte'] == 'AFIRMATIVOS')
+                $suma = sumaafirmativos($valor);
+            else
+                $suma = suma($valor);
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
@@ -105,7 +98,7 @@ class DiputadosNacionales {
     }
 
     function getPorcentajeponderado() {
-        $seccionales = $this->getSeccionales();
+        $seccionales = $this->getDepartamentos();
         $resultado = $this->getPorcentajes();
         //print_r($resultado);
         $resultado = $resultado['porcentajes'];
@@ -158,33 +151,27 @@ class DiputadosNacionales {
         return($dhont);
     }
 
-    function getSeccionales() {
+    function getDepartamentos() {
         $total = 0;
         $resultado = array();
-        if ($this->seccionales > 0) {
-            $sql = "SELECT * FROM seccional WHERE circuito_id=? and id in (select seccionales_id from mesa where concejal>0)";
-            $seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
-            foreach ($seccionales as $item) {
-                $total += $item['electores_provincia'];
-            }
-            foreach ($seccionales as $item) {
-                $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
-                    'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 2));
-            }
-            
-        } else {   ///// NO TIENE SECCIONALES LA LOCALIDAD
-            $sql = "SELECT * FROM circuito WHERE id=?";
-            $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
-            
-            return array("1" => array('id' => "1", "nombre" => $circuito['nombre'], 'electores' => $circuito['electores_provincia'], 'peso' => 100));
+        $sql = "SELECT * FROM seccion WHERE id in (select seccion_id from circuito,mesa where circuito.id=mesa.circuito_id and diputado_nacional>0)";
+        $departamentos = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($departamentos as $item) {
+            $total += $item['electores_nacion'];
         }
+        foreach ($departamentos as $item) {
+            $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_nacion'] / $total * 100, 2));
+        }
+
 
         return($resultado);
     }
 
     function getPartidos() {
-        $sql = "SELECT partido_lista.* FROM partido_lista,cargo_local "
-                . "where partido_lista.id=cargo_local.lista_id and cargo_local.circuito_id=?";
+        $sql = "SELECT partido_lista_nacional.* FROM partido_lista_nacional,cargo_nacional "
+                . "where partido_lista_nacional.id=cargo_nacional.lista_nacional_id "
+                . "and cargo_nacional.provincia_id=?";
         $partidos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         $resultado = array();
         foreach ($partidos as $item) {

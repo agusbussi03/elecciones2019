@@ -58,22 +58,22 @@
     <body>
         <div class="container" style="margin-bottom:20px;">
             <div style='width: 55%;float: left'>
-                <h1 style="margin-top:0;margin-bottom: 0">Concejales {{circuito.nombre}}- PORCENTAJES</h1>
+                <h1 style="margin-top:0;margin-bottom: 0">Diputados Nacionales - PORCENTAJES</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
             <div style='float: left;width:45%;'>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
+           <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>
         <div style="clear: both;height:25px;"></div>
@@ -102,8 +102,8 @@
                             {%if loop.index>0%}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">{{config.obtieneconcejal(clave)|slice(0, 20)}}</p></span>
-                                        <img src="data:image/gif;base64,{{config.obtieneconcejalfoto(clave)}}" width="30px" style="float:right;"/>
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">{{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
+                                        <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
 
                                     </div>
                                     <div style="width:45%;float:left;text-align:left;">

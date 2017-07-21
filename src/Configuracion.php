@@ -107,7 +107,22 @@ class Configuracion {
             return base64_encode(file_get_contents("imagenes/default.jpg"));
         return base64_encode($candidato['foto']);
     }
-
+    function getObtienedipnac($nombre) {
+        $datos = explode("-", $nombre);
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista_nacional l where tipo='D' and c.lista_nacional_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
+    }
+     function getObtienedipnacfoto($nombre) {
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista_nacional l where tipo='D' and c.lista_nacional_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return base64_encode(file_get_contents("imagenes/default.jpg"));
+        return base64_encode($candidato['foto']);
+    }
+    
     function getLocalmesa($numero) {
         require_once 'Mesa.php';
         $mesa = new Mesa($numero, $this->app);

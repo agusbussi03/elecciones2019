@@ -284,6 +284,7 @@ $app->get('/backup', function () use ($app) {
     $backup_file = str_replace(" ", "_", $backup_file);
     $command = "mysqldump --opt -h " . $app['datos_conexion']['host'] . " -u " . $app['datos_conexion']['user'] . " -p" .
             $app['datos_conexion']['password'] . "  " . $app['datos_conexion']['dbname'] . " | gzip > " . $backup_file;
+    //echo $command;
     system($command);
     require_once'Configuracion.php';
     $mensaje = 'Backup enviado';

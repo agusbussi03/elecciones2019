@@ -6,22 +6,22 @@
     <div {#class="container"#}>
         <div>
             <div style='width: 65%;float: left'>
-                <h1 class="page-header">Diputados nacionales {{circuito.nombre}}- VOTOS</h1>
+                <h1 class="page-header">Diputados nacionales - VOTOS</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
             <div style='float: right;width:35%'>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
            <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
+                        onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>
         {% if mensaje is defined %}   
@@ -39,7 +39,7 @@
                     <!--thead-->
                     <tr>
                         <td style="font-size:12px;width:400px;">
-                            Seccional
+                            Departamento
                         </td>
                         {#{dump(votos)}#}
                         {% for clave,item in votos|first %}
@@ -56,7 +56,7 @@
                     {% for clave,item in votos %}
                         <tr class="odd gradeX" id="r_{{loop.index}}">
                             <td style="width:400px;">
-                                {{ seccionales[clave].nombre }}
+                                {{ departamentos[clave].nombre }}
                             </td> 
                             {% set total=0 %}
                             {% for item2 in item %}
