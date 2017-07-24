@@ -102,8 +102,10 @@
                             {%if loop.index>0%}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">{{config.obtieneconcejal(clave)|slice(0, 20)}}</p></span>
-                                        <img src="data:image/gif;base64,{{config.obtieneconcejalfoto(clave)}}" width="30px" style="float:right;"/>
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">{{config.obtieneconcejal(clave)|slice(0, 20)}}</p></span>
+                                      {%if partidos[item.id].logo!=""%}
+                                <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}   
+                                    <img src="data:image/gif;base64,{{config.obtieneconcejalfoto(clave)}}" width="30px" style="float:right;"/>
 
                                     </div>
                                     <div style="width:45%;float:left;text-align:left;">

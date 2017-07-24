@@ -31,11 +31,12 @@
                                     <thead>
                                         <tr>
                                             <th>Nro. P.</th>
-                                            <th>Partido></th><th>Nro. L.</th>
+                                            <th>Partido</th><th>Nro. L.</th>
                                             <th>Lista</th>
+                                            <th>Logo</th>
                                             <th>Diputado</th>
                                             <th>Senador</th>
-                                             <th></th>
+                                            <th></th>
                                         </tr>
                                     </thead> 
 
@@ -47,12 +48,29 @@
                                                 <td>{{item.nombre_partido}}</td>
                                                 <td>{{item.id_lista}}</td>
                                                 <td>{{item.nombre_lista}}</td>
-                                                <td><input type="checkbox" name="D,{{item.id}}" {%if item.diputado=='D'%}checked{%endif%} class="btn btn-primary"></td>
+                                                <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}">{%endif%}
+                                                    <form action="{{path('partido_nacional_logo',{'id':item.id})}}" method="post" enctype="multipart/form-data">
+                                                        <input name="logo" type="file">
+                                                        <input type="submit" class="btn btn-primary">Subir logo</button>
+                                                    </form>
+                                                </td>
+                                                <td><input type="checkbox" name="D,{{item.id}}" {%if item.diputado=='D'%}checked{%endif%} class="btn btn-primary">
+                                                    {%if item.diputado=='D'%}
+                                                        <img width='100px' src="data:image/png;base64,{{item.dip_foto}}">
+                                                        <form action="{{path('partidosnacionales',{'provincia':provincia.id})}}" method="POST" enctype="multipart/form-data">
+                                                            <input name="logo" type="file"> 
+                                                            <input name="apellido" type="text" value='{{item.dip_apellido}}'>
+                                                            <input type="hidden" name="candidato_id" value="{{item.candip_id}}">
+                                                            <input type="hidden" name="cargo_id" value="{{item.dip_id}}">
+                                                            <input type="submit" class="btn btn-primary" value="grabar">
+                                                        </form>
+                                                    {%endif%}
+                                                </td>
                                                 <td><input type="checkbox" name="S,{{item.id}}"  {%if item.senador=='S'%}checked{%endif%} class="btn btn-primary"></td>
                                                 <td>                                     
-                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se eliminarán los datos relacionados a cargos y renglones de este partido. Continua?'))
-                                                            window.location.href = '{{ path('partidosnacionales',{'provincia':item.provincia_id,'borrar':item.id}) }}';">Borrar</button>
-                                            </td>
+                                                    <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se eliminarán los datos relacionados a cargos y renglones de este partido. Continua?'))
+                                                        window.location.href = '{{ path('partidosnacionales',{'provincia':item.provincia_id,'borrar':item.id}) }}';">Borrar</button>
+                                                </td>
                                             </tr>
                                         {% endfor %}
 
@@ -65,7 +83,7 @@
                     </div>
                 </div>
             </div>
-    <div class="row">
+            <div class="row">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Nuevo Partido Lista
@@ -104,10 +122,10 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                    $(document).ready(function () {
-                        $('#dataTables-example').DataTable({
-                            responsive: true
-                        });
-                    });
+                                                $(document).ready(function () {
+                                                    $('#dataTables-example').DataTable({
+                                                        responsive: true
+                                                    });
+                                                });
                 </script>
             {% endblock %}

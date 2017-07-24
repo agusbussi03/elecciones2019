@@ -103,7 +103,7 @@ class MesaNacional {
     function actualiza($votos) {
         $columnas = array( 'D' => 'diputado', 'S' => 'senador');
         unset($votos['total_votos']);
-        print_r($votos);
+        $this->sumavotos();
         foreach ($votos as $clave => $valor) {
             $dato = explode(",", $clave);
             $columna = $columnas[$dato[0]];

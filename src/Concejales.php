@@ -22,7 +22,7 @@ class Concejales {
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccional sec, partido_lista p, cargo_local car "
                 . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and r.concejal>0 and car.lista_id=r.lista_id "
+                . "and m.circuito_id=? and r.concejal>=0 and car.lista_id=r.lista_id "
                 . "and car.circuito_id=m.circuito_id and car.tipo='C' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
@@ -51,7 +51,7 @@ class Concejales {
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccional sec, partido_lista p "
                 . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and r.concejal>0 and p.especial=1 "
+                . "and m.circuito_id=? and r.concejal>=0 and p.especial=1 "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         if ($this->seccionales == 0) {
@@ -71,6 +71,8 @@ class Concejales {
                 $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
             $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
         }
+        //print_r($resultado);
+        //print_r($totales);
         return(array('votos' => $resultado, 'totales' => $totales));
     }
 
@@ -86,12 +88,12 @@ class Concejales {
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100,2) : 0;
                 $porcentajes[$clave][$clave2]['id'] = $valor2['id'];
                 if (!isset($totales_porcentajes[$clave2]))
-                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100,2) : 0;
                 else
-                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? $valor2['votos'] / $suma * 100 : 0;
+                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? round($valor2['votos'] / $suma * 100,2) : 0;
                 $totales_porcentajes[$clave2]['id'] = $valor2['id'];
             }
         }
@@ -114,9 +116,9 @@ class Concejales {
             foreach ($item as $clave2 => $item2) {
                 if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {
                     if (!isset($porcentajes_peso[$clave2]))
-                        $porcentajes_peso[$clave2]['porcentaje'] = $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
+                        $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100,2);
                     else
-                        $porcentajes_peso[$clave2]['porcentaje'] += $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
+                        $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100,2);
                     $porcentajes_peso[$clave2]['id'] = $item2['id'];
                 }
             }

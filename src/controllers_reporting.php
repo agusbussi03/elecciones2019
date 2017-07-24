@@ -1,7 +1,7 @@
 <?php
 
 $app->get('/rep_circuito', function () use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id";
@@ -28,7 +28,7 @@ $app->get('/rep_circuito', function () use ($app) {
 })->bind('rep_circuito');
 
 $app->get('/rep_nacional', function () use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
         $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
@@ -53,7 +53,7 @@ $app->get('/rep_nacional', function () use ($app) {
 })->bind('rep_nacional');
 
 $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id and c.id=$circuito";
@@ -127,7 +127,7 @@ $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
 
 
 $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     if (isset($_GET['tiporeporte'])) $_SESSION['tiporeporte']=$_GET['tiporeporte'];
@@ -183,7 +183,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
 
 
 $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     if (isset($_GET['tiporeporte'])) $_SESSION['tiporeporte']=$_GET['tiporeporte'];

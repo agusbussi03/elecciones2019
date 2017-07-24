@@ -25,7 +25,7 @@ class DiputadosNacionales {
                 . "cargo_nacional car "
                 . "WHERE r.mesa_id=m.id and r.lista_nacional_id=p.id and "
                 . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
-                . "r.diputado>0 and car.lista_nacional_id=r.lista_nacional_id and car.tipo='D' "
+                . "r.diputado>=0 and car.lista_nacional_id=r.lista_nacional_id and car.tipo='D' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
@@ -46,7 +46,7 @@ class DiputadosNacionales {
                 . "FROM renglon_nacional r, mesa m,seccion sec, partido_lista_nacional p "
                 . "WHERE r.mesa_id=m.id and r.lista_nacional_id=p.id and "
                 . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
-                . "r.diputado>0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
+                . "r.diputado>=0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
                 . "p.id,p.id_lista,p.nombre_lista ORDER BY sec.nombre asc,`p`.`id_partido` ASC,"
                 . " p.nombre_lista asc ";
         
