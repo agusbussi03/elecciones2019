@@ -1,4 +1,5 @@
 <?php
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -110,7 +111,7 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
         Mesa::unsetTestigo($_GET['borrar'], $app);
     }
     if (isset($_GET['responsable'])) {
-        Mesa::setResponsable($_GET['mesa'],$_GET['responsable'], $app);
+        Mesa::setResponsable($_GET['mesa'], $_GET['responsable'], $app);
     }
     $mesas = Mesa::testigosporcircuito($circuito['id'], $app);
     return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas, 'seccionales' => $seccionales));
@@ -136,11 +137,14 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     $categoria = 'G';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
-    if ($mesa->votosporcargo($categoria)>0 && !validar('admin') ){
+    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin')) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
     }
     $mascara = $mesa->getMascara();
-    return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
+    if ($mesa->votosporcargo($categoria) > 0) {
+        return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app), 'mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa. Modifica los datos?')));
+    }
+    return $app['twig']->render('mesa_carga.html.twig', array('mensaje' => '', 'mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesacarga');
 
 $app->post('/mesacarga/{nro}', function ($nro) use ($app) {
@@ -176,9 +180,9 @@ $app->post('/mesacarga_elige', function () use ($app) {
     }
     require_once 'Usuarios.php';
 
-    $usuario=new Usuarios(0, $app);
+    $usuario = new Usuarios(0, $app);
     $usuario->getByUsername($_SESSION['usuario']);
-    if (!$usuario->mesapermitida($mesa)){
+    if (!$usuario->mesapermitida($mesa)) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => "No permitido")));
     }
     $mesa->sumavotos();
@@ -191,13 +195,17 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require_once'MesaNacional.php';
+    require_once'Mesa.php';
+
     require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
+        $mesalocal = new Mesa($nro, $app);
     $mesa->sumavotos();
     $votos = $mesa->votos();
     $mascara = $mesa->getMascara();
-    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
+
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,'mesalocal' => $mesalocal, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
@@ -209,6 +217,13 @@ $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     $categoria = 'D';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
+    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin')) {
+        return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
+    }
+    $mascara = $mesa->getMascara();
+    if ($mesa->votosporcargo($categoria) > 0) {
+        return $app['twig']->render('mesanacional_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app), 'mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa. Modifica los datos?')));
+    }
     $mascara = $mesa->getMascara();
     return $app['twig']->render('mesanacional_carga.html.twig', array('mascara' => $mascara, 'mesa' => $mesa, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacionalcarga');
@@ -333,7 +348,7 @@ $app->get('/usuarios', function () use ($app) {
         return $app->redirect('login');
     }
     require_once'Usuarios.php';
-    if(isset($_GET['quitarmesa_id'])){
+    if (isset($_GET['quitarmesa_id'])) {
         Usuarios::quitarmesausuario($_GET['quitarmesa_id'], $app);
     }
 
@@ -343,10 +358,10 @@ $app->get('/usuarios', function () use ($app) {
     $secciones = $app['db']->fetchAll('SELECT seccion.*,provincia.nombre as provincia FROM seccion,provincia where provincia.id=seccion.provincia_id order by seccion.nombre');
     $circuitos = $app['db']->fetchAll('SELECT circuito.*,seccion.nombre as seccion FROM seccion,circuito where seccion.id=circuito.seccion_id order by circuito.nombre');
     $seccionales = $app['db']->fetchAll('SELECT seccional.*,circuito.nombre as circuito FROM seccional,circuito where circuito.id=seccional.circuito_id order by circuito.nombre,seccional.nombre');
-    $mesausuario= $app['db']->fetchAll('SELECT *,u.id as id FROM mesa_usuario u,mesa m where m.id=u.mesa_id and usuario_id order by numero asc');
+    $mesausuario = $app['db']->fetchAll('SELECT *,u.id as id FROM mesa_usuario u,mesa m where m.id=u.mesa_id and usuario_id order by numero asc');
     return $app['twig']->render('usuarios.html.twig', array('usuarios' => $usuarios,
                 'provincia' => $provincia, 'secciones' => $secciones, 'circuitos' => $circuitos,
-                'seccionales' => $seccionales, 'mensaje' => $mensaje,'mesausuario'=>$mesausuario));
+                'seccionales' => $seccionales, 'mensaje' => $mensaje, 'mesausuario' => $mesausuario));
 })->bind('usuarios');
 
 $app->post('/usuarios', function () use ($app) {
@@ -354,16 +369,15 @@ $app->post('/usuarios', function () use ($app) {
         return $app->redirect('login');
     }
     require_once 'Usuarios.php';
-    if (isset($_POST['add'])){
+    if (isset($_POST['add'])) {
         require 'Mesa.php';
         try {
-             $mesa=new Mesa($_POST['add'],$app);
-             Usuarios::agregarmesausuario($_POST['user_id'],$mesa->getId() , $app);
+            $mesa = new Mesa($_POST['add'], $app);
+            Usuarios::agregarmesausuario($_POST['user_id'], $mesa->getId(), $app);
         } catch (Exception $exc) {
-
+            
         }
         return $app->redirect($app['url_generator']->generate('usuarios'));
-
     }
     $usuario = new Usuarios($_POST['user_id'], $app);
     $usuario->actualizar($_POST);
@@ -388,7 +402,7 @@ $app->get('/geolocales', function () use ($app) {
         return $app->redirect('login');
     }
     $sql = "SELECT *,1 testigo from locales l where EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde) UNION SELECT *,0 testigo from locales l where NOT EXISTS (select * from mesa m where m.numero<=l.mesahasta and m.numero>=l.mesadesde)";
-    
+
     $locales = $app['db']->fetchAll($sql, array());
 
     return $app['twig']->render('geolocales.html.twig', array('locales' => $locales));

@@ -114,13 +114,13 @@ class Concejales {
         $porcentajes_peso = array();
         foreach ($resultado as $clave => $item) {
             foreach ($item as $clave2 => $item2) {
-                if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {
+               /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {*/
                     if (!isset($porcentajes_peso[$clave2]))
                         $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100,2);
                     else
                         $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100,2);
                     $porcentajes_peso[$clave2]['id'] = $item2['id'];
-                }
+               /* }*/
             }
         }
         //print_r($porcentajes_peso);

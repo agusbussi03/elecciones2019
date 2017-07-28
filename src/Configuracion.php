@@ -126,7 +126,14 @@ class Configuracion {
     function getLocalmesa($numero) {
         require_once 'Mesa.php';
         $mesa = new Mesa($numero, $this->app);
-        return $mesa->getLocal();
+        $localidad=$mesa->getCircuito_nombre();
+        $seccional=$mesa->getSeccional();
+        if ($seccional>0){
+           $seccional = $this->app['db']->fetchAssoc("SELECT nombre FROM seccional where id=$seccional ");
+           $seccional=$seccional['nombre']."/";
+         
+        }
+        return $localidad."/".$seccional.$mesa->getLocal();
     }
 
     function getOrdenaCandidatos($arreglo) {

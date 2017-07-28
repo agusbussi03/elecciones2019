@@ -40,7 +40,8 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Mesa Nacional {{ mesa.numero }}</h1>
+            <h4 class="page-header">Mesa {{ mesa.numero }} - Escuela: {{config.localmesa(mesa.numero)}}
+            </h4>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -86,14 +87,14 @@
                             </tr>
                         {% endfor %}
 
-                            <tr class="odd gradeX" id="total">
-                                <td>
-                                    TOTAL
-                                </td> <td></td>
-                                <td>
-                                    <input class="form-control inputs" value="" type="number" id='total_votos' name="total_votos" size="3">
-                                </td>          
-                            </tr>
+                        <tr class="odd gradeX" id="total">
+                            <td>
+                                TOTAL
+                            </td> <td></td>
+                            <td>
+                                <input class="form-control inputs" value="" type="number" id='total_votos' name="total_votos" size="3">
+                            </td>          
+                        </tr>
                     </tbody>
                 </table>
                 <input type="submit" value="Grabar" class="btn btn-primary btn-lg btn-block">        
@@ -106,68 +107,79 @@
 
 {% block final %}
     <script>
-                $(document).ready(function () {
-                     $('#otros').hide();
-                    i = 1;
-                    $.each($('#tablacarga').children(), function (key, fila) {
-                        //alert(fila.cells.length);
-                        texto = fila.cells[fila.cells.length - 1].innerHTML;
-                        if (texto.indexOf('input') === -1) {
-                            $('#r_' + i).hide();
-                        }
-                        i++;
-                    });
-
-                    $('.inputs')[0].focus();
-                });
-
-                $('.inputs').keydown(function (e) {
-                    if (e.keyCode == 13) {
-                        form = $('#formu');
-                        focusable = form.find('input,select,textarea').filter(':visible');
-                        next = focusable.eq(focusable.index(this) + 1);
-                        if (next.length) {
-                            next.focus();
-                        } else {
-                            form.submit();
-                        }
-                        return false;
-                    }
+        $(document).ready(function () {
+            $('#otros').hide();
+            i = 1;
+            $.each($('#tablacarga').children(), function (key, fila) {
+                //alert(fila.cells.length);
+                texto = fila.cells[fila.cells.length - 1].innerHTML;
+                if (texto.indexOf('input') === -1) {
+                    $('#r_' + i).hide();
                 }
-                );
+                i++;
+            });
 
-                $("#formu").submit(function (event) {
-                    if (!(parseInt($('#total_votos').val()) > 0)) {
-                        alert('Ingrese el total de votos');
-                        event.preventDefault();
-                        return;
-                    }
-                    if (parseInt($('#total_votos').val()) >{{ mesa.electores_nacion }} ) {
-                        alert('El total de votos supera los {{ mesa.electores_nacion }} (total de electores)');
-                        event.preventDefault();
-                        return;
-                    }
+            $('.inputs')[0].focus();
+        });
 
-                    suma = 0;
-                    $.each($('.inputs'), function (key, fila) {
-                        if ((parseInt(fila.value) > 0) && (fila.name != 'total_votos'))
-                            suma += parseInt(fila.value);
-                    });
-                    otros = parseInt($('#total_votos').val()) - suma;
+        $('.inputs').keydown(function (e) {
+            if (e.keyCode == 13) {
+                form = $('#formu');
+                focusable = form.find('input,select,textarea').filter(':visible');
+                next = focusable.eq(focusable.index(this) + 1);
+                if (next.length) {
+                    next.focus();
+                } else {
+                    form.submit();
+                }
+                return false;
+            }
+        }
+        );
 
-                    if (!(otros >=0) ) {
-                        alert('La suma de los votos por partido/lista supera el total informado ');
-                        event.preventDefault();
-                        return;
-                    }
+        $("#formu").submit(function (event) {
+            if (!(parseInt($('#total_votos').val()) > 0)) {
+                alert('Ingrese el total de votos');
+                event.preventDefault();
+                return;
+            }
+            if (parseInt($('#total_votos').val()) >{{ mesa.electores_nacion }} ) {
+                alert('El total de votos supera los {{ mesa.electores_nacion }} (total de electores)');
+                event.preventDefault();
+                return;
+            }
+
+            suma = 0;
+            $.each($('.inputs'), function (key, fila) {
+                if ((parseInt(fila.value) > 0) && (fila.name != 'total_votos'))
+                    suma += parseInt(fila.value);
+            });
+            otros = parseInt($('#total_votos').val()) - suma;
+
+            if (!(otros >= 0)) {
+                alert('La suma de los votos por partido/lista supera el total informado ');
+                event.preventDefault();
+                return;
+            }
 
 
-                    $('#otros').val(otros);
-                    //event.preventDefault();
-                });
+            $('#otros').val(otros);
+            //event.preventDefault();
+        });
+
+        {% if mensaje %}
+            {% if mensaje.codigo==1 %}
+                        var r = confirm("{{mensaje.texto}}");
+                        if (r == true) {
+
+                        } else {
+                            window.location.href = "{{path('mesacarga_elige')}}";
+                        }
+            {% endif%}
+        {% endif%}
 
 
-            </script>
+    </script>
 
 {% endblock %}
 

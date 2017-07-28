@@ -45,16 +45,16 @@
 
                 {% for item in totales %}
                     <tr class="odd gradeX" id="r_{{loop.index}}">
-                        <td>
+                        <td style="padding:0;">
                             {{ loop.index }}
                         </td> 
-                        <td>{%if item.logo!=""%}<img src="data:image/gif;base64,{{item.logo}}" width="50px"/>{%endif%}
+                        <td style="padding:0;">{%if item.logo!=""%}<img src="data:image/gif;base64,{{item.logo}}" width="30px"/>{%endif%}
                             {{ item.partido }}
                         </td> 
-                        <td style="text-align: right"> 
+                        <td style="padding:0;text-align: right"> 
                             {{item.orden}}
                         </td>
-                        <td style="text-align: right"> 
+                        <td style="padding:0;text-align: right"> 
                             {{item.valor}}
                         </td>
                     </tr>

@@ -9,7 +9,9 @@
             <div class="col-lg-12">
                 <h1 class="page-header">Mesa Nacional {{ mesa.numero }}</h1>
                 <li>
-                    <a href="{{ path('mesa',{'nro':mesa.numero}) }}">Mesa provincial</a>
+                    <div class="panel-heading">
+                            <a href="{{ path('mesa',{'nro':mesa.numero}) }}">Mesas provincial</a>
+                    </div>
                 </li>
             </div>
             <!-- /.col-lg-12 -->
@@ -19,7 +21,8 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Electores:{{mesa.electores_nacion}} 
+                        Ubicacion:  {{mesalocal.seccion_nombre}} - Circuito: {{mesalocal.circuito_nombre}}  
+                           - Electores: {{mesalocal.electores_nacion}} - Escuela:  {{mesalocal.local}} 
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -33,7 +36,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                               
+
                                 {% for item in mascara %}
                                     <tr class="odd gradeX" id="r_{{loop.index}}">
                                         <td>
@@ -46,45 +49,48 @@
                                         {% endif %}
 
                                         <td>
-                                             {% if 'D' in item.cargos %}
+                                            {% if 'D' in item.cargos %}
                                                 {% set total_diputado=total_diputado+votos[item.datos.id].diputado%}
-                                                         {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
-                                        </td>                                              
-                                        {% if configuracion.senadores_nacionales==1%}
-                                            <td>
-                                               {% if 'S' in item.cargos %}
-                                                {% set total_senador=total_senador+votos[item.datos.id].senador%}
-                                                         {{votos[item.datos.id].senador}}{%else%}-{% endif %}
-                                            </td> 
+                                                {{votos[item.datos.id].diputado}}{%else%}-{% endif %}
+                                            </td>                                              
+                                            {% if configuracion.senadores_nacionales==1%}
+                                                <td>
+                                                    {% if 'S' in item.cargos %}
+                                                        {% set total_senador=total_senador+votos[item.datos.id].senador%}
+                                                        {{votos[item.datos.id].senador}}{%else%}-{% endif %}
+                                                    </td> 
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tr class="odd gradeX">
+                                            <td>TOTAL</td>
+                                            {% if configuracion.tipo==0%}
+                                                <td></td>
+                                            {%endif%} 
+
+                                            {%if mesa.diputado_nacional==1%}   <td>{{total_diputado}}</td>{%endif%}
+                                            {%if mesa.senador_nacional==1%}   <td>{{total_senador}}</td>{%endif%}
+
                                         </tr>
-                                    {% endif %}
-                                {% endfor %}
 
-                            </tbody>
-                        </table>
-                        <!-- /.table-responsive -->
-
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
             </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <!-- /.row -->
-    </div>
-    <!-- /#wrapper -->
 
 
 
-{% endblock %}    
+        {% endblock %}    
 
-{% block final %}
-    <script>
+        {% block final %}
+            <script>
 
-    </script>
+            </script>
 
 
-{% endblock %}
+        {% endblock %}
 
 

@@ -213,9 +213,12 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
     if ($tipo == 'graficos') {
         $resultado = $diputados->getPorcentajeponderado();
         $partidos = $diputados->getPartidos();
+        //print_r($resultado);
         uasort($resultado, 'ordena');
+        
         return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado, 'circuito' => $circuito, 'partidos' => $partidos));
     }
+    
     if ($tipo == 'distribucion') {
         $resultado = $diputados->getDistribucion();
         return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));

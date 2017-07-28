@@ -40,8 +40,8 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <h3 class="page-header">Mesa {{ mesa.numero }} - Escuela: {{config.localmesa(mesa.numero)}}
-                 - {{mesa.circuito_nombre}} - {{config.getNombreSeccional(mesa.seccional)}}</h3>
+                <h4 class="page-header">Mesa {{ mesa.numero }} - Escuela: {{config.localmesa(mesa.numero)}}
+                </h4>
             </div>
         </div>
         <div class="row">
@@ -139,8 +139,9 @@
             <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
             <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
             <script>
+
                 $(document).ready(function () {
-                     $('#otros').hide();
+                    $('#otros').hide();
                     i = 1;
                     $.each($('#tablacarga').children(), function (key, fila) {
                         //alert(fila.cells.length);
@@ -188,7 +189,7 @@
                     });
                     otros = parseInt($('#total_votos').val()) - suma;
 
-                    if (!(otros >=0) ) {
+                    if (!(otros >= 0)) {
                         alert('La suma de los votos por partido/lista supera el total informado ');
                         event.preventDefault();
                         return;
@@ -198,8 +199,16 @@
                     $('#otros').val(otros);
                     //event.preventDefault();
                 });
-
-
+                {% if mensaje %}
+                    {% if mensaje.codigo==1 %}
+                        var r = confirm("{{mensaje.texto}}");
+                        if (r == true) {
+                            
+                        } else {
+                            window.location.href="{{path('mesacarga_elige')}}";
+                        }
+                    {% endif%}
+                {% endif%}
             </script>
 
 

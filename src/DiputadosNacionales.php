@@ -105,13 +105,13 @@ class DiputadosNacionales {
         $porcentajes_peso = array();
         foreach ($resultado as $clave => $item) {
             foreach ($item as $clave2 => $item2) {
-                if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {
+               /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {*/
                     if (!isset($porcentajes_peso[$clave2]))
                         $porcentajes_peso[$clave2]['porcentaje'] = $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
                     else
                         $porcentajes_peso[$clave2]['porcentaje'] += $item2['porcentaje'] * $seccionales[$clave]['peso'] / 100;
                     $porcentajes_peso[$clave2]['id'] = $item2['id'];
-                }
+               /* }*/
             }
         }
         //print_r($porcentajes_peso);
@@ -121,10 +121,8 @@ class DiputadosNacionales {
     function getDistribucion() {
 
         $porcentajes_peso = $this->getPorcentajeponderado();
-        $sql = "SELECT * FROM circuito WHERE id=?  ";
-        $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
-        $titulares = $circuito['conc_titulares'];
-        $suplentes = $circuito['conc_suplentes'];
+        $titulares = 8;
+        $suplentes = 8;
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;

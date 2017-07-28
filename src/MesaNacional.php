@@ -12,7 +12,9 @@ class MesaNacional {
     private $usuario = '';
     private $intendente = 0;
     private $app;
-
+    private $diputado_nacional = 0;
+    private $senador_nacional = 0;
+    
     function __construct($nro, $app) {
         $this->app = $app;
         $this->numero = $nro;
@@ -21,7 +23,8 @@ class MesaNacional {
             throw new Exception("Mesa no existe");
         $this->id=$datos['id'];
         $this->electores_nacion = $datos['electores_nacion'];
-
+$this->diputado_nacional = $datos['diputado_nacional'];
+        $this->senador_nacional = $datos['senador_nacional'];
     }
 
     function getNumero() {
@@ -100,6 +103,13 @@ class MesaNacional {
         }
         return $votos;
     }
+     function votosporcargo($cargo) {
+        $columnas = array( 'D' => 'diputado', 'S' => 'senador');
+        $cargo = $columnas[$cargo];
+        $sql = "SELECT sum($cargo) as suma from renglon_nacional WHERE mesa_id=?";
+        $resultado = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+        return $resultado['suma'];
+    }
     function actualiza($votos) {
         $columnas = array( 'D' => 'diputado', 'S' => 'senador');
         unset($votos['total_votos']);
@@ -117,7 +127,13 @@ class MesaNacional {
         return;
     }
 
-   
+     function getDiputado_nacional() {
+        return $this->diputado_nacional;
+    }
+
+    function getSenador_nacional() {
+        return $this->senador_nacional;
+    }
 
     static function testigos($app) {
         $sql = "SELECT * FROM mesas where testigo=1";

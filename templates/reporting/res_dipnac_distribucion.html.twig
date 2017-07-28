@@ -1,27 +1,27 @@
 {% extends "layout.html.twig" %}
 {% block content %}
-    <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content=60">
 
     {#% include "navigator.html.twig" %#}
     <div {#class="container"#}>
         <div>
-            <div style='width: 65%;float: left'>
-                <h1 class="page-header">Concejales {{circuito.nombre}}- CARGOS</h1>
+            <div style='width: 55%;float: left'>
+                <h1 class="page-header">Dip. Nacionales - CARGOS</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
-            <div style='float: right;width:35%'>
+             <div style='float: left;width:45%;'>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
-           <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
+                <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>
         <div {#class="row"#}>
@@ -45,16 +45,16 @@
 
                 {% for item in totales %}
                     <tr class="odd gradeX" id="r_{{loop.index}}">
-                        <td>
+                        <td style="padding:0;">
                             {{ loop.index }}
                         </td> 
-                        <td>{%if item.logo!=""%}<img src="data:image/gif;base64,{{item.logo}}" width="50px"/>{%endif%}
+                        <td style="padding:0;">{%if item.logo!=""%}<img src="data:image/gif;base64,{{item.logo}}" width="30px"/>{%endif%}
                             {{ item.partido }}
                         </td> 
-                        <td style="text-align: right"> 
+                        <td style="padding:0;text-align: right"> 
                             {{item.orden}}
                         </td>
-                        <td style="text-align: right"> 
+                        <td style="padding:0;text-align: right"> 
                             {{item.valor}}
                         </td>
                     </tr>

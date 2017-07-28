@@ -81,10 +81,12 @@
                         <td></td><td></td>
                         {% set total=0 %}
                         {% for item2 in totales %}
+                            {%if loop.index>1%}
                             <td style="text-align: right;"> 
                                 <b>{{item2.porcentaje|number_format(2, '.', ',')}}%</b>
                             </td>
                             {%set total=total+item2.porcentaje %}
+                            {%endif%}
                         {%endfor%}
                         
                     </tr>
