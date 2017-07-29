@@ -77,13 +77,13 @@
             </div>
         </div>
         <div style="clear: both;height:25px;"></div>
-        <div style="width:45%;float:left;">
+        <div style="width:33%;float:left;">
             {% for clave,item in totales %}
                 {%if loop.index>0  and clave!="NULOS--" and clave!="EMITIDOS" %}
                     <div class="container">   
                         <div style="width:45%;float:left;text-align:right;">
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
-                                {{clave|slice(0, 20)}}</p></span>
+                                {{config.limpianombre(clave)|slice(0, 20)}}</p></span>
                                 {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
                                 <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
                                 {%endif%}
@@ -97,13 +97,32 @@
                     {%endif%}
                     {%endfor%}
                     </div>
-                    <div style="width:45%;float:left;">
+                     <div style="width:33%;float:left;">
+                        {% for clave,item in totales_partido %}
+                            {%if loop.index>0%}
+                                <div class="container">   
+                                    <div style="width:45%;float:left;text-align:right;">
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
+                                            {{clave|slice(0, 20)}}</p></span>
+                                            {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                            <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
+
+                                        </div>
+                                        <div style="width:45%;float:left;text-align:left;">
+                                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                        </div>
+                                    </div> 
+                                    <div style="clear: both;height:5px;"></div>
+                                {%endif%}
+                                {%endfor%}
+                                </div>
+                    <div style="width:33%;float:left;">
                         {%set candidatos=config.ordenacandidatos(totales)%}
                         {% for clave,item in candidatos %}
                             {%if loop.index>0 and clave!="NULOS--" and clave!="EMITIDOS"%}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">{{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:70%;">{{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
                                         <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
                                         {%if partidos[item.id] is defined%}
                                             <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>

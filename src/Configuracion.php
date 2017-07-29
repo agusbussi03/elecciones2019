@@ -86,11 +86,12 @@ class Configuracion {
     }
 
     function getNombreSeccional($id) {
-        if (!($id>0)) return "";
-        $seccional = $this->app['db']->fetchAssoc("SELECT * FROM seccional where id=".$id);
+        if (!($id > 0))
+            return "";
+        $seccional = $this->app['db']->fetchAssoc("SELECT * FROM seccional where id=" . $id);
         return $seccional['nombre'];
     }
-    
+
     function getObtieneconcejal($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
@@ -107,6 +108,7 @@ class Configuracion {
             return base64_encode(file_get_contents("imagenes/default.jpg"));
         return base64_encode($candidato['foto']);
     }
+
     function getObtienedipnac($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
@@ -115,25 +117,25 @@ class Configuracion {
             return "Candidato " . "($datos[0])";
         return $candidato['apellido'] . "($datos[0])";
     }
-     function getObtienedipnacfoto($nombre) {
+
+    function getObtienedipnacfoto($nombre) {
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista_nacional l where tipo='D' and c.lista_nacional_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
         if ($candidato['apellido'] == "")
             return base64_encode(file_get_contents("imagenes/default.jpg"));
         return base64_encode($candidato['foto']);
     }
-    
+
     function getLocalmesa($numero) {
         require_once 'Mesa.php';
         $mesa = new Mesa($numero, $this->app);
-        $localidad=$mesa->getCircuito_nombre();
-        $seccional=$mesa->getSeccional();
-        if ($seccional>0){
-           $seccional = $this->app['db']->fetchAssoc("SELECT nombre FROM seccional where id=$seccional ");
-           $seccional=$seccional['nombre']."/";
-         
+        $localidad = $mesa->getCircuito_nombre();
+        $seccional = $mesa->getSeccional();
+        if ($seccional > 0) {
+            $seccional = $this->app['db']->fetchAssoc("SELECT nombre FROM seccional where id=$seccional ");
+            $seccional = $seccional['nombre'] . "/";
         }
-        return $localidad."/".$seccional.$mesa->getLocal();
+        return $localidad . "/" . $seccional . $mesa->getLocal();
     }
 
     function getOrdenaCandidatos($arreglo) {
@@ -153,6 +155,12 @@ class Configuracion {
         }
         //print_r($unidos);die;
         return $unidos;
+    }
+
+    function getLimpianombre($clave) {
+        $clave2 = explode("-", $clave);
+        if (isset($clave2[2]))  return $clave2[0] . "/" . $clave2[2];
+        return $clave;
     }
 
 }
