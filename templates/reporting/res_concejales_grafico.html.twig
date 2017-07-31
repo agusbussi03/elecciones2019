@@ -58,8 +58,12 @@
     <body>
         <div class="container" style="margin-bottom:20px;">
             <div style='width: 55%;float: left'>
-                <h1 style="margin-top:0;margin-bottom: 0">Concejales {{circuito.nombre}}- PORCENTAJES</h1>
+                <h2 style="margin-top:0;margin-bottom: 0">Concejales {{circuito.nombre}}- PORCENTAJES ({{session.tiporeporte}})</h2>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
+                  <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
+
             </div>
             <div style='float: left;width:45%;'>
                {%if session.admin==1%} <button type="button" class="btn btn-sm btn-default"

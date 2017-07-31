@@ -57,15 +57,21 @@
     </head>
     <body>
         <div class="container" style="margin-bottom:20px;">
-            <div style='width: 65%;float: left'>
-                <h1 style="margin-top:0;margin-bottom: 0">Diputados Nacionales - PORCENTAJES</h1>
+            <div style='width: 50%;float: left'>
+                <h2 style="margin-top:0;margin-bottom: 0">Diputados Nacionales - PORCENTAJES ({{session.tiporeporte}})</h2>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
+
             </div>
             <div style='float: left;width:45%;'>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                {%if session.admin==1%}
+                    <button type="button" class="btn btn-sm btn-default"
+                            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
+                    <button type="button" class="btn btn-sm btn-default"
+                            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                {%endif%}
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
                 <button type="button" class="btn btn-sm btn-default"
@@ -86,7 +92,26 @@
                                 {{config.limpianombre(clave)|slice(0, 20)}}</p></span>
                                 {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
                                 <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
-                                {%endif%}
+                            {%endif%}
+
+                        </div>
+                        <div style="width:45%;float:left;text-align:left;">
+                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                        </div>
+                    </div> 
+                    <div style="clear: both;height:5px;"></div>
+                {%endif%}
+            {%endfor%}
+        </div>
+        <div style="width:33%;float:left;">
+            {% for clave,item in totales_partido %}
+                {%if loop.index>0%}
+                    <div class="container">   
+                        <div style="width:45%;float:left;text-align:right;">
+                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
+                                {{clave|slice(0, 20)}}</p></span>
+                                {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
 
                             </div>
                             <div style="width:45%;float:left;text-align:left;">
@@ -97,25 +122,6 @@
                     {%endif%}
                     {%endfor%}
                     </div>
-                     <div style="width:33%;float:left;">
-                        {% for clave,item in totales_partido %}
-                            {%if loop.index>0%}
-                                <div class="container">   
-                                    <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
-                                            {{clave|slice(0, 20)}}</p></span>
-                                            {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                            <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
-
-                                        </div>
-                                        <div style="width:45%;float:left;text-align:left;">
-                                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
-                                        </div>
-                                    </div> 
-                                    <div style="clear: both;height:5px;"></div>
-                                {%endif%}
-                                {%endfor%}
-                                </div>
                     <div style="width:33%;float:left;">
                         {%set candidatos=config.ordenacandidatos(totales)%}
                         {% for clave,item in candidatos %}

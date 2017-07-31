@@ -4,7 +4,7 @@ $app->get('/rep_circuito', function () use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id";
+    $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id and m.intendente+m.concejal>=1";
     $resultado = $app['db']->fetchAll($sql);
     foreach ($resultado as $item) {
         $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and concejal=1 and "

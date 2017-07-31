@@ -114,7 +114,7 @@ class Configuracion {
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista_nacional l where tipo='D' and c.lista_nacional_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
         if ($candidato['apellido'] == "")
-            return "Candidato " . "($datos[0])";
+            return "" . "($datos[0])";
         return $candidato['apellido'] . "($datos[0])";
     }
 

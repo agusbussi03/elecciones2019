@@ -10,10 +10,12 @@
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
              <div style='float: left;width:45%;'>
-                <button type="button" class="btn btn-sm btn-default"
+                 {%if session.admin==1%}
+                     <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
-                <button type="button" class="btn btn-sm btn-default"
+                    <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                {%endif%}
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
                 <button type="button" class="btn btn-sm btn-default"
