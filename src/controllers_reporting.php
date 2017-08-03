@@ -83,10 +83,6 @@ $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
     $pdf = new PDF_MC_Table('P', 'mm', 'A4');
     $pdf->Open();
     $pdf->AliasNbPages();
-    $pdf->SetCreator("METES");
-    $pdf->SetAuthor("Pablo Bussi");
-    $pdf->SetSubject("Reporte de avance");
-    $pdf->SetTitle("Reporte de Avance");
     $pdf->AddPage('P', 'A4');
     $pdf->SetMargins(15, 2, 2, 5);
     $pdf->Ln();
@@ -125,6 +121,46 @@ $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
 })->bind('avance_circuito');
 
 
+$app->get('/avance_nacional/{provincia}', function ($provincia) use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+                . "id not in (select mesa_id from renglon_nacional where diputado>0)";
+        $mesas_nocargadas_D = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+                . "id in (select mesa_id from renglon_nacional where diputado>0)";
+        $mesas_cargadas_D = $app['db']->fetchAll($sql);
+        $mesas = array('diputado' => array('cargadas' => $mesas_cargadas_D, 'nocargadas' => $mesas_nocargadas_D));
+    require('mc_table.php');
+    require_once('Configuracion.php');
+    $configuracion = new Configuracion($app);
+    $pdf = new PDF_MC_Table('P', 'mm', 'A4');
+    $pdf->Open();
+    $pdf->AliasNbPages();
+    $pdf->AddPage('P', 'A4');
+    $pdf->SetMargins(15, 2, 2, 5);
+    $pdf->Ln();
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->SetWidths(array(200));
+    $titulo = 'Faltantes Diputados';
+    $pdf->Row(array($titulo));
+    $pdf->SetFont('Arial', '', 10);
+    $columnas = array(15, 80, 80);
+    $pdf->SetWidths($columnas);
+    $titulos = array("Mesa", "Escuela", "Responsable");
+    $pdf->Row_b($titulos);
+    foreach ($mesas['diputado']['nocargadas'] as $item) {
+        $pdf->Row_b(array($item['numero'], utf8_decode($configuracion->getLocalmesa($item['numero'])), $item['responsable']));
+    }
+    $pdf->SetWidths(array(200));
+    $pdf->Row(array(date('d/M/Y h:i:s A')));
+    ob_clean();
+    $pdf->Output('reporte.pdf', 'D');
+    die;
+})->bind('avance_nacional');
+
+
 
 
 $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($app) {
@@ -138,16 +174,15 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     $app['twig']->addGlobal('session', $_SESSION);
     require_once 'Concejales.php';
     $concejales = new Concejales($id, $app);
-    //print_r($concejales->getSeccionales());
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
-
+   
     if ($tipo == 'votos') {
         $resultado = $concejales->getResultados();
         return $app['twig']->render('reporting/res_concejales_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'seccionales' => $concejales->getSeccionales()));
     }
     if ($tipo == 'porcentajes') {
         $resultado = $concejales->getPorcentajes();
-        //print_r($resultado);
+        //$resultado=ajustar($resultado);
         return $app['twig']->render('reporting/res_concejales_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $concejales->getSeccionales()));
     }
@@ -189,8 +224,23 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
     if ($tipo == 'distribucion') {
-        $resultado = $concejales->getDistribucion();
-        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));
+        
+        $id=0;
+        if (isset($_GET['id'])) $id=$_GET['id'];
+        $resultado = $concejales->getDistribucion($id);
+        $_partidos=$concejales->getPartidos();
+        
+         $partidos = array();
+        foreach($_partidos as $item){
+            $partidos[$item['id_partido']]=$item['nombre_partido'];
+        }
+        $suma=array();
+        foreach ($resultado as $item){
+            if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
+            else $suma[$item['partido']]=1;
+        }
+        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
+                array('partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
     }
     if ($tipo == 'votos_grafico') {
         $resultado = $concejales->getResultados();
@@ -203,8 +253,6 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
                 $datos[$clave2][] = $item2['votos'];
             }
         }
-        // print_r($seccionales);
-        // print_r($datos);die;
         return $app['twig']->render('reporting/res_concejales_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'datos' => $datos));
     }
 })->bind('rep_concejales_seccional');
@@ -230,7 +278,7 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
     }
     if ($tipo == 'porcentajes') {
         $resultado = $diputados->getPorcentajes();
-        //print_r($resultado);
+       
         return $app['twig']->render('reporting/res_dipnac_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $diputados->getDepartamentos()));
     }
@@ -269,13 +317,27 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
-        return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio,'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
+        return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
 
     if ($tipo == 'distribucion') {
-        $resultado = $diputados->getDistribucion();
-        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('circuito' => $circuito, 'totales' => $resultado));
-    }
+        $id=0;
+        if (isset($_GET['id'])) $id=$_GET['id'];
+        $resultado = $diputados->getDistribucion($id);
+        $_partidos=$diputados->getPartidos();
+        
+         $partidos = array();
+        foreach($_partidos as $item){
+            $partidos[$item['id_partido']]=$item['nombre_partido'];
+        }
+        $suma=array();
+        foreach ($resultado as $item){
+            if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
+            else $suma[$item['partido']]=1;
+        }
+        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', 
+                array('partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
+        }
 })->bind('rep_dipnac_seccion');
 
 function suma($item) {

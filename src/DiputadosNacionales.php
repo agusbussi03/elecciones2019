@@ -118,18 +118,24 @@ class DiputadosNacionales {
         return($porcentajes_peso);
     }
 
-    function getDistribucion() {
+    function getDistribucion($id) {
 
         $porcentajes_peso = $this->getPorcentajeponderado();
-        $titulares = 8;
-        $suplentes = 8;
+        $titulares = 9;
+        $suplentes = 9;
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;
         $partidos = $this->getPartidos();
         while ($i <= $total_concejales) {
             foreach ($porcentajes_peso as $clave => $item) {
-                $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
+                 if ($clave != "OTROS--" && $clave != "NULOS--" && $clave != "BLANCOS--") {
+                    if ($id > 0) {
+                        if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
+                            $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
+                    } else
+                        $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
+                }
             }
             $i++;
         }

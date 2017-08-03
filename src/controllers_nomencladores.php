@@ -116,7 +116,7 @@ $app->post('/seccion_edit/{id}', function ($id) use ($app) {
                 . "mesa_desde=?,mesa_hasta=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
             (int) $_POST['electores_provincia'], (int) $_POST['mesa_desde'],
-            (int) $_POST['mesa_desde'], (int) $id));
+            (int) $_POST['mesa_hasta'], (int) $id));
         $seccion = $app['db']->fetchAssoc("SELECT provincia_id FROM seccion where id=$id");
         $provincia = $seccion['provincia_id'];
     } catch (Exception $ex) {
@@ -666,17 +666,19 @@ $app->post('/seccional_edit/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
+     $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
+        $circuito = $circuito['circuito_id'];
     $breadcumb = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     $mensaje = array('codigo' => 0, 'texto' => "La seccional fue modificada");
     try {
         $sql = "UPDATE seccional SET nombre=?,electores_nacion=?,electores_provincia=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
             (int) $_POST['electores_provincia'], (int) $id));
-        $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
-        $circuito = $circuito['circuito_id'];
+       
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
     }
+    
     $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
     return $app['twig']->render('nomencladores/seccionales.html.twig', array('breadcumb' => $breadcumb, 'circuito' => $circuito, 'seccionales' => $seccionales, 'mensaje' => $mensaje));
 })->bind('seccional_editp');
@@ -762,6 +764,8 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
+    
+    
     if (isset($_GET['borrar'])) {
         $id_borrar = $_GET['borrar'];
         $sql = "DELETE FROM renglon_nacional WHERE lista_nacional_id=?";
@@ -784,6 +788,22 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
         $item['logo'] = base64_encode($item['logo']);
         $item['dip_foto'] = base64_encode($item['dip_foto']);
         $partidos[] = $item;
+    }
+    if (isset($_GET['xls'])) {
+        $texto = "";
+        foreach ($partidos as $item) {
+            if ($item['especial']==0){
+            $texto .= '"' . $item['id_partido'] . '",';
+            $texto .= '"' . $item['nombre_partido'] . '","' . $item['id_lista'] . '",';
+            $texto .= '"' . $item['nombre_lista'] . '","' . $item['nombre_lista'] . '",';
+            $texto .= '"' . $item['dip_apellido'] . '","' . $item['sen_apellido'] . '",'. "\n\r";
+            }
+        }
+        header('Content-Description: File Transfer');
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+        echo $texto;
+        die;
     }
     return $app['twig']->render('nomencladores/partidosnacionales.html.twig', array('partidos' => $partidos, 'provincia' => $provincia));
 })->bind('partidosnacionales');

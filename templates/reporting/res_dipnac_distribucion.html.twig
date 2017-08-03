@@ -1,20 +1,21 @@
 {% extends "layout.html.twig" %}
 {% block content %}
-    <meta http-equiv="refresh" content=60">
+    <meta http-equiv="refresh" content="60">
 
     {#% include "navigator.html.twig" %#}
     <div {#class="container"#}>
         <div>
             <div style='width: 55%;float: left'>
-                <h1 class="page-header">Dip. Nacionales - CARGOS</h1>
+                <h1>Dip. Nacionales - Distribución</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion}}</b>
             </div>
-             <div style='float: left;width:45%;'>
-                 {%if session.admin==1%}
-                     <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
+
+            <div style='float: left;width:45%;'>
+                {%if session.admin==1%}
                     <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
+                    <button type="button" class="btn btn-sm btn-default"
+                            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
                 {%endif%}
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
@@ -26,25 +27,21 @@
                         onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>
-        <div {#class="row"#}>
+        <div style="clear:both" />  
+        <div>
+            {% if config.tipo==0%}
+                {% for clave,item in partidos %} <a href="?id={{clave}}">{{item}}</a> / {%endfor%}
+            {%endif %} 
+        </div>
+        <div style='width: 50%;float: left'>
             <table width="100%" class="table table-striped table-bordered table-hover">
-                <!--thead-->
                 <tr>
-                    <td>
-                        ORDEN
+                    <td>ORDEN</td>
+                    <td>Partido/lista</td>
+                    <td>Orden Partido/lista
                     </td>
-                    <td>
-                        PARTIDO
-                    </td>
-                    <td>
-                        ORDEN PARTIDO
-                    </td>
-                    <td>
-                        INDICE
-                    </td>
+                    <td>INDICE</td>
                 </tr>
-                <!--/thead-->
-
                 {% for item in totales %}
                     <tr class="odd gradeX" id="r_{{loop.index}}">
                         <td style="padding:0;">
@@ -59,6 +56,24 @@
                         <td style="padding:0;text-align: right"> 
                             {{item.valor}}
                         </td>
+                    </tr>
+                {%endfor%}
+            </table>
+        </div>
+        <div style='width: 30%;float: left;margin-left: 20px;'>
+            <table width="50%" class="table table-striped table-bordered table-hover">
+                <tr>
+                    <td>Partido/lista</td>
+                    <td>Cargos</td>
+                </tr>
+                {% for clave,item in suma %}
+                    <tr class="odd gradeX" id="r_{{loop.index}}">
+                        <td style="padding:0;">
+                            {{ clave }}
+                        </td> 
+                        <td style="padding:0;">
+                            {{ item }}
+                        </td> 
                     </tr>
                 {%endfor%}
             </table>

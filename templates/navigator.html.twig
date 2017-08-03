@@ -13,6 +13,7 @@
     <!-- /.navbar-header -->
 
     <ul class="nav navbar-top-links navbar-right">
+         <a class="navbar-brand" href="{{path('homepage')}}">.Inicio.</a>
         {{session.usuario}}({{session.provincia}})
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -52,22 +53,12 @@
                         <i class="fa fa-dashboard fa-fw"></i>
                         Panel de Control</a>
                 </li>
+                {%if session.admin==1%}
                 <li>
                     <a href="{{ path('provincia') }}">
                         <i class="fa fa-check-square-o  fa-fw"></i>
                         Nomencladores
                     </a>
-                    {#<ul class="nav nav-second-level">
-                        <li>
-                            <a href="{{ path('provincia') }}">Provincia</a>
-                        </li>
-                        
-                        <li>
-                            <a href="{{ path('geolocales') }}">Locales (GEO)</a>
-                        </li>
-                    
-
-            </ul>#}
                 </li>
 
                 <li>
@@ -85,6 +76,7 @@
                         <i class="fa fa-user fa-fw"></i>
                         Usuarios</a>
                 </li>
+                {%endif%}
                 <li>
                     <a href="#">
                         <i class="fa fa-wrench fa-fw"></i>
@@ -97,7 +89,6 @@
                         <li>
                             <a href="{{path('rep_nacional')}}">Nacional</a>
                         </li>
-
                     </ul>
                 </li>
             </ul>

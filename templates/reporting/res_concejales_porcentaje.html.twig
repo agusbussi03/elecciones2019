@@ -48,9 +48,14 @@
                         <td>Peso</td>
                         {#{dump(votos)}#}
                         {% for clave,item in votos|first %}
+                             {%if (clave|trim!="BLANCOS--" and clave!="NULOS--") or 
+                                (clave|trim=="BLANCOS--" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
+                                (clave|trim=="NULOS--" and session.tiporeporte in ["EMITIDOS"])
+                                %}
                             <td style="font-size:10px;">
                                 {{clave}}
                             </td>
+                            {%endif%}
                         {%endfor%}
 
                     </tr>
@@ -65,12 +70,17 @@
                                 {{ seccionales[clave].electores }} ({{ seccionales[clave].peso }}%)
                             </td> 
                             {% set total=0 %}
-                            {% for item2 in item %}
+                            {% for clave2,item2 in item %}
+                                {%if (clave2|trim!="BLANCOS--" and clave2!="NULOS--") or 
+                                (clave2|trim=="BLANCOS--" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
+                                (clave2|trim=="NULOS--" and session.tiporeporte in ["EMITIDOS"])
+                                %}
                                 <td style="text-align: right"> 
                                     {%if loop.index>1%}{{item2.porcentaje|number_format(2, '.', ',')}}% 
                                     {%else%}{{item2}}{%endif%}
                                 </td>
-                                {%if loop.index>1%} {%set total=total+item2.porcentaje %}{%endif%}
+                                {%endif%}
+                                
                             {%endfor%}
                         </tr>
                     {% endfor %}
@@ -80,11 +90,15 @@
                         </td> 
                         <td></td>
                         {% set total=0 %}
-                        {% for item2 in totales %}
+                        {% for clave2,item2 in totales %}
+                             {%if (clave2|trim!="BLANCOS--" and clave2!="NULOS--") or 
+                                (clave2|trim=="BLANCOS--" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
+                                (clave2|trim=="NULOS--" and session.tiporeporte in ["EMITIDOS"])
+                                %}
                             <td style="text-align: right;"> 
                                 <b>{%if loop.index>1%}{{item2.porcentaje|number_format(2, '.', ',')}}%{%else%}{{item2}}{%endif%}</b>
                             </td>
-                            {%if loop.index>1%} {%set total=total+item2.porcentaje %}{%endif%}
+                            {%endif%}
                         {%endfor%}
 
                     </tr>
