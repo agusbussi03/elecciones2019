@@ -40,12 +40,16 @@
                                 <tbody>
                                     {% for item in partidos %}
                                         <tr class="odd gradeX">
-                                            <td>{{item.id_partido}}</td>
-                                            <td>{{item.nombre_partido}}</td>
+                                            <form action="{{path('partido_edit',{'id':item.id})}}" method="post" enctype="multipart/form-data">
+                                            <td><input tyle="text" name="id_partido" value="{{item.id_partido}}" size="2"></td>
+                                            <td><input tyle="text" name="nombre_partido" value="{{item.nombre_partido}}"></td>
                                             {%if config.tipo==0%}
-                                                <td>{{item.id_lista}}</td>
-                                                <td>{{item.nombre_lista}}</td>
+                                                <td><input tyle="text" name="id_lista" value="{{item.id_lista}}" size="2"></td>
+                                                <td><input tyle="text" name="nombre_lista" value="{{item.nombre_lista}}"></td>
+                                                
                                             {%endif%}
+                                            <td><input type="submit" value="Cambiar"></td>
+                                            </form>
                                             <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}"{%endif%}</td>
 
                                             <td>

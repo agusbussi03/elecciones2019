@@ -666,19 +666,18 @@ $app->post('/seccional_edit/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-     $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
-        $circuito = $circuito['circuito_id'];
+    $circuito = $app['db']->fetchAssoc("SELECT circuito_id FROM seccional where id=$id");
+    $circuito = $circuito['circuito_id'];
     $breadcumb = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     $mensaje = array('codigo' => 0, 'texto' => "La seccional fue modificada");
     try {
         $sql = "UPDATE seccional SET nombre=?,electores_nacion=?,electores_provincia=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
             (int) $_POST['electores_provincia'], (int) $id));
-       
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
     }
-    
+
     $seccionales = $app['db']->fetchAll("SELECT * FROM seccional where circuito_id=$circuito");
     return $app['twig']->render('nomencladores/seccionales.html.twig', array('breadcumb' => $breadcumb, 'circuito' => $circuito, 'seccionales' => $seccionales, 'mensaje' => $mensaje));
 })->bind('seccional_editp');
@@ -734,7 +733,6 @@ $app->post('/partido_logo/{id}', function ($id) use ($app) {
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM partido_lista where id=$id");
     $provincia = $provincia['provincia_id'];
-//echo "SSSSSS.$provincia";
     if (isset($_FILES['logo']['tmp_name'])) {
 
         try {
@@ -760,12 +758,39 @@ $app->post('/partido_logo/{id}', function ($id) use ($app) {
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partido_logo');
+
+
+$app->post('/partido_edit/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM partido_lista where id=$id");
+    $provincia = $provincia['provincia_id'];
+    $sql = "UPDATE partido_lista SET id_partido=?,nombre_partido=? WHERE id=?";
+    $app['db']->executeQuery($sql, array($_POST['id_partido'], $_POST['nombre_partido'], (int) $id));
+
+    if (isset($_POST['id_lista'])) {
+
+        $sql = "UPDATE partido_lista SET id_lista=?,nombre_lista=? WHERE id=?";
+        $app['db']->executeQuery($sql, array($_POST['id_lista'], $_POST['nombre_lista'], (int) $id));
+    }
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista");
+    foreach ($partidos2 as $item) {
+        $item['logo'] = base64_encode($item['logo']);
+        $partidos[] = $item;
+    }
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+    return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
+})->bind('partido_edit');
+
+
+
 $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    
-    
+
+
     if (isset($_GET['borrar'])) {
         $id_borrar = $_GET['borrar'];
         $sql = "DELETE FROM renglon_nacional WHERE lista_nacional_id=?";
@@ -792,11 +817,11 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (isset($_GET['xls'])) {
         $texto = "";
         foreach ($partidos as $item) {
-            if ($item['especial']==0){
-            $texto .= '"' . $item['id_partido'] . '",';
-            $texto .= '"' . $item['nombre_partido'] . '","' . $item['id_lista'] . '",';
-            $texto .= '"' . $item['nombre_lista'] . '","' . $item['nombre_lista'] . '",';
-            $texto .= '"' . $item['dip_apellido'] . '","' . $item['sen_apellido'] . '",'. "\n\r";
+            if ($item['especial'] == 0) {
+                $texto .= '"' . $item['id_partido'] . '",';
+                $texto .= '"' . $item['nombre_partido'] . '","' . $item['id_lista'] . '",';
+                $texto .= '"' . $item['nombre_lista'] . '","' . $item['nombre_lista'] . '",';
+                $texto .= '"' . $item['dip_apellido'] . '","' . $item['sen_apellido'] . '",' . "\n\r";
             }
         }
         header('Content-Description: File Transfer');
@@ -825,7 +850,7 @@ $app->post('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
         if (isset($_FILES['logo']['tmp_name'])) {
             $logo = file_get_contents($_FILES['logo']['tmp_name']);
             $sql = "update candidato set foto=? where id=?";
-            $app['db']->executeQuery($sql, array($logo,(int)$candidato_id));
+            $app['db']->executeQuery($sql, array($logo, (int) $candidato_id));
         }
         if (isset($_POST['apellido'])) {
             $apellido = $_POST['apellido'];

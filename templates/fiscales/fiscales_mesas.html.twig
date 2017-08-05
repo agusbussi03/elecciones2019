@@ -1,0 +1,84 @@
+{% extends "layout.html.twig" %}
+{% block content %}
+    {% include "navigator.html.twig" %}
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">FISCALES - Mesas</h1>
+                <li><a href='{{ path('fiscales_locales',{'id':escuela.circu}) }}'>Volver</a></li>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>Numero</th>
+                                    <th>DNI</th>
+                                    <th>Nombre</th>
+                                    <th>Celular</th>
+                                    <th>Mail</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in mesas%}
+                                    {%if item.testigo>0%}
+
+                                        <tr class="odd gradeX">
+                                    <form action="{{path('fiscales_cargamesa',{'id':item.mesa})}}" method="POST">
+                                        <td>{{item.mesa}}</td>
+                                        <td></td>
+                                        <td>Mesa Testigo</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td> </td>
+                                    </form>
+                                    </tr>
+                                {%else%}
+                                    <tr class="odd gradeX">
+                                    <form action="{{path('fiscales_cargamesa',{'id':item.mesa})}}" method="POST">
+                                        <td>{{item.mesa}}</td>
+                                        <td><input type="text" name="dni" size="7" value="{{item.dni}}"  onblur='buscapadron(this.value,{{item.mesa}} );'></td>
+                                        <td><input id=n_{{item.mesa}}  type="text" name="nombre" value="{{item.nombre}}"></td>
+                                        <td><input type="text" name="telefono" value="{{item.telefono}}"></td>
+                                        <td><input  type="text" name="mail" value="{{item.mail}}"></td>
+                                        <td> 
+                                            <input type="submit" value="Grabar" class="button">  
+                                        </td>
+                                    </form>
+                                    </tr> 
+                                {%endif%}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}    
+{% block final %}
+    <!-- DataTables JavaScript -->
+    <script src="{{ asset('/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
+    <script>
+                                            $(document).ready(function () {
+                                                $('#dataTables-example').DataTable({
+                                                    responsive: true
+                                                });
+                                            });
+
+                                            function buscapadron(dni, nummesa) {
+                                                $.get("{{ path('padron') }}" + "?dni=" + dni, "", function (data, textStatus, jqxhr) {
+
+                                                    $("#n_" + nummesa).val(data);
+                                                });
+                                            }
+    </script>
+{% endblock %}

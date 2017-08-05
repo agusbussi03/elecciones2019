@@ -22,7 +22,7 @@
                                 <tr>
                                     <th>Usuario</th>
                                     <th>Nombre</th>
-                                    <th>Admin/Carga/Lectura</th>
+                                    <th>Admin/Carga/Lectura/Fiscal</th>
 
                                     <th>Pcia./Depto/Ciudad/Secc</th>
 
@@ -51,6 +51,10 @@
                                                     <select name="lectura">
                                                         <option value="0" {%if item.lectura=='0'%}selected{%endif%}>NO</option>
                                                         <option value="1" {%if item.lectura=='1'%}selected{%endif%}>SI</option>                                              
+                                                    </select>
+                                                     <select name="fiscal">
+                                                        <option value="0" {%if item.fiscal=='0'%}selected{%endif%}>NO</option>
+                                                        <option value="1" {%if item.fiscal=='1'%}selected{%endif%}>SI</option>                                              
                                                     </select>
                                                 </td>
                                                 <td>

@@ -30,6 +30,7 @@ if (!isset($_SESSION['usuario'])){
         $_SESSION['admin']=0;
         $_SESSION['carga']=0;
         $_SESSION['lectura']=0;
+         $_SESSION['fiscal']=0;
 }
     require 'Configuracion.php';
 

@@ -10,11 +10,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $app->get('/', function () use ($app) {
     require_once'Estado.php';
-    if (!(validar('admin') || validar('carga') || validar('lectura'))) {
+    if (!(validar('admin') || validar('carga') || validar('lectura') || validar('fiscal'))) {
         return $app->redirect('login');
     }
     if (validar('carga')) {
         return $app->redirect('mesacarga_elige');
+    }
+    if (validar('fiscal')) {
+        return $app->redirect('fiscales_seccion');
     }
     return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     //  return $app->redirect($app['url_generator']->generate(''));
@@ -54,9 +57,10 @@ $app->post('/login', function () use ($app) {
         $_SESSION['admin'] = $usuario->getAdmin();
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
+         $_SESSION['fiscal'] = $usuario->getFiscal();
         $_SESSION['provincia'] = $usuario->getProvincia();
         $app['twig']->addGlobal('session', $_SESSION);
-        if (!(validar('admin') || validar('carga') || validar('lectura'))) {
+        if (!(validar('admin') || validar('carga') || validar('lectura') || validar('fiscal'))) {
             return $app->redirect('login');
         }
         return $app->redirect($app['url_generator']->generate('homepage'));
@@ -65,6 +69,8 @@ $app->post('/login', function () use ($app) {
 });
 
 include("controllers_nomencladores.php");
+include("controllers_fiscales.php");
+
 /* * ************** M E S A S *********************************** */
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {

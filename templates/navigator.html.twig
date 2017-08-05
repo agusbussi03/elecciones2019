@@ -48,11 +48,13 @@
                         </div> 
                     </form>
                 </li>
+                {%if session.admin==1 or session.lectura %}
                 <li>
                     <a href="{{ path('homepage') }}">
                         <i class="fa fa-dashboard fa-fw"></i>
                         Panel de Control</a>
                 </li>
+                {%endif%}
                 {%if session.admin==1%}
                 <li>
                     <a href="{{ path('provincia') }}">
@@ -76,7 +78,17 @@
                         <i class="fa fa-user fa-fw"></i>
                         Usuarios</a>
                 </li>
+                
                 {%endif%}
+                 {%if session.admin==1 or session.fiscal==1%}
+                <li>
+                    <a href="{{ path('fiscales_seccion') }}">
+                        <i class="fa fa-check-square-o  fa-fw"></i>
+                        Fiscales
+                    </a>
+                </li>
+                {%endif%}
+                 {%if session.admin==1 or session.lectura %}
                 <li>
                     <a href="#">
                         <i class="fa fa-wrench fa-fw"></i>
@@ -91,6 +103,8 @@
                         </li>
                     </ul>
                 </li>
+                {%endif%}
+                
             </ul>
         </div>
     </div>

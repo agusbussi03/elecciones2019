@@ -14,6 +14,7 @@ class Usuarios {
     private $admin = 0;
     private $carga = 0;
     private $lectura = 0;
+        private $fiscal = 0;
     private $provincia = 0;
     private $seccion = 0;
     private $circuito = 0;
@@ -28,9 +29,9 @@ class Usuarios {
 
     function actualizar($datos) {
 
-        $sql = "UPDATE usuarios SET nombreyapellido=?,admin=?,carga=?,lectura=?,provincia_id=? where id=?;";
+        $sql = "UPDATE usuarios SET nombreyapellido=?,admin=?,carga=?,lectura=?,fiscal=?,provincia_id=? where id=?;";
         $this->app['db']->executeQuery($sql, array($datos['nombreyapellido'], (int) $datos['admin'],
-            (int) $datos['carga'], (int) $datos['lectura'], (int) $datos['provincia'], (int) $this->id));
+            (int) $datos['carga'], (int) $datos['lectura'], (int) $datos['fiscal'], (int) $datos['provincia'], (int) $this->id));
 
         if ($datos['seccion'] == 0) {
             $sql = "UPDATE usuarios SET seccion_id=NULL where id=?;";
@@ -91,6 +92,7 @@ class Usuarios {
         $this->nombreyapellido = $user['nombreyapellido'];
         $this->admin = $user['admin'];
         $this->lectura = $user['lectura'];
+        $this->fiscal = $user['fiscal'];
         $this->carga = $user['carga'];
         $this->provincia = $user['provincia_id'];
         $this->seccion = $user['seccion_id'];
@@ -146,6 +148,10 @@ class Usuarios {
 
     function getLectura() {
         return $this->lectura;
+    }
+    
+     function getFiscal() {
+        return $this->fiscal;
     }
 
     function getApp() {
