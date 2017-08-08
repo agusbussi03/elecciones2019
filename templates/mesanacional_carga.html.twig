@@ -66,7 +66,7 @@
                                 </td>
                                 {% if configuracion.tipo==0%}
                                     <td>
-                                        {%if item.datos.id_lista!=0%}{{ item.datos.id_lista }}-{{ item.datos.nombre_lista }}{%endif%}
+                                        {%if item.datos.id_lista!=''%}{{ item.datos.id_lista }}-{{ item.datos.nombre_lista }}{%endif%}
                                     </td>
                                 {%endif%}
                                 {%if categoria=='D'%}

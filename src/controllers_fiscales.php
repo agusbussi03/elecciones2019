@@ -5,7 +5,7 @@ $app->get('/fiscales_seccion', function () use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     if (isset($_GET['print'])) {        imprime($app,$_GET['seccion']);}
-    $sql = "SELECT * from tbcarmes where tipo='S'";
+    $sql = "SELECT * from tbcarmes where tipo='S' and sec<>99";
     $resultado = $app['db']->fetchAll($sql);
     return $app['twig']->render('fiscales/fiscales_seccion.html.twig', array('secciones' => $resultado));
 })->bind('fiscales_seccion');
@@ -14,7 +14,8 @@ $app->get('/fiscales_circuito/{id}', function ( $id) use ($app) {
     if (!validar('admin') && !validar('fiscal')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "SELECT * from tbcarmes where tipo in ('C','M','T') and sec=$id";
+      if (isset($_GET['print'])) {        imprime($app,0,$_GET['circu']);}
+    $sql = "SELECT * from tbcarmes where tipo in ('C','M','T') and cirnro<>9999 and sec=$id";
     $resultado = $app['db']->fetchAll($sql);
     return $app['twig']->render('fiscales/fiscales_circuito.html.twig', array('circuitos' => $resultado));
 })->bind('fiscales_circuito');
@@ -88,7 +89,7 @@ $app->get('/padron', function () use ($app) {
 })->bind('padron');
 
 
-function imprime($app,$seccion){
+function imprime($app,$seccion=0,$circuito=0){
     
     require('mc_table.php');
     require_once('Configuracion.php');
@@ -105,11 +106,12 @@ function imprime($app,$seccion){
     $pdf->Row(array($titulo));
     $resultado=array();
     $where=" 1 ";
-    if ($seccion>=0) $where.="AND secc=$seccion ";
+    if ($seccion>0) $where.="AND secc=$seccion ";
+    if ($circuito>0) $where.="AND circu=$circuito ";
     $sql="SELECT desest,direst,locest,dni,nombre,mail,desde,hasta,telefono,t1.nomb as departamento "
             . "FROM tblocales l, tbcarmes t1,tbcarmes t2 where $where and l.secc=t1.sec and t1.tipo='S' "
             . "and trim(l.circu)=concat(t2.cirnro,t2.cirlet) order by secc,t2.cirnro,t2.cirlet";
-    
+    //echo $sql;die;
     $resultado = $app['db']->fetchAll($sql);
     $pdf->SetFont('Arial', '', 8);
     $columnas = array(30, 30, 60,60,15,50,20,20);
