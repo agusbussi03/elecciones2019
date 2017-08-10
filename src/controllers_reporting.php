@@ -264,8 +264,9 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         }
         //print_r($resultado);
         $grafico=array();
+        $resultado_grafico=$concejales->getDistribucionCompleta($id);
         if($id>0){
-            foreach($resultado as $clave=>$item){
+            foreach($resultado_grafico as $clave=>$item){
             if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
             }
         }
@@ -377,6 +378,10 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
             if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
             }
         }
+        
+        
+        
+        
         return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', 
                 array('grafico'=>$grafico, 'partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
         }

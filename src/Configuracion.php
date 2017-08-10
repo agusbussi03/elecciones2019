@@ -80,8 +80,11 @@ class Configuracion {
         return $_SESSION['usuario'];
     }
 
-    function getUltimaactualizacion() {
-        $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%m') as hora FROM log order by tiempo desc LIMIT 1 ");
+    function getUltimaactualizacion($tipo="") {
+        $where="";
+        if ($tipo!="") $where=" where datos like '%[$tipo%' ";
+        $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%i') as hora "
+                . "FROM log $where order by tiempo desc LIMIT 1 ");
         return $hora['hora'];
     }
 

@@ -21,8 +21,7 @@
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Ubicacion:  {{mesalocal.seccion_nombre}} - Circuito: {{mesalocal.circuito_nombre}}  
-                           - Electores: {{mesalocal.electores_nacion}} - Escuela:  {{mesalocal.local}} 
+                       Mesa {{ mesa.numero }} - Electores: {{mesa.electores_nacion}} - {{config.localmesa(mesa.numero)}}
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">

@@ -21,7 +21,8 @@ class Estado {
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_testigo'] = $resultado[0];
         $sql = "SELECT count(distinct mesa_id) FROM `renglon` "
-                . "where mesa_id in (SELECT id  from mesa where gobernador+diputado+senador+intendente+concejal>=1)";
+                . "where mesa_id in (SELECT id  from mesa where gobernador+diputado+senador+intendente+concejal>=1) "
+                . "and gobernador+diputado+senador+intendente+concejal>=1";
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_con_carga'] = $resultado[0];
          $sql = "SELECT * FROM log  order by id desc limit 0,5";
@@ -31,7 +32,8 @@ class Estado {
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_testigo_nacional'] = $resultado[0];
         $sql = "SELECT count(distinct mesa_id) FROM `renglon_nacional` "
-                . "where mesa_id in (SELECT id  from mesa where diputado_nacional+senador_nacional>=1 ) ";
+                . "where mesa_id in (SELECT id  from mesa where diputado_nacional+senador_nacional>=1 )"
+                . " and  diputado+senador>=1 ";
         $resultado = $app['db']->fetchArray($sql);
         $estado['mesas_con_carga_nacional'] = $resultado[0];
         return $estado;

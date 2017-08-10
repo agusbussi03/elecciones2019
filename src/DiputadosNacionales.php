@@ -164,7 +164,9 @@ class DiputadosNacionales {
     function getDepartamentos() {
         $total = 0;
         $resultado = array();
-        $sql = "SELECT * FROM seccion WHERE id in (select seccion_id from circuito,mesa where circuito.id=mesa.circuito_id and diputado_nacional>0)";
+        $sql = "SELECT * FROM seccion WHERE id in (select seccion_id from circuito,mesa,renglon_nacional "
+                . "where circuito.id=mesa.circuito_id and diputado_nacional>0 "
+                . "and renglon_nacional.mesa_id=mesa.id and renglon_nacional.diputado>0)";
         $departamentos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($departamentos as $item) {
             $total += $item['electores_nacion'];
