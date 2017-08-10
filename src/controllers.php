@@ -143,7 +143,7 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     $categoria = 'G';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
-    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin')) {
+    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin') && !validar('carga')) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
     }
     $mascara = $mesa->getMascara();

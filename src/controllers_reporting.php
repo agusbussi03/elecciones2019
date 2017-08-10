@@ -120,6 +120,17 @@ $app->get('/avance_circuito/{circuito}', function ($circuito) use ($app) {
     die;
 })->bind('avance_circuito');
 
+$app->get('/faltante_circuito/{circuito}', function ($circuito) use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    require_once 'Concejales.php';
+    $concejales = new Concejales($circuito, $app);
+    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
+    $faltantes=$concejales->getFaltante();
+    return $app['twig']->render('reporting/res_concejales_faltante.html.twig', 
+            array('faltantes' => $faltantes, 'circuito' => $circuito));
+})->bind('faltante_circuito');
 
 $app->get('/avance_nacional/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
@@ -161,6 +172,18 @@ $app->get('/avance_nacional/{provincia}', function ($provincia) use ($app) {
 })->bind('avance_nacional');
 
 
+
+$app->get('/faltante_nacional/{provincia}', function ($provincia) use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    require_once 'DiputadosNacionales.php';
+    $diputados = new DiputadosNacionales($provincia, $app);
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+    $faltantes=$diputados->getFaltante();
+    return $app['twig']->render('reporting/res_dipnac_faltante.html.twig', 
+            array('faltantes' => $faltantes, 'provincia' => $provincia));
+})->bind('faltante_nacional');
 
 
 $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($app) {
@@ -239,8 +262,16 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
             if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
             else $suma[$item['partido']]=1;
         }
+        //print_r($resultado);
+        $grafico=array();
+        if($id>0){
+            foreach($resultado as $clave=>$item){
+            if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
+            }
+        }
+        //print_r($grafico);
         return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
-                array('partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
+                array('grafico'=>$grafico,'partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
     }
     if ($tipo == 'votos_grafico') {
         $resultado = $concejales->getResultados();
@@ -254,6 +285,11 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
             }
         }
         return $app['twig']->render('reporting/res_concejales_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'datos' => $datos));
+    }
+     if ($tipo == 'avance') {
+        $avance = $concejales->getAvance();
+        return $app['twig']->render('reporting/res_concejales_avance.html.twig', 
+                array('circuito' => $circuito,'avance' => $avance));
     }
 })->bind('rep_concejales_seccional');
 
@@ -335,9 +371,20 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
             if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
             else $suma[$item['partido']]=1;
         }
-        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', 
-                array('partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
+        $grafico=array();
+        if($id>0){
+            foreach($resultado as $clave=>$item){
+            if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
+            }
         }
+        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', 
+                array('grafico'=>$grafico, 'partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
+        }
+        if ($tipo == 'avance') {
+        $avance = $diputados->getAvance();
+        return $app['twig']->render('reporting/res_dipnac_avance.html.twig', 
+                array('circuito' => $circuito,'avance' => $avance));
+    }
 })->bind('rep_dipnac_seccion');
 
 function suma($item) {

@@ -89,12 +89,12 @@ class Concejales {
             $general += $suma;
             $porcentajes[$clave]['EMITIDOS'] = $suma;
             foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 2) : 0;
+                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
                 $porcentajes[$clave][$clave2]['id'] = $valor2['id'];
                 if (!isset($totales_porcentajes[$clave2]))
-                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 2) : 0;
+                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
                 else
-                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? round($valor2['votos'] / $suma * 100, 2) : 0;
+                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
                 $totales_porcentajes[$clave2]['id'] = $valor2['id'];
             }
         }
@@ -111,9 +111,9 @@ class Concejales {
             foreach ($item as $clave2 => $item2) {
                 /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') { */
                 if (!isset($porcentajes_peso[$clave2]))
-                    $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 2);
+                    $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
                 else
-                    $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 2);
+                    $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
                 $porcentajes_peso[$clave2]['id'] = $item2['id'];
                 /* } */
             }
@@ -123,6 +123,14 @@ class Concejales {
 
     function getDistribucion($id) {
         $porcentajes_peso = $this->getPorcentajeponderado();
+        $partidos = $this->getPartidos();
+        $total_partido = 0;
+        if ($id != 0) {
+            foreach ($porcentajes_peso as $item) {
+                if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
+                    $total_partido += $item['porcentaje'];
+            }
+        }
         $sql = "SELECT * FROM circuito WHERE id=?  ";
         $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
         $titulares = $circuito['conc_titulares'];
@@ -130,13 +138,13 @@ class Concejales {
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;
-        $partidos = $this->getPartidos();
+
         while ($i <= $total_concejales) {
             foreach ($porcentajes_peso as $clave => $item) {
                 if ($clave != "OTROS--" && $clave != "NULOS--" && $clave != "BLANCOS--") {
                     if ($id > 0) {
                         if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
-                            $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
+                            $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => ($item['porcentaje'] * 100 / $total_partido) / $i, "logo" => buscarfoto($partidos, $clave));
                     } else
                         $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
                 }
@@ -171,7 +179,7 @@ class Concejales {
             }
             foreach ($seccionales as $item) {
                 $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
-                    'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 2));
+                    'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 200));
             }
         } else {   ///// NO TIENE SECCIONALES LA LOCALIDAD
             $sql = "SELECT * FROM circuito WHERE id=?";
@@ -194,6 +202,40 @@ class Concejales {
         }
 
         return($resultado);
+    }
+
+    function getAvance() {
+        $sql = "SELECT seccional.id,seccional.nombre as nombre,count(*) as mesas from seccional,mesa "
+                . "where seccional.circuito_id=" . $this->id . " and mesa.seccionales_id=seccional.id "
+                . " and mesa.concejal=1 "
+                . "group by seccional.id,seccional.nombre";
+        $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($_seccionales as $item) {
+            $sql = "select count(DISTINCT mesa.id) as cargadas from mesa,renglon "
+                    . "where renglon.mesa_id=mesa.id and renglon.concejal>0 "
+                    . " and mesa.seccionales_id=" . $item['id'];
+            $cargadas = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+            $item['cargadas']=$cargadas['cargadas'];
+            $seccionales[] = $item;
+        }
+        return $seccionales;
+    }
+     function getFaltante() {
+        $sql = "SELECT seccional.id,seccional.nombre as nombre,count(*) as mesas from seccional,mesa "
+                . "where seccional.circuito_id=" . $this->id . " and mesa.seccionales_id=seccional.id "
+                . " and mesa.concejal=1 "
+                . "group by seccional.id,seccional.nombre";
+        $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($_seccionales as $item) {
+            $sql = "select  * from mesa "
+                    . " where  seccionales_id=" . $item['id']." and mesa.concejal=1 and id not in (select mesa_id from renglon "
+                    . " where renglon.concejal>0 )";
+                    
+            $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
+            $item['faltantes']=$faltantes;
+            $seccionales[] = $item;
+        }
+        return $seccionales;
     }
 
 }

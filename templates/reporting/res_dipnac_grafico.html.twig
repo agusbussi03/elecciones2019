@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="refresh" content="30">
+        <meta http-equiv="refresh" content="120">
         <style>
 
             .container{
@@ -79,22 +79,25 @@
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
                 <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'avance'}) }}';">Avance</button>
+           <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>
-        <div style="clear: both;height:25px;"></div>
-        <div style="width:33%;float:left;">
+        <div style="clear: both;height:0px;"></div>
+        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Listas</h2>
             {% for clave,item in totales %}
                 {%if loop.index>0  and clave!="EMITIDOS" %}
                     {%if (clave|trim!="BLANCOS" and clave!="NULOS") or 
                                 (clave|trim=="BLANCOS" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
                                 (clave|trim=="NULOS" and session.tiporeporte in ["EMITIDOS"])
-                                %} 
+                    %} 
                     <div class="container">   
                         <div style="width:45%;float:left;text-align:right;">
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
-                                {{config.limpianombre(clave)|slice(0, 20)}}</p></span>
+                                {{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
                                 {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
                                 <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
                             {%endif%}
 
@@ -106,52 +109,68 @@
                     <div style="clear: both;height:5px;"></div>
                 {%endif%}
                 {%endif%}
-            {%endfor%}
-        </div>
-        <div style="width:33%;float:left;">
-            {% for clave,item in totales_partido %}
-                {%if loop.index>0%}
-                    <div class="container">   
-                        <div style="width:45%;float:left;text-align:right;">
-                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
-                                {{clave|slice(0, 20)}}</p></span>
-                                {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
-
-                            </div>
-                            <div style="width:45%;float:left;text-align:left;">
-                                <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
-                            </div>
-                        </div> 
-                        <div style="clear: both;height:5px;"></div>
-                    {%endif%}
                     {%endfor%}
                     </div>
-                    <div style="width:33%;float:left;">
-                        {%set candidatos=config.ordenacandidatos(totales)%}
-                        {% for clave,item in candidatos %}
-                            {%if loop.index>0 and  clave!="EMITIDOS"%}
-                                 {%if (clave|trim!="BLANCOS" and clave!="NULOS") or 
-                                (clave|trim=="BLANCOS" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
-                                (clave|trim=="NULOS" and session.tiporeporte in ["EMITIDOS"])
-                                %} 
+                    <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Partidos</h2>
+                        {% for clave,item in totales_partido %}
+                            {%if loop.index>0%}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:70%;">{{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
-                                        <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
-                                        {%if partidos[item.id] is defined%}
-                                            <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
-                                        {%endif%}
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:90%;">
+                                            {{config.obtienedipnac(clave)|slice(0, 20)}}</p>
+                                            {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                            <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
 
-                                    </div>
-                                    <div style="width:45%;float:left;text-align:left;">
-                                        <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
-                                    </div>
-                                </div> 
-                                <div style="clear: both;height:5px;"></div>
-                            {%endif%}
-                             {%endif%}
-                        {%endfor%}
-                    </div>
-                </body>
-            </html>
+                                        </div>
+                                        <div style="width:45%;float:left;text-align:left;">
+                                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                        </div>
+                                    </div> 
+                                    <div style="clear: both;height:5px;"></div>
+                                {%endif%}
+                                {%endfor%}
+                                    <!-- muestoro blancos y nulos-->
+                                    {% for clave,item in totales %}
+                                        {%if loop.index>0  and (clave=="OTROS" or clave=="BLANCOS" or clave=="NULOS") %} 
+                                            <div class="container">   
+                                                <div style="width:45%;float:left;text-align:right;">
+                                                    <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:90%;">
+                                                        {{clave}}</p>
+                                                </div>
+                                                <div style="width:45%;float:left;text-align:left;">
+                                                    <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                                </div>
+                                            </div> 
+                                            <div style="clear: both;height:5px;"></div>
+                                        {%endif%}
+                                    {%endfor%}        
+
+                                </div>
+                                {#<div style="width:33%;float:left;">
+                                    {%set candidatos=config.ordenacandidatos(totales)%}
+                                    {% for clave,item in candidatos %}
+                                        {%if loop.index>0 and  clave!="EMITIDOS"%}
+                                             {%if (clave|trim!="BLANCOS" and clave!="NULOS") or 
+                                            (clave|trim=="BLANCOS" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
+                                            (clave|trim=="NULOS" and session.tiporeporte in ["EMITIDOS"])
+                                            %} 
+                                            <div class="container">   
+                                                <div style="width:45%;float:left;text-align:right;">
+                                                    <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:70%;">{{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
+                                                    <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
+                                                    {%if partidos[item.id] is defined%}
+                                                        <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
+                                                    {%endif%}
+            
+                                                </div>
+                                                <div style="width:45%;float:left;text-align:left;">
+                                                    <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                                </div>
+                                            </div> 
+                                            <div style="clear: both;height:5px;"></div>
+                                        {%endif%}
+                                         {%endif%}
+                                    {%endfor%}
+                                </div>#}
+                            </body>
+                        </html>

@@ -119,20 +119,26 @@ class DiputadosNacionales {
     }
 
     function getDistribucion($id) {
-
+        $partidos = $this->getPartidos();
         $porcentajes_peso = $this->getPorcentajeponderado();
+        $total_partido=0;
+        if ($id!=0){
+            foreach ($porcentajes_peso as $item){
+                if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
+                    $total_partido+=$item['porcentaje'];
+            }
+        }
         $titulares = 9;
         $suplentes = 9;
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;
-        $partidos = $this->getPartidos();
         while ($i <= $total_concejales) {
             foreach ($porcentajes_peso as $clave => $item) {
                  if ($clave != "OTROS--" && $clave != "NULOS--" && $clave != "BLANCOS--") {
                     if ($id > 0) {
                         if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
-                            $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
+                            $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => ($item['porcentaje'] / $i*100/$total_partido), "logo" => buscarfoto($partidos, $clave));
                     } else
                         $dhont[] = array('partido' => $clave, 'orden' => $i, "valor" => $item['porcentaje'] / $i, "logo" => buscarfoto($partidos, $clave));
                 }
@@ -165,7 +171,7 @@ class DiputadosNacionales {
         }
         foreach ($departamentos as $item) {
             $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
-                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_nacion'] / $total * 100, 2));
+                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_nacion'] / $total * 100, 200));
         }
 
 
@@ -185,7 +191,41 @@ class DiputadosNacionales {
 
         return($resultado);
     }
-
+     function getAvance() {
+        $sql = "SELECT seccion.id,seccion.nombre,count(DISTINCT mesa.id) as mesas "
+                . "FROM seccion,mesa,circuito where mesa.circuito_id=circuito.id "
+                . "and circuito.seccion_id=seccion.id and mesa.diputado_nacional=1 "
+                . "group by seccion.id,seccion.nombre ";
+        $_secciones = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($_secciones as $item) {
+            $sql = "SELECT count(DISTINCT mesa.id) as cargadas FROM mesa,circuito,renglon_nacional "
+                    . "where mesa.circuito_id=circuito.id and circuito.seccion_id=". $item['id'] 
+                    . " and mesa.diputado_nacional=1 and renglon_nacional.mesa_id=mesa.id "
+                    . " and renglon_nacional.diputado>0 ";
+            $cargadas = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
+            $item['cargadas']=$cargadas['cargadas'];
+            $secciones[] = $item;
+        }
+        return $secciones;
+    }
+  function getFaltante() {
+        $sql = "SELECT seccion.id,seccion.nombre as nombre,count(*) as mesas "
+                . "from seccion,mesa,circuito where seccion.id=circuito.seccion_id and "
+                . "mesa.circuito_id=circuito.id and mesa.diputado_nacional=1 "
+                . "and seccion.provincia_id=".$this->id." group by seccion.id,seccion.nombre ";
+        $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($_seccionales as $item) {
+            $sql = "select mesa.* from mesa,circuito where circuito.seccion_id=".$item['id']
+                    . " and mesa.circuito_id=circuito.id and mesa.diputado_nacional=1 "
+                    . " and mesa.id not in (select renglon_nacional.mesa_id "
+                    . " from renglon_nacional where renglon_nacional.diputado>0 )";
+                    
+            $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
+            $item['faltantes']=$faltantes;
+            $seccionales[] = $item;
+        }
+        return $seccionales;
+    }
 }
 
 function ordena_dhont($a, $b) { {

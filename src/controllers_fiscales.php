@@ -82,10 +82,15 @@ $app->post('/fiscales_cargalocal/{id}', function ( $id) use ($app) {
 })->bind('fiscales_cargalocal');
 
 $app->get('/padron', function () use ($app) {
-        $sql = "SELECT * from padron2017.padron_definitivo2017 where matricula=".$_GET['dni'];
+    $sql = "SELECT * from padron2017.padron_definitivo2017 where matricula=".$_GET['dni'];
     $resultado = $app['db']->fetchAssoc($sql);
-    if ($resultado) {echo $resultado['apellido']." ".$resultado['nombres'];die;}
-    echo "";die;
+    $nombre=$mail=$telefono="";
+    if ($resultado) {$nombre=$resultado['apellido']." ".$resultado['nombres'];}
+    $sql = "SELECT * from contactos_nuevo.contactos where documento=".$_GET['dni'];
+    $resultado = $app['db']->fetchAssoc($sql);
+    if ($resultado) {$mail=$resultado['email'];$telefono=$resultado['celular'];}
+    echo json_encode(array('nombre'=>$nombre,'telefono'=>$telefono,'mail'=>$mail));
+    die;
 })->bind('padron');
 
 
@@ -114,7 +119,7 @@ function imprime($app,$seccion=0,$circuito=0){
     //echo $sql;die;
     $resultado = $app['db']->fetchAll($sql);
     $pdf->SetFont('Arial', '', 8);
-    $columnas = array(30, 30, 60,60,15,50,20,20);
+    $columnas = array(28, 28, 58,58,15,50,20,20);
     $pdf->SetWidths($columnas);
     $titulos = array( "Departamento","Localidad","Escuela", "Direccion","dni","nombre","telefono","mail");
     foreach ($resultado as $i) {

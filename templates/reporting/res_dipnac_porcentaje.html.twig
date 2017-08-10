@@ -1,7 +1,7 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-    <meta http-equiv="refresh" content="15">
+    <meta http-equiv="refresh" content="120">
     <div {#class="container"#}>
         <div>
             <div style='width: 65%;float: left'>
@@ -26,6 +26,8 @@
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
                 <button type="button" class="btn btn-sm btn-default"
+                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'avance'}) }}';">Avance</button>
+           <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
             </div>
         </div>

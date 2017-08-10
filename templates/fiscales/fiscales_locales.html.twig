@@ -37,8 +37,8 @@
 
                                     <td><input type='text' name='dni' size="6" value="{{item.dni}}"   onblur='buscapadron(this.value,{{item.Id}} );'></td>
                                     <td><input  id=n_{{item.Id}}  type='text' name='nombre' value="{{item.nombre}}"></td>
-                                    <td><input type='text' name='telefono' value="{{item.telefono}}"></td>
-                                    <td><input type='text' name='mail' value="{{item.mail}}"></td>
+                                    <td><input id=t_{{item.Id}} type='text' name='telefono' value="{{item.telefono}}"></td>
+                                    <td><input id=m_{{item.Id}} type='text' name='mail' value="{{item.mail}}"></td>
                                     <td> {{item.desde}}-{{item.hasta}}
                                         <input type="submit" value="Grabar" class="button">  
                                         <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('fiscales_mesas',{'id':item.Id}) }}';">Mesas</button>
@@ -84,9 +84,10 @@
                                                 });
                                             });
                                             function buscapadron(dni, nummesa) {
-                                                $.get("{{ path('padron') }}" + "?dni=" + dni, "", function (data, textStatus, jqxhr) {
-
-                                                    $("#n_" + nummesa).val(data);
+                                                $.getJSON("{{ path('padron') }}" + "?dni=" + dni, "", function (data, textStatus, jqxhr) {
+                                                    $("#n_" + nummesa).val(data.nombre);
+                                                    $("#m_" + nummesa).val(data.telefono);
+                                                    $("#t_" + nummesa).val(data.mail);
                                                 });
                                             }
     </script>
