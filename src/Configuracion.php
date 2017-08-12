@@ -141,6 +141,14 @@ class Configuracion {
         return $localidad . "/" . $seccional . $mesa->getLocal();
     }
 
+    function getResponsableLocalmesa($numero) {
+        require_once 'Mesa.php';
+        $escuela = $this->app['db']->fetchAssoc("SELECT * FROM locales where mesadesde<=$numero and mesahasta>=$numero ");
+            
+        if (isset($escuela['contacto']) and $escuela['contacto']!="") return " (".$escuela['contacto']." - ".$escuela['telefono'].")";
+        return "";
+    }
+    
     function getOrdenaCandidatos($arreglo) {
         $divididos = array();
         //print_r($arreglo);

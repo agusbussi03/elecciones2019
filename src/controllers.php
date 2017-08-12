@@ -19,6 +19,9 @@ $app->get('/', function () use ($app) {
     if (validar('fiscal')) {
         return $app->redirect('fiscales_seccion');
     }
+    if (validar('lectura')) {
+        return $app->redirect('rep_circuito');
+    }  
     return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     //  return $app->redirect($app['url_generator']->generate(''));
 })->bind('homepage');
@@ -254,7 +257,7 @@ $app->get('/regenerarmesas/{provincia}', function ($provincia) use ($app) {
     require_once'MesaNacional.php';
 
     $testigos = Mesa::testigos($provincia, $app);
-    print_r($testigos);
+   // print_r($testigos);
     foreach ($testigos as $item) {
         $mesa = new Mesa($item['numero'], $app);
         $mesa->regenera();

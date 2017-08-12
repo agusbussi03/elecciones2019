@@ -32,10 +32,10 @@ $app->get('/rep_nacional', function () use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
-            . "id not in (select mesa_id from renglon_nacional where diputado_nacional>0)";
+            . "id not in (select mesa_id from renglon_nacional where renglon_nacional.diputado>0)";
     $mesas_nocargadas_D = $app['db']->fetchAll($sql);
     $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
-            . "id  in (select mesa_id from renglon_nacional where diputado_nacional>0)";
+            . "id  in (select mesa_id from renglon_nacional where renglon_nacional.diputado>0)";
     $mesas_cargadas_D = $app['db']->fetchAll($sql);
     $sql = "SELECT * FROM mesa where senador_nacional=1 and "
             . "id not in (select mesa_id from renglon_nacional where senador_nacional>0)";
@@ -127,22 +127,21 @@ $app->get('/faltante_circuito/{circuito}', function ($circuito) use ($app) {
     require_once 'Concejales.php';
     $concejales = new Concejales($circuito, $app);
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $faltantes=$concejales->getFaltante();
-    return $app['twig']->render('reporting/res_concejales_faltante.html.twig', 
-            array('faltantes' => $faltantes, 'circuito' => $circuito));
+    $faltantes = $concejales->getFaltante();
+    return $app['twig']->render('reporting/res_concejales_faltante.html.twig', array('faltantes' => $faltantes, 'circuito' => $circuito));
 })->bind('faltante_circuito');
 
 $app->get('/avance_nacional/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
-                . "id not in (select mesa_id from renglon_nacional where diputado>0)";
-        $mesas_nocargadas_D = $app['db']->fetchAll($sql);
-        $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
-                . "id in (select mesa_id from renglon_nacional where diputado>0)";
-        $mesas_cargadas_D = $app['db']->fetchAll($sql);
-        $mesas = array('diputado' => array('cargadas' => $mesas_cargadas_D, 'nocargadas' => $mesas_nocargadas_D));
+    $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+            . "id not in (select mesa_id from renglon_nacional where diputado>0)";
+    $mesas_nocargadas_D = $app['db']->fetchAll($sql);
+    $sql = "SELECT * FROM mesa where diputado_nacional=1 and "
+            . "id in (select mesa_id from renglon_nacional where diputado>0)";
+    $mesas_cargadas_D = $app['db']->fetchAll($sql);
+    $mesas = array('diputado' => array('cargadas' => $mesas_cargadas_D, 'nocargadas' => $mesas_nocargadas_D));
     require('mc_table.php');
     require_once('Configuracion.php');
     $configuracion = new Configuracion($app);
@@ -180,9 +179,8 @@ $app->get('/faltante_nacional/{provincia}', function ($provincia) use ($app) {
     require_once 'DiputadosNacionales.php';
     $diputados = new DiputadosNacionales($provincia, $app);
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    $faltantes=$diputados->getFaltante();
-    return $app['twig']->render('reporting/res_dipnac_faltante.html.twig', 
-            array('faltantes' => $faltantes, 'provincia' => $provincia));
+    $faltantes = $diputados->getFaltante();
+    return $app['twig']->render('reporting/res_dipnac_faltante.html.twig', array('faltantes' => $faltantes, 'provincia' => $provincia));
 })->bind('faltante_nacional');
 
 
@@ -198,7 +196,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     require_once 'Concejales.php';
     $concejales = new Concejales($id, $app);
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
-   
+
     if ($tipo == 'votos') {
         $resultado = $concejales->getResultados();
         return $app['twig']->render('reporting/res_concejales_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'seccionales' => $concejales->getSeccionales()));
@@ -219,6 +217,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         $resultado = $concejales->getPorcentajeponderado();
         $partidos = $concejales->getPartidos();
         uasort($resultado, 'ordena');
+        $otros = $blancos = $nulos = array();
         $resultado_limpio = $resultado_partido = array();
         foreach ($resultado as $clave => $item) {
             if ($clave == "EMITIDOS") {
@@ -247,32 +246,35 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app['twig']->render('reporting/res_concejales_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
     if ($tipo == 'distribucion') {
-        
-        $id=0;
-        if (isset($_GET['id'])) $id=$_GET['id'];
+
+        $id = 0;
+        if (isset($_GET['id']))
+            $id = $_GET['id'];
         $resultado = $concejales->getDistribucion($id);
-        $_partidos=$concejales->getPartidos();
-        
-         $partidos = array();
-        foreach($_partidos as $item){
-            $partidos[$item['id_partido']]=$item['nombre_partido'];
+        $_partidos = $concejales->getPartidos();
+
+        $partidos = array();
+        foreach ($_partidos as $item) {
+            $partidos[$item['id_partido']] = $item['nombre_partido'];
         }
-        $suma=array();
-        foreach ($resultado as $item){
-            if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
-            else $suma[$item['partido']]=1;
+        $suma = array();
+        foreach ($resultado as $item) {
+            if (isset($suma[$item['partido']]))
+                $suma[$item['partido']] ++;
+            else
+                $suma[$item['partido']] = 1;
         }
         //print_r($resultado);
-        $grafico=array();
-        $resultado_grafico=$concejales->getDistribucionCompleta($id);
-        if($id>0){
-            foreach($resultado_grafico as $clave=>$item){
-            if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
+        $grafico = array();
+        $resultado_grafico = $concejales->getDistribucionCompleta($id);
+        if ($id > 0) {
+            foreach ($resultado_grafico as $clave => $item) {
+                if (!(isset($grafico[$item['partido']])))
+                    $grafico[$item['partido']] = $item;
             }
         }
         //print_r($grafico);
-        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', 
-                array('grafico'=>$grafico,'partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
+        return $app['twig']->render('reporting/res_concejales_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
     }
     if ($tipo == 'votos_grafico') {
         $resultado = $concejales->getResultados();
@@ -287,10 +289,9 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         }
         return $app['twig']->render('reporting/res_concejales_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'datos' => $datos));
     }
-     if ($tipo == 'avance') {
+    if ($tipo == 'avance') {
         $avance = $concejales->getAvance();
-        return $app['twig']->render('reporting/res_concejales_avance.html.twig', 
-                array('circuito' => $circuito,'avance' => $avance));
+        return $app['twig']->render('reporting/res_concejales_avance.html.twig', array('circuito' => $circuito, 'avance' => $avance));
     }
 })->bind('rep_concejales_seccional');
 
@@ -315,7 +316,7 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
     }
     if ($tipo == 'porcentajes') {
         $resultado = $diputados->getPorcentajes();
-       
+
         return $app['twig']->render('reporting/res_dipnac_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $diputados->getDepartamentos()));
     }
@@ -330,6 +331,8 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         $partidos = $diputados->getPartidos();
         uasort($resultado, 'ordena');
         $resultado_limpio = $resultado_partido = array();
+        $otros = $blancos = $nulos = array();
+
         foreach ($resultado as $clave => $item) {
             if ($clave == "EMITIDOS") {
                 
@@ -350,45 +353,50 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
                 $resultado_limpio[$clave] = $item;
             }
         }
+        
         uasort($resultado_partido, 'ordena');
+        
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
+        
         return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
 
     if ($tipo == 'distribucion') {
-        $id=0;
-        if (isset($_GET['id'])) $id=$_GET['id'];
+        $id = 0;
+        if (isset($_GET['id']))
+            $id = $_GET['id'];
         $resultado = $diputados->getDistribucion($id);
-        $_partidos=$diputados->getPartidos();
-        
-         $partidos = array();
-        foreach($_partidos as $item){
-            $partidos[$item['id_partido']]=$item['nombre_partido'];
+        $_partidos = $diputados->getPartidos();
+
+        $partidos = array();
+        foreach ($_partidos as $item) {
+            $partidos[$item['id_partido']] = $item['nombre_partido'];
         }
-        $suma=array();
-        foreach ($resultado as $item){
-            if (isset($suma[$item['partido']]))   $suma[$item['partido']]++;
-            else $suma[$item['partido']]=1;
+        $suma = array();
+        foreach ($resultado as $item) {
+            if (isset($suma[$item['partido']]))
+                $suma[$item['partido']] ++;
+            else
+                $suma[$item['partido']] = 1;
         }
-        $grafico=array();
-        if($id>0){
-            foreach($resultado as $clave=>$item){
-            if (!(isset($grafico[$item['partido']]))) $grafico[$item['partido']]=$item;
+        $grafico = array();
+        if ($id > 0) {
+            foreach ($resultado as $clave => $item) {
+                if (!(isset($grafico[$item['partido']])))
+                    $grafico[$item['partido']] = $item;
             }
         }
-        
-        
-        
-        
-        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', 
-                array('grafico'=>$grafico, 'partidos' => $partidos,'circuito' => $circuito, 'totales' => $resultado,'suma'=>$suma));
-        }
-        if ($tipo == 'avance') {
+
+
+
+
+        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
+    }
+    if ($tipo == 'avance') {
         $avance = $diputados->getAvance();
-        return $app['twig']->render('reporting/res_dipnac_avance.html.twig', 
-                array('circuito' => $circuito,'avance' => $avance));
+        return $app['twig']->render('reporting/res_dipnac_avance.html.twig', array('circuito' => $circuito, 'avance' => $avance));
     }
 })->bind('rep_dipnac_seccion');
 

@@ -103,6 +103,7 @@ class DiputadosNacionales {
         //print_r($resultado);
         $resultado = $resultado['porcentajes'];
         $porcentajes_peso = array();
+        //print_r($resultado);
         foreach ($resultado as $clave => $item) {
             foreach ($item as $clave2 => $item2) {
                /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') {*/

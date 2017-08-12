@@ -70,18 +70,19 @@
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
                     <button type="button" class="btn btn-sm btn-default"
                             onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
-                {%endif%}
+                
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                {%endif%}
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
                 <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'avance'}) }}';">Avance</button>
-               <button type="button" class="btn btn-sm btn-default"
+                <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
-            </div>
+           </div>
         </div>
         <div style="clear: both;height:0px;"></div>
         <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Listas</h2>
@@ -93,17 +94,19 @@
                     %} 
                     <div class="container">   
                         <div style="width:45%;float:left;text-align:right;">
-                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:80%;">
+                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">
                                 {{config.obtieneconcejal(clave)|slice(0, 20)}}</p></span>
-                                {%if partidos[item.id] is defined%}
+                                {%if item.id is defined and partidos[item.id] is defined%}
                                 <img src="data:image/gif;base64,{{config.obtieneconcejalfoto(clave)}}" width="30px" style="float:right;"/>
                             {%endif%}
-                            {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                            {%if item.id is defined and partidos[item.id] is defined and partidos[item.id].logo!=""%}
                                 <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
 
                             </div>
                             <div style="width:45%;float:left;text-align:left;">
-                                <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                               {%if item.porcentaje is defined%} 
+                                   <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                {%endif%}   
                             </div>
                         </div> 
                         <div style="clear: both;height:5px;"></div>
@@ -111,7 +114,7 @@
                 {%endif%}
             {%endfor%}
         </div>
-        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Listas en partido</h2>
+        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Partido</h2>
             {% for clave,item in totales_partido %}
                 {%if loop.index>0%}
                     <div class="container">   
@@ -132,16 +135,22 @@
                         <!-- muestoro blancos y nulos-->
                         {% for clave,item in totales %}
                             {%if loop.index>0  and (clave=="OTROS" or clave=="BLANCOS" or clave=="NULOS") %} 
+                                {%if (session.tiporeporte=='EMITIDOS' and  (clave=="OTROS" or clave=="BLANCOS" or clave=="NULOS"))
+                                or (session.tiporeporte=='VALIDOS' and  (clave=="OTROS" or clave=="BLANCOS")) 
+                                 or (session.tiporeporte=='AFIRMATIVOS' and  (clave=="OTROS" ))  %}
                                 <div class="container">   
                                     <div style="width:45%;float:left;text-align:right;">
-                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:90%;">
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:85%;">
                                             {{clave}}</p>
                                     </div>
                                     <div style="width:45%;float:left;text-align:left;">
+                                        {%if item.porcentaje is defined%}
                                         <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                        {%endif%}
                                     </div>
                                 </div> 
                                 <div style="clear: both;height:5px;"></div>
+                            {%endif%}
                             {%endif%}
                         {%endfor%}        
 

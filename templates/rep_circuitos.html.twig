@@ -117,11 +117,13 @@
                                                     onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'graficos',id:item.datos.id})}}'">Resultados concejal</button>
                                             <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                     onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos_grafico',id:item.datos.id})}}'">Grafico Seccionales</button>
-                                               <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('faltante_circuito',{circuito:item.datos.id})}}'">Reporte de Faltantes</button>
-                                        
-                                                    <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('avance_circuito',{circuito:item.datos.id})}}'">Reporte de Avance</button>
+                                            {%if session.admin==1 %}
+                                                <button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                        onclick="window.location.href = '{{path('faltante_circuito',{circuito:item.datos.id})}}'">Reporte de Faltantes</button>
+
+                                                <button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                        onclick="window.location.href = '{{path('avance_circuito',{circuito:item.datos.id})}}'">Reporte de Avance</button>
+                                            {%endif%}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -140,10 +142,10 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-                                                                    $(document).ready(function () {
-                                                                        $('#dataTables-example').DataTable({
-                                                                            responsive: true
-                                                                        });
-                                                                    });
+                                                            $(document).ready(function () {
+                                                                $('#dataTables-example').DataTable({
+                                                                    responsive: true
+                                                                });
+                                                            });
     </script>
 {% endblock %}
