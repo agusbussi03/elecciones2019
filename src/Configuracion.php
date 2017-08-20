@@ -149,6 +149,18 @@ class Configuracion {
         return "";
     }
     
+     function getAvanceConcejal($numero) {
+    $carga = $this->app['db']->fetchAssoc("
+        SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2 where mesa1.circuito_id=$numero and mesa2.circuito_id=$numero 
+        and mesa1.concejal=1 and mesa2.concejal=1 and mesa1.id  in 
+        (select mesa_id from renglon where concejal>0) and 
+        mesa2.id not in (select mesa_id from renglon where concejal>0)");
+    return number_format($carga['cargada']/($carga['cargada']+$carga['no_cargada'])*100,2,",",".");
+    
+    
+     }
+    
     function getOrdenaCandidatos($arreglo) {
         $divididos = array();
         //print_r($arreglo);

@@ -123,6 +123,8 @@
 
                                                 <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                         onclick="window.location.href = '{{path('avance_circuito',{circuito:item.datos.id})}}'">Reporte de Avance</button>
+                                            <button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                        onclick="window.location.href = '{{path('mesas_circuito_concejal',{circuito:item.datos.id})}}'">Mesas (XLS)</button>
                                             {%endif%}
                                         </td>
                                     </tr>

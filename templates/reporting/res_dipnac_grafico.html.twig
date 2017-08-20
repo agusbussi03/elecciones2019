@@ -97,8 +97,8 @@
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">
                                 {{config.obtienedipnac(clave)|slice(0, 20)}}</p></span>
                                 {%if item.id is defined and partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
-                                <img src="data:image/png;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>
+                                <img src="{{path('logo_candidato_nacional',{nombre:clave})}}" width="30px" style="float:right;"/>
+                                <img src="{{path('logo_partido_nacional',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>
                             {%endif%}
 
                         </div>
@@ -121,7 +121,7 @@
                                         <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:85%;">
                                             {{config.obtienedipnac(clave)|slice(0, 20)}}</p>
                                             {%if  item.id is defined and partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                            <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
+                                            <img src="{{path('logo_partido_nacional',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>{%endif%}
 
                                         </div>
                                         <div style="width:45%;float:left;text-align:left;">

@@ -59,7 +59,8 @@
         <div class="container" style="margin-bottom:20px;">
             <div style='width: 55%;float: left'>
                 <h2 style="margin-top:0;margin-bottom: 0">Concejales {{circuito.nombre}}- PORCENTAJES ({{session.tiporeporte}})</h2>
-                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C')}}</b>
+                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C')}}
+                    - Avance: {{config.avanceconcejal(circuito.id)}}</b>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
                  <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
@@ -97,10 +98,10 @@
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">
                                 {{config.obtieneconcejal(clave)|slice(0, 20)}}</p></span>
                                 {%if item.id is defined and partidos[item.id] is defined%}
-                                <img src="data:image/gif;base64,{{config.obtieneconcejalfoto(clave)}}" width="30px" style="float:right;"/>
+                                <img src="{{path('logo_candidato',{nombre:clave})}}" width="30px" style="float:right;"/>
                             {%endif%}
                             {%if item.id is defined and partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
+                                <img src="{{path('logo_partido',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>{%endif%}
 
                             </div>
                             <div style="width:45%;float:left;text-align:left;">
@@ -122,7 +123,7 @@
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:85%;">
                                 {{clave|slice(0, 20)}}</p></span>
                                 {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
-                                <img src="data:image/gif;base64,{{partidos[item.id].logo}}" width="30px" style="float:right;"/>{%endif%}
+                                <img src="{{path('logo_partido',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>{%endif%}
 
                             </div>
                             <div style="width:45%;float:left;text-align:left;">

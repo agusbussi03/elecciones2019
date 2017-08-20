@@ -131,6 +131,92 @@ $app->get('/faltante_circuito/{circuito}', function ($circuito) use ($app) {
     return $app['twig']->render('reporting/res_concejales_faltante.html.twig', array('faltantes' => $faltantes, 'circuito' => $circuito));
 })->bind('faltante_circuito');
 
+$app->get('/mesas_circuito_concejal/{circuito}', function ($circuito) use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    require_once 'Concejales.php';
+    require_once 'Configuracion.php';
+    $concejales = new Concejales($circuito, $app);
+    $configuracion = new Configuracion($app);
+    $partidos = $concejales->getPartidos();
+    $mesas = $app['db']->fetchAll("SELECT * FROM mesa where concejal=1 and circuito_id=$circuito");
+    $texto = "";
+    $texto = "Mesa;Ubicacion;";
+    //print_r($partidos);
+    foreach ($partidos as $partido)
+        $texto .= $partido['nombre_partido'] . "/" . $partido['nombre_lista'] . ";";
+    $texto .= "OTROS;BLANCOS;NULOS;";
+    $texto .= "\n\r";
+    foreach ($mesas as $mesa) {
+        $texto .= $mesa['numero'] . ";";
+        $texto .= $configuracion->getLocalmesa($mesa['numero']) . ";";
+        foreach ($partidos as $partido) {
+            $votos = $app['db']->fetchAssoc("SELECT * FROM renglon "
+                    . "where mesa_id=" . $mesa['id'] . " and lista_id=" . $partido['id']);
+            $texto .= $votos['concejal'] . ";";
+        }
+
+        foreach (array(989, 990, 991) as $partido) {
+            $votos = $app['db']->fetchAssoc("SELECT * FROM renglon "
+                    . "where mesa_id=" . $mesa['id'] . " and lista_id=" . $partido);
+            $texto .= $votos['concejal'] . ";";
+        }
+        header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+        header("Content-Disposition: attachment; filename=concejales.xls");  //File name extension was wrong
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        $texto .= "\n\r";
+    }
+    echo $texto;
+    die;
+})->bind('mesas_circuito_concejal');
+
+$app->get('/mesas_dipnac/{provincia}', function ($provincia) use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    require_once 'DiputadosNacionales.php';
+    require_once 'Configuracion.php';
+    $diputados = new DiputadosNacionales($provincia, $app);
+    $configuracion = new Configuracion($app);
+    $partidos = $diputados->getPartidos();
+    //print_r($partidos);die;
+    $mesas = $app['db']->fetchAll("SELECT * FROM mesa where diputado_nacional=1");
+    $texto = "";
+    $texto = "Mesa;Ubicacion;";
+    //print_r($partidos);
+    foreach ($partidos as $partido)
+        $texto .= $partido['nombre_partido'] . "/" . $partido['nombre_lista'] . ";";
+    $texto .= "OTROS;BLANCOS;NULOS;";
+    $texto .= "\n\r";
+    foreach ($mesas as $mesa) {
+        $texto .= $mesa['numero'] . ";";
+        $texto .= $configuracion->getLocalmesa($mesa['numero']) . ";";
+        foreach ($partidos as $partido) {
+            $votos = $app['db']->fetchAssoc("SELECT * FROM renglon_nacional "
+                    . "where mesa_id=" . $mesa['id'] . " and lista_nacional_id=" . $partido['id']);
+            $texto .= $votos['diputado'] . ";";
+        }
+
+        foreach (array(15, 16, 17) as $partido) {
+            $votos = $app['db']->fetchAssoc("SELECT * FROM renglon_nacional "
+                    . "where mesa_id=" . $mesa['id'] . " and lista_nacional_id=" . $partido);
+            $texto .= $votos['diputado'] . ";";
+        }
+        header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+        header("Content-Disposition: attachment; filename=diputados.xls");  //File name extension was wrong
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        $texto .= "\n\r";
+    }
+    echo $texto;
+    die;
+})->bind('mesas_dipnac');
+
+
 $app->get('/avance_nacional/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -353,13 +439,13 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
                 $resultado_limpio[$clave] = $item;
             }
         }
-        
+
         uasort($resultado_partido, 'ordena');
-        
+
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
-        
+
         return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
 
@@ -388,10 +474,6 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
                     $grafico[$item['partido']] = $item;
             }
         }
-
-
-
-
         return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
     }
     if ($tipo == 'avance') {
@@ -432,3 +514,39 @@ function ordena($a, $b) {
     }
     return ($a['porcentaje'] > $b['porcentaje']) ? -1 : 1;
 }
+
+$app->get('/logo_partido/{id}', function ($id) use ($app) {
+    $logo = $app['db']->fetchAssoc("SELECT logo FROM partido_lista where id=$id");
+    header('Content-Type: image/jpeg');
+    echo $logo['logo'];
+    die;
+})->bind('logo_partido');
+$app->get('/logo_partido_nacional/{id}', function ($id) use ($app) {
+    $logo = $app['db']->fetchAssoc("SELECT logo FROM partido_lista_nacional where id=$id");
+    header('Content-Type: image/jpeg');
+    echo $logo['logo'];
+    die;
+})->bind('logo_partido_nacional');
+$app->get('/logo_candidato/{nombre}', function ($nombre) use ($app) {
+    $candidato = $app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
+            . "partido_lista l where tipo='C' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+    header('Content-Type: image/jpeg');
+    if ($candidato['apellido'] == "")
+        echo file_get_contents("imagenes/default.jpg");
+    echo $candidato['foto'];
+    die;
+})->bind('logo_candidato');
+$app->get('/logo_candidato_nacional/{nombre}', function ($nombre) use ($app) {
+    $candidato = $app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can "
+            . "on c.candidato_id=can.id ,partido_lista_nacional l where tipo='D' "
+            . "and c.lista_nacional_id=l.id "
+            . "and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre'");
+    header('Content-Type: image/jpeg');
+    if ($candidato['apellido'] == "")
+        echo file_get_contents("imagenes/default.jpg");
+    echo $candidato['foto'];
+    die;
+})->bind('logo_candidato_nacional');
+
+       
+
