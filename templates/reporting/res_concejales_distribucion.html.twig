@@ -58,8 +58,8 @@
         <div>
             <div style='width: 50%;float: left'>
                 <h1>Concejales {{circuito.nombre}}- Distribución</h1>
-                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C')}}</b>
-            </div>
+<b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C',circuito.id)}}
+                    - Avance: {{config.avanceconcejal(circuito.id)}}%</b>            </div>
             <div style='float: right;width:35%'>
               {%if session.admin==1%} <button type="button" class="btn btn-sm btn-default"
                         onclick="window.location.href = '{{ path('rep_concejales_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>

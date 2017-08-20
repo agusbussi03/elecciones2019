@@ -7,7 +7,8 @@
         <div>
             <div style='width: 65%;float: left'>
                 <h1 class="page-header">Concejales {{circuito.nombre}}- Estado de avance</h1>
-                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C')}}</b>
+               <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('C',circuito.id)}}
+                    - Avance: {{config.avanceconcejal(circuito.id)}}%</b>
             </div>
             <div style='float: right;width:35%'>
                 {%if session.admin==1%} <button type="button" class="btn btn-sm btn-default"
@@ -39,7 +40,7 @@
         </div>
         {%else%}
             <div {#class="row"#}>
-                <table width="100%" class="table table-striped table-bordered table-hover">
+                <table style="width:50%" class="table table-striped table-bordered table-hover">
                     <!--thead-->
                     <tr>
                         <th>Seccional</th>

@@ -80,9 +80,10 @@ class Configuracion {
         return $_SESSION['usuario'];
     }
 
-    function getUltimaactualizacion($tipo="") {
+    function getUltimaactualizacion($tipo="",$circuito=0) {
         $where="";
         if ($tipo!="") $where=" where datos like '%[$tipo%' ";
+        if ($circuito>0) $where.=" and texto in (select numero from mesa where circuito_id=$circuito) ";
         $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%i') as hora "
                 . "FROM log $where order by tiempo desc LIMIT 1 ");
         return $hora['hora'];
