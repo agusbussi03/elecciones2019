@@ -13,11 +13,24 @@
                 <ol class="breadcrumb">
                     <li><a href='{{ path('provincia',{'id':provincia.id}) }}'>VOLVER A {{provincia.nombre}}</a></li>
                 </ol>
+                {%if config.cerrada==0%}
+                    <button type="button" class="btn btn-outline btn-primary btn-sm" 
+                            onclick="if (confirm('Se eliminarán los renglones provinciales que hayan sido cargados. Continua?'))
+                                    window.location.href = '{{ path('vaciarmesas',{'provincia':provincia.id}) }}?tipo=provincia';">Vaciar mesas provinciales</button>
+                    <button type="button" class="btn btn-outline btn-primary btn-sm" 
+                            onclick="if (confirm('Se eliminarán los renglones nacionales que hayan sido cargados. Continua?'))
+                                    window.location.href = '{{ path('vaciarmesas',{'provincia':provincia.id}) }}?tipo=nacion';">Vaciar mesas nacionales</button>
+                    <button type="button" class="btn btn-outline btn-primary btn-sm" 
+                            onclick="if (confirm('Se eliminarán los responsables de las mesas. Continua?'))
+                                    window.location.href = '{{ path('vaciarmesas',{'provincia':provincia.id}) }}?tipo=responsables';">Vaciar responsables</button>
+                {%endif%}
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Mesas seleccionadas como muestra
                     </div>
+
                     <div class="panel-body">
+
                         <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                             <thead>
                                 <tr>
@@ -26,10 +39,15 @@
                                     <th>Localidad</th>
                                     <th>Seccional</th>
                                     <th>Escuela</th>
-                                    <th>Electores P.</th>
                                     <th>Electores N.</th>
+                                    <th>Electores P.</th>
+                                    <th>Diputado N.</th>
+                                    <th>Senador N.</th>
                                     <th>Gobernador</th>
                                     <th>Diputado</th>
+                                    <th>Senador</th>
+                                    <th>Intendente</th>
+                                    <th>Concejal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,10 +60,17 @@
                                         <td>{{item.c_nombre}}</a></td>
                                         <td>{{item.sec_nombre}}</td>
                                         <td>{{config.localmesa(item.numero)}}</td>
-                                        <td>{{item.electores_provincia}}</td>
                                         <td>{{item.electores_nacion}}</td>
-                                        <td>{%if item.gobernador==0%}NO{%else%}SI{%endif%}</td>
-                                        <td>{%if item.diputado==0%}NO{%else%}SI{%endif%}</td>
+                                        <td>{{item.electores_provincia}}</td>
+                                        <td>{%if item.diputado_nacional==0%}-{%else%}Dip N.{%endif%}</td>
+                                        <td>{%if item.senador_nacional==0%}-{%else%}Sen N.{%endif%}</td>
+                                        <td>{%if item.gobernador==0%}-{%else%}Gob{%endif%}</td>
+                                        <td>{%if item.diputado==0%}-{%else%}Diputado{%endif%}</td>
+                                        <td>{%if item.senador==0%}-{%else%}Senador{%endif%}</td>
+                                        <td>{%if item.intendente==0%}-{%else%}Intendente{%endif%}</td>
+                                        <td>{%if item.concejal==0%}-{%else%}Concejal{%endif%}</td>
+
+
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -63,10 +88,10 @@
     <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
     <script>
-        $(document).ready(function () {
-            $('#dataTables-example').DataTable({
-                responsive: true
-            });
-        });
+                            $(document).ready(function () {
+                                $('#dataTables-example').DataTable({
+                                    responsive: true
+                                });
+                            });
     </script>
 {% endblock %}

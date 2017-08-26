@@ -704,7 +704,7 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
         $app['db']->executeQuery($sql, array((int) $id_borrar));
     }
     $partidos = array();
-    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0");
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0 order by id_partido");
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $partidos[] = $item;
@@ -712,14 +712,22 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partidos');
+
+
 $app->post('/partidos/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?)";
-    $app['db']->executeQuery($sql, array($_POST['id_partido'], $_POST['nombre_partido'],
-        $_POST['id_lista'], $_POST['nombre_lista'], (int) $provincia));
-    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0");
+    if (isset($_POST['color'])) {
+        $sql = "UPDATE partido_lista set color=? where id_partido=?";
+        $app['db']->executeQuery($sql, array("#".$_POST['color'], $_POST['id_partido']));
+    }
+    if (isset($_POST['nombre_partido'])) {
+        $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?)";
+        $app['db']->executeQuery($sql, array($_POST['id_partido'], $_POST['nombre_partido'],
+            $_POST['id_lista'], $_POST['nombre_lista'], (int) $provincia));
+    }
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0 order by id_partido");
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $partidos[] = $item;
@@ -727,6 +735,8 @@ $app->post('/partidos/{provincia}', function ($provincia) use ($app) {
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partidosp');
+
+
 $app->post('/partido_logo/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -750,7 +760,7 @@ $app->post('/partido_logo/{id}', function ($id) use ($app) {
             return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje, 'partidos' => $partidos));
         }
     }
-    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista");
+    $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista order by id_partido");
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $partidos[] = $item;
@@ -790,7 +800,7 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
 
-
+ 
     if (isset($_GET['borrar'])) {
         $id_borrar = $_GET['borrar'];
         $sql = "DELETE FROM renglon_nacional WHERE lista_nacional_id=?";
@@ -836,7 +846,10 @@ $app->post('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-
+if (isset($_POST['color'])) {
+        $sql = "UPDATE partido_lista_nacional set color=? where id_partido=?";
+        $app['db']->executeQuery($sql, array("#".$_POST['color'], $_POST['id_partido']));
+    }
     if (isset($_POST['cargo_id'])) {
         $cargo_id = $_POST['cargo_id'];
         $candidato_id = $_POST['candidato_id'];

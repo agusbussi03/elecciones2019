@@ -104,7 +104,11 @@
                         </div>
                         <div style="width:45%;float:left;text-align:left;">
                             {%if item.porcentaje is defined%}
-                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                {%set color='red'%}
+                                   {%if item.id is defined and partidos[item.id] is defined%}
+                                       {%set color=config.colorpartidonacional(partidos[item.id].id_partido)%}
+                                   {%endif%}   
+                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;background-color:{{color}}"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
                             {%endif%}
                         </div>
                     </div> 
@@ -125,7 +129,11 @@
 
                                         </div>
                                         <div style="width:45%;float:left;text-align:left;">
-                                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                            {%set color='red'%}
+                                   {%if item.id is defined and partidos[item.id] is defined%}
+                                       {%set color=config.colorpartidonacional(partidos[item.id].id_partido)%}
+                                   {%endif%}   
+                                            <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;background-color:{{color}}"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
                                         </div>
                                     </div> 
                                     <div style="clear: both;height:5px;"></div>
@@ -144,7 +152,10 @@
                                                 </div>
                                                 <div style="width:45%;float:left;text-align:left;">
                                                     {%if item.porcentaje is defined%}
-                                                    <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                        
+                                       {%set color='red'%}
+                                    
+                                                    <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;background-color:{{color}};"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
                                                      {%endif%}
                                                 </div>
                                             </div> 

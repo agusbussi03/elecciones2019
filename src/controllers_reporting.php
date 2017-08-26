@@ -299,6 +299,7 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app['twig']->render('reporting/res_concejales_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $total_ponderado, 'seccionales' => $concejales->getSeccionales()));
     }
+
     if ($tipo == 'graficos') {
         $resultado = $concejales->getPorcentajeponderado();
         $partidos = $concejales->getPartidos();
@@ -412,6 +413,51 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         return $app['twig']->render('reporting/res_dipnac_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $total_ponderado, 'seccionales' => $diputados->getDepartamentos()));
     }
+    if ($tipo == 'mapa') {
+        $resultado = $diputados->getPorcentajes();
+        $departamentos = $diputados->getDepartamentos();
+        $partidos = $diputados->getPartidos();
+        foreach ($departamentos as $departamento) {
+            //$totales[$departamento['nombre']]['electores']=$departamento['electores'];
+            foreach ($resultado['porcentajes'][$departamento['id']] as $clave => $item) {
+                if (!(in_array($clave, array("EMITIDOS", "BLANCOS--", "NULOS--")))) {
+                    $partido = strtok($clave, "-");
+                    if (isset($totales[$departamento['nombre']][$partido]))
+                        $totales[$departamento['nombre']][$partido] += $item['porcentaje'];
+                    else
+                        $totales[$departamento['nombre']][$partido] = $item['porcentaje'];
+                }
+            }
+        }
+        require_once('Configuracion.php');
+        $configuracion = new Configuracion($app);
+        $partidos2 = array();
+        foreach ($partidos as $clave => $item) {
+            if (!(isset($partidos2[$item['id_partido']]))) {
+                $partidos2[$item['id_partido']]['nombre_partido'] = $item['nombre_partido'];
+                $partidos2[$item['id_partido']]['color'] = $configuracion->getColorpartidonacional($item['id_partido']);
+            }
+        }
+
+        $totales2 = array();
+        foreach ($totales as $clave => $item) {
+            foreach ($item as $clave2 => $item2) {
+                $totales2[$clave][$clave2] = number_format($item2, 2, ".", ",");
+            }
+        }
+        $totales = array();
+        foreach ($totales2 as $clave => $item) {
+            arsort($item);
+            $totales[$clave] = $item;
+        }
+       
+        $colores_departamento = array();
+        foreach ($totales as $clave => $item) {
+            $colores_departamento[$clave]= $configuracion->getColorpartidonacionalpornombre(array_keys($item)[0]);
+        }
+        return $app['twig']->render('reporting/res_dipnac_mapas.html.twig', 
+                array('totales' => $totales, 'partidos' => $partidos2,'colores_departamento' => $colores_departamento));
+    }
     if ($tipo == 'graficos') {
         $resultado = $diputados->getPorcentajeponderado();
         $partidos = $diputados->getPartidos();
@@ -441,7 +487,6 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         }
 
         uasort($resultado_partido, 'ordena');
-
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
@@ -548,5 +593,5 @@ $app->get('/logo_candidato_nacional/{nombre}', function ($nombre) use ($app) {
     die;
 })->bind('logo_candidato_nacional');
 
-       
+
 

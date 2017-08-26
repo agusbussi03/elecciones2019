@@ -309,7 +309,7 @@ function getLocal() {
     static function testigosprovincia($provincia, $app) {
         $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
                 . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
-                . "WHERE (m.gobernador=1 or m.diputado=1) and m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and p.id=$provincia";
+                . "WHERE (1) and m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and p.id=$provincia";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }

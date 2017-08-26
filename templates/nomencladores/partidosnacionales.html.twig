@@ -2,6 +2,8 @@
 
 {% block content %}
     {% include "navigator.html.twig" %}
+        <script src="{{ asset('js/jscolor.min.js') }}"></script>
+
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
@@ -10,6 +12,15 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
+                  <form action="#" method="POST">
+                    <p style="float:left;">Aplicar color: 
+                        <input class="jscolor" name=color value="ab2567"> al partido número 
+                    </p> 
+                    <input class="form-control inputs" name=id_partido value="" type="number" size="3" 
+                           min="0" max="999" style="width:100px;float: left">
+                    <input type="submit" value="Aplicar" name="setcolor" style="float:left;margin-right: 20px;">
+                    
+                    </form>
                 <ol class="breadcrumb">
                     <li><a href='{{ path('provincia',{'provincia':provincia}) }}'>VOLVER</a></li>
                     <li><a href='?xls'>Exportar Excel</a></li>
@@ -24,7 +35,7 @@
                     {{mensaje.texto}} 
                 </div>
                 {% endif %}
-
+                  
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <form role="form" action="{{path('cargosnacionales',{'provincia':provincia.id})}}" method="POST">
@@ -46,7 +57,14 @@
                                         {% for item in partidos %}
                                             <tr class="odd gradeX">
                                                 <td>{{item.id_partido}}</td>
-                                                <td>{{item.nombre_partido}}</td>
+                                                <td>
+                                                <input tyle="text" name="nombre_partido" 
+                                                       value="{{item.nombre_partido}}"
+                                                       {%if item.color!=""%}
+                                                           style="background-color:{{item.color}}"
+                                                        {%endif%}
+                                                       >
+                                                </td>
                                                 <td>{{item.id_lista}}</td>
                                                 <td>{{item.nombre_lista}}</td>
                                                 <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}">{%endif%}

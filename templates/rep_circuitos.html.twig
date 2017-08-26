@@ -115,8 +115,8 @@
                                             </h4></td>
                                         <td><button type="button" class="btn btn-outline btn-primary btn-xs"
                                                     onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'graficos',id:item.datos.id})}}'">Resultados concejal</button>
-                                            <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos_grafico',id:item.datos.id})}}'">Grafico Seccionales</button>
+                                            {#<!-- button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'votos_grafico',id:item.datos.id})}}'">Grafico Seccionales</button-->#}
                                             {%if session.admin==1 %}
                                                 <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                         onclick="window.location.href = '{{path('faltante_circuito',{circuito:item.datos.id})}}'">Reporte de Faltantes</button>

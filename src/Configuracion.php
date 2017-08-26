@@ -186,7 +186,24 @@ class Configuracion {
         if (isset($clave2[2]))  return $clave2[0] . "/" . $clave2[2];
         return $clave;
     }
-
+   function getColorpartido($clave) {
+       $color = $this->app['db']->fetchAssoc("
+        SELECT color FROM partido_lista where id_partido=".$clave);
+       if ($color['color']!="") return $color['color'];
+        return "red";
+    }
+       function getColorpartidonacional($clave) {
+        $color = $this->app['db']->fetchAssoc("
+        SELECT color FROM partido_lista_nacional where id_partido=".$clave);
+       if ($color['color']!="") return $color['color'];
+        return "red";
+    }
+  function getColorpartidonacionalpornombre($clave) {
+        $color = $this->app['db']->fetchAssoc("
+        SELECT color FROM partido_lista_nacional where nombre_partido='$clave'");
+       if ($color['color']!="") return $color['color'];
+        return "red";
+    }
 }
 
 function cmp($a, $b) {

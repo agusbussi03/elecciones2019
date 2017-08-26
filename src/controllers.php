@@ -21,7 +21,7 @@ $app->get('/', function () use ($app) {
     }
     if (validar('lectura')) {
         return $app->redirect('rep_circuito');
-    }  
+    }
     return $app['twig']->render('index.html.twig', array('estado' => Estado::getEstado($app)));
     //  return $app->redirect($app['url_generator']->generate(''));
 })->bind('homepage');
@@ -60,7 +60,7 @@ $app->post('/login', function () use ($app) {
         $_SESSION['admin'] = $usuario->getAdmin();
         $_SESSION['carga'] = $usuario->getCarga();
         $_SESSION['lectura'] = $usuario->getLectura();
-         $_SESSION['fiscal'] = $usuario->getFiscal();
+        $_SESSION['fiscal'] = $usuario->getFiscal();
         $_SESSION['provincia'] = $usuario->getProvincia();
         $app['twig']->addGlobal('session', $_SESSION);
         if (!(validar('admin') || validar('carga') || validar('lectura') || validar('fiscal'))) {
@@ -209,12 +209,12 @@ $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
     require_once 'Configuracion.php';
     $mensaje = "";
     $mesa = new MesaNacional($nro, $app);
-        $mesalocal = new Mesa($nro, $app);
+    $mesalocal = new Mesa($nro, $app);
     $mesa->sumavotos();
     $votos = $mesa->votos();
     $mascara = $mesa->getMascara();
 
-    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa,'mesalocal' => $mesalocal, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
+    return $app['twig']->render('mesanacional.html.twig', array('mesa' => $mesa, 'mesalocal' => $mesalocal, 'votos' => $votos, 'mascara' => $mascara, 'configuracion' => new Configuracion($app)));
 })->bind('mesanacional');
 
 $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
@@ -249,21 +249,23 @@ $app->post('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
 })->bind('mesanacionalcarga_p');
 
-
-$app->get('/regenerarmesas/{provincia}', function ($provincia) use ($app) {
+ 
+$app->get('/vaciarmesas/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
     }
-    require_once'MesaNacional.php';
 
-    $testigos = Mesa::testigos($provincia, $app);
-   // print_r($testigos);
-    foreach ($testigos as $item) {
-        $mesa = new Mesa($item['numero'], $app);
-        $mesa->regenera();
-    }
-    return $app->redirect($app['url_generator']->generate('provincia'));
-})->bind('regenerarmesas');
+    if ($_GET['tipo'] == 'provincia')
+        $app['db']->executeQuery("delete from renglon", array());
+    
+    if ($_GET['tipo'] == 'nacion')
+        $app['db']->executeQuery("delete from renglon_nacional", array());
+    
+        if ($_GET['tipo'] == 'responsables')
+        $app['db']->executeQuery("update mesa set responsable=NULL", array());
+
+    return $app->redirect($app['url_generator']->generate('mesastestigoprovincia',array('provincia'=>$provincia)));
+})->bind('vaciarmesas');
 
 /* * ************** C O N F I G U  R A C I O N *********************************** */
 

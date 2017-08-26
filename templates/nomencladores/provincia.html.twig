@@ -26,7 +26,7 @@
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Votantes P</th><th>Votantes N</th>
+                                        <th>Votantes N</th><th>Votantes P</th>
                                         <th>Mesas</th>
                                         <th></th>
                                     </tr>
@@ -35,8 +35,8 @@
                                     {% for item in provincia %}
                                         <tr class="odd gradeX">
                                             <td>{{item.nombre}}</td>
-                                            <td>{{item.votantes_provincia}}</td>
                                             <td>{{item.votantes_nacion}}</td>
+                                            <td>{{item.votantes_provincia}}</td>
                                             <td>{{item.mesas}}</td>
                                             <td>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('secciones',{'provincia':item.id}) }}';">Departamentos</button>
@@ -48,7 +48,7 @@
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':item.id}) }}';">Escuelas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigoprovincia',{'provincia':item.id}) }}';">Mesas</button>
                                     {%if config.cerrada==0%}              
-                                     <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se reconstruira la estructura de carga de todas las mesas. Para esto se perderan los datos que hayan sido cargados. Continua?')) window.location.href = '{{ path('regenerarmesas',{'provincia':item.id}) }}';">Regenerar</button>
+                                     
                                     <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
                                     <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('provincia_delete',{'id':item.id}) }}';">Borrar</button>
                                     {%endif%}
