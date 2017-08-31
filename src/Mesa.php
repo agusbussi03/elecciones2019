@@ -314,10 +314,12 @@ function getLocal() {
         return $resultado;
     }
 
-    static function testigosporcircuito($circuito, $app) {
+    static function testigosporcircuito($circuito, $filtro="",$app) {
+        $where="";
+        if ($filtro!="") $where= " m.$filtro=1 and ";
         $sql = "SELECT m.*,c.id as c_id,c.nombre as c_nombre,s.id as s_id ,s.nombre as s_nombre,p.id as p_id, p.nombre as p_nombre , sec.id as sec_id, sec.nombre as sec_nombre "
                 . "FROM circuito c,seccion s,provincia p, mesa m LEFT join seccional sec on seccionales_id=sec.id "
-                . "WHERE m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and c.id=$circuito ";
+                . "WHERE $where m.circuito_id=c.id and c.seccion_id=s.id and s.provincia_id=p.id and c.id=$circuito ";
         $resultado = $app['db']->fetchAll($sql);
         return $resultado;
     }

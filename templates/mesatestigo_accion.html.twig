@@ -17,6 +17,33 @@
             <a href='{{ path('circuitos',{'seccion':circuito.seccion_id}) }}'>Volver a
               {{circuito.nombre}}</a>
           </li>
+           <li>
+           Filtrar por: 
+          </li>
+           <li>
+            <a href='?filtro=gobernador'>Gobernador</a>
+          </li>
+           <li>
+            <a href='?filtro=diputado'>Diputado</a>
+          </li>
+           <li>
+            <a href='?filtro=senador'>Senador</a>
+          </li>
+           <li>
+            <a href='?filtro=intendente'>Intendente</a>
+          </li>
+           <li>
+            <a href='?filtro=concejal'>Concejal</a>
+          </li>
+           <li>
+            <a href='?filtro=diputado_nacional'>Diputado Nacional</a>
+          </li>
+           <li>
+            <a href='?filtro=senador_nacional'>Senador Nacional</a>
+          </li>
+           <li>
+            <a href='?filtro='>Todos</a>
+          </li>
         </ol>
         <div class="panel panel-default">
           <div class="panel-body">
@@ -116,15 +143,17 @@
                                   <td>
                                     <form action='{{ path('testigo_accion',{'circuito':circuito.id}) }}' method=GET>
                                       {{item.responsable}}<br>
-                                      <input type=text value="" name=responsable>
+                                      <input type=text value="" name=responsable id="r_{{item.id}}">
                                       <input type=hidden value="{{item.id}}" name=mesa>
-                                      <input type=submit class="btn btn-info" value=Grabar>
+                                      <button type="button" onclick="buscapadron({{item.id}} );" >Buscar DNI</button>  
+                                      <input type=submit class="btn btn-info" value=Grabar />
                                     </form>
                                   </td>
                                   <td>
                                     {%if config.cerrada==0%}
                                       <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('testigo_accion',{'circuito':circuito.id}) }}?borrar={{item.id}}';">Borrar</button>
-                                      {%endif%}
+                                    
+                                    {%endif%}
                                     </td>
                                   </tr>
                                 {% endfor %}
@@ -202,5 +231,12 @@
                             $(this).children().attr("class", "fa fa-times");
                           }
                         });
+                        
+                        
+                          function buscapadron(nummesa) {
+                                               $.getJSON("{{ path('padron') }}" + "?dni=" + $("#r_" + nummesa).val(), "", function (data, textStatus, jqxhr) {
+                                                    $("#r_" + nummesa).val(data.nombre + '-'+data.telefono+'-'+data.mail);
+                                                });
+                                            }
                       </script>
                     {% endblock %}

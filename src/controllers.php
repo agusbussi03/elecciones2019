@@ -122,7 +122,9 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     if (isset($_GET['responsable'])) {
         Mesa::setResponsable($_GET['mesa'], $_GET['responsable'], $app);
     }
-    $mesas = Mesa::testigosporcircuito($circuito['id'], $app);
+    $filtro="";
+    if (isset($_GET['filtro'])) $filtro=$_GET['filtro'];
+    $mesas = Mesa::testigosporcircuito($circuito['id'], $filtro,$app);
     return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas, 'seccionales' => $seccionales));
 })->bind('testigo_accion');
 
