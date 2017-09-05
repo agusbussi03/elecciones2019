@@ -125,6 +125,18 @@
 
                                 </div>
                             </form>
+                                           <div class="panel-heading">
+                                Importar Partido Lista (formato:  nro.partido;nombre partido;nro.lista;nombre lista)
+                            </div>   
+                            <form role="form" action="{{path('partidosnacionales',{'provincia':provincia.id})}}" method="POST" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label>Nombre lista</label>
+                                    <input class="form-control" name="partidos" type="file" size="40" >
+
+                                    <input type="submit"  class="btn btn-primary" value="Importar">
+
+                                </div>
+                            </form>           
                         {%else%}
                             Configuracion cerrada
                         {%endif%}

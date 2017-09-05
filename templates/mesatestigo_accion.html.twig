@@ -44,6 +44,9 @@
            <li>
             <a href='?filtro='>Todos</a>
           </li>
+          <li>
+            <a href='?exportar='>Exportar</a>
+          </li>
         </ol>
         <div class="panel panel-default">
           <div class="panel-body">
@@ -70,7 +73,10 @@
               <tbody>
                 {% for item in testigos%}
                   <tr class="odd gradeX">
-                    <td>{{item.numero}}</td>
+                    <td><input type="numeric" value="{{item.numero}}" size="3" id="id_{{item.numero}}"/>
+                    <button type="button" 
+                            onclick="$.getJSON('{{ path('testigo_accion',{'circuito':circuito.id}) }}?cambiar=1&origen={{item.numero}}&destino='+$('#id_{{item.numero}}').val(),'', function (data, textStatus, jqxhr) {alert(data);})" >Cambiar</button>
+                    </td>
 
                     <td>{{item.c_nombre}}</td>
                     <td>{{item.sec_nombre}}</td>

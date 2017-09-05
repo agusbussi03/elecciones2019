@@ -1,5 +1,5 @@
 {% extends "layout.html.twig" %}
-  
+
 {% block content %}
     {% include "navigator.html.twig" %}
     <script src="{{ asset('js/jscolor.min.js') }}"></script>
@@ -13,6 +13,7 @@
             <div class="col-lg-12">
                 <ol class="breadcrumb">
                     <li><a href='{{ path('provincia',{'provincia':provincia.id}) }}'>{{provincia.nombre}}</a></li>
+                    <li><a href='?xls'>Exportar Excel</a></li>
                 </ol>
                 {% if mensaje is defined %}
                     <div {% if mensaje.codigo==0 %}class="alert alert-success alert-dismissable"
@@ -25,13 +26,13 @@
                 </div>
                 {% endif %}
                     <form action="#" method="POST">
-                    <p style="float:left;">Aplicar color: 
-                        <input class="jscolor" name=color value="ab2567"> al partido número 
-                    </p> 
-                    <input class="form-control inputs" name=id_partido value="" type="number" size="3" 
-                           min="0" max="999" style="width:100px;float: left">
-                    <input type="submit" value="Aplicar" name="setcolor" style="float:left;">
-                    
+                        <p style="float:left;">Aplicar color: 
+                            <input class="jscolor" name=color value="ab2567"> al partido número 
+                        </p> 
+                        <input class="form-control inputs" name=id_partido value="" type="number" size="3" 
+                               min="0" max="999" style="width:100px;float: left">
+                        <input type="submit" value="Aplicar" name="setcolor" style="float:left;">
+
                     </form>
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -50,36 +51,36 @@
                                 <tbody>
                                     {% for item in partidos %}
                                         <tr class="odd gradeX">
-                                            <form action="{{path('partido_edit',{'id':item.id})}}" method="post" enctype="multipart/form-data">
-                                            <td><input tyle="text" name="id_partido" value="{{item.id_partido}}" size="2"></td>
-                                            
-                                            <td><input tyle="text" name="nombre_partido" 
-                                                       value="{{item.nombre_partido}}"
-                                                       {%if item.color!=""%}
-                                                           style="background-color:{{item.color}}"
-                                                        {%endif%}
-                                                       ></td>
-                                            {%if config.tipo==0%}
-                                                <td><input tyle="text" name="id_lista" value="{{item.id_lista}}" size="2"></td>
-                                                <td><input tyle="text" name="nombre_lista" value="{{item.nombre_lista}}"></td>
-                                                
-                                            {%endif%}
-                                            <td><input type="submit" value="Cambiar"></td>
-                                            </form>
-                                            <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}">{%endif%}</td>
+                                    <form action="{{path('partido_edit',{'id':item.id})}}" method="post" enctype="multipart/form-data">
+                                        <td><input tyle="text" name="id_partido" value="{{item.id_partido}}" size="2"></td>
 
-                                            <td>
-                                                <form action="{{path('partido_logo',{'id':item.id})}}" method="post" enctype="multipart/form-data">
-                                                    <input name="logo" type="file">
-                                                    <button type="submit" class="btn btn-primary">Subir logo</button>
-                                                </form>
-                                            </td>
-                                            <td>                                     
-                                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se eliminarán los datos relacionados a cargos y renglones de este partido. Continua?'))
-                                                            window.location.href = '{{ path('partidos',{'provincia':item.provincia_id,'borrar':item.id}) }}';">Borrar</button>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
+                                        <td><input tyle="text" name="nombre_partido" 
+                                                   value="{{item.nombre_partido}}"
+                                                   {%if item.color!=""%}
+                                                       style="background-color:{{item.color}}"
+                                                   {%endif%}
+                                                   ></td>
+                                            {%if config.tipo==0%}
+                                            <td><input tyle="text" name="id_lista" value="{{item.id_lista}}" size="2"></td>
+                                            <td><input tyle="text" name="nombre_lista" value="{{item.nombre_lista}}"></td>
+
+                                        {%endif%}
+                                        <td><input type="submit" value="Cambiar"></td>
+                                    </form>
+                                    <td>{%if item.logo|length >0 %}<img width='50px' src="data:image/png;base64,{{item.logo}}">{%endif%}</td>
+
+                                    <td>
+                                        <form action="{{path('partido_logo',{'id':item.id})}}" method="post" enctype="multipart/form-data">
+                                            <input name="logo" type="file">
+                                            <button type="submit" class="btn btn-primary">Subir logo</button>
+                                        </form>
+                                    </td>
+                                    <td>                                     
+                                        <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="if (confirm('Se eliminarán los datos relacionados a cargos y renglones de este partido. Continua?'))
+                                                    window.location.href = '{{ path('partidos',{'provincia':item.provincia_id,'borrar':item.id}) }}';">Borrar</button>
+                                    </td>
+                                    </tr>
+                                {% endfor %}
 
                                 </tbody>
                             </table>
@@ -112,6 +113,20 @@
 
                                 </div>
                             </form>
+
+                            <div class="panel-heading">
+                                Importar Partido Lista (formato:  nro.partido;nombre partido;nro.lista;nombre lista)
+                            </div>   
+                            <form role="form" action="{{path('partidos',{'provincia':provincia.id})}}" method="POST" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label>Nombre lista</label>
+                                    <input class="form-control" name="partidos" type="file" size="40" >
+
+                                    <input type="submit"  class="btn btn-primary" value="Importar">
+
+                                </div>
+                            </form>           
+
                         {%else%}
                             Configuracion cerrada
                         {%endif%}
@@ -128,11 +143,11 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                                                    $(document).ready(function () {
-                                                        $('#dataTables-example').DataTable({
-                                                            responsive: true
-                                                        });
-                                                         $('.color').colorPicker();
-                                                    });
+                                            $(document).ready(function () {
+                                                $('#dataTables-example').DataTable({
+                                                    responsive: true
+                                                });
+                                                $('.color').colorPicker();
+                                            });
                 </script>
             {% endblock %}

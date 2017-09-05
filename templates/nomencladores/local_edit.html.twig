@@ -34,7 +34,7 @@
                                 <label>Telefono</label>
                                 <input class="form-control" name="telefono" value="{{local.telefono}}"  type="text" size="4">
                                 <label>Contacto</label>
-                                <input class="form-control" name="contacto" value="{{local.contacto}}"  type="text" size="4" >
+                                <input class="form-control" name="contacto" value="{{local.contacto}}" id=contacto onblur='buscapadron(this.value);'  type="text" size="4" >
                                 <label>Latitud</label>
                                 <input class="form-control" name="lat" value="{{local.lat}}"  type="number" size="4"  step=0.0001>
                                 <label>Longitud</label>
@@ -43,8 +43,10 @@
                                 <input class="form-control" name="mesa_desde" value="{{local.mesadesde}}"  type="number">
                                 <label>Mesa hasta</label>
                                 <input class="form-control" name="mesa_hasta" value="{{local.mesahasta}}"  type="number">
-
+                                
                                 <input type="submit"  class="btn btn-primary" value="Grabar">
+                                <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':local.provincia_id}) }}';">Salir</button>
+
                             </div>
                         </form>
                     </div>
@@ -62,11 +64,18 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                    $(document).ready(function () {
-                        $('#dataTables-example').DataTable({
-                            responsive: true
-                        });
-                    });
+                                    $(document).ready(function () {
+                                        $('#dataTables-example').DataTable({
+                                            responsive: true
+                                        });
+                                    });
+
+
+                                    function buscapadron(dni) {
+                                        $.getJSON("{{ path('padron') }}" + "?dni=" + dni, "", function (data, textStatus, jqxhr) {
+                                            $("#contacto").val(data.nombre + " " + data.telefono + " " + data.mail);
+                                        });
+                                    }
                 </script>
 
 

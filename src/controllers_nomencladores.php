@@ -605,16 +605,16 @@ $app->post('/local_edit/{id}', function ($id) use ($app) {
         $sql = "UPDATE locales SET nombre=?,direccion=?,telefono=?,"
                 . "contacto=?,lat=?,lon=?,mesadesde=?,mesahasta=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], $_POST['direccion'], $_POST['telefono'],
-            $_POST['contacto'], $_POST['lat'], $_POST['lon'],
+            $_POST['contacto'], (float)$_POST['lat'], (float)$_POST['lon'],
             (int) $_POST['mesa_desde'], (int) $_POST['mesa_hasta'], (int) $id));
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion:" . $ex->getMessage());
     }
 
     $localeditado = $app['db']->fetchAssoc("SELECT * FROM locales where id=$id");
-    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=" . $localeditado['provincia_id']);
-    $locales = $app['db']->fetchAll('SELECT * FROM locales where provincia_id=' . $provincia['id']);
-    return $app['twig']->render('nomencladores/locales.html.twig', array('provincia' => $provincia, 'locales' => $locales, 'mensaje' => $mensaje));
+    //$provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=" . $localeditado['provincia_id']);
+    //$locales = $app['db']->fetchAll('SELECT * FROM locales where provincia_id=' . $provincia['id']);
+    return $app['twig']->render('nomencladores/local_edit.html.twig', array('local' => $localeditado, 'mensaje' => $mensaje));
 })->bind('local_editp');
 
 /* * **************************************************************** */
@@ -710,6 +710,22 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
         $partidos[] = $item;
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
+    if (isset($_GET['xls'])) {
+        $texto = "";
+        foreach ($partidos as $item) {
+            if ($item['especial'] == 0) {
+                $texto .= '"' . $item['id_partido'] . '",';
+                $texto .= '"' . $item['nombre_partido'] . '","' . $item['id_lista'] . '",';
+                $texto .= '"' . $item['nombre_lista'] . '","' . $item['nombre_lista'] . '",';
+                $texto .= "\n\r";
+            }
+        }
+        header('Content-Description: File Transfer');
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+        echo $texto;
+        die;
+    }
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partidos');
 
@@ -720,18 +736,33 @@ $app->post('/partidos/{provincia}', function ($provincia) use ($app) {
     }
     if (isset($_POST['color'])) {
         $sql = "UPDATE partido_lista set color=? where id_partido=?";
-        $app['db']->executeQuery($sql, array("#".$_POST['color'], $_POST['id_partido']));
+        $app['db']->executeQuery($sql, array("#" . $_POST['color'], $_POST['id_partido']));
     }
     if (isset($_POST['nombre_partido'])) {
-        $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?)";
+        $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?,null)";
         $app['db']->executeQuery($sql, array($_POST['id_partido'], $_POST['nombre_partido'],
             $_POST['id_lista'], $_POST['nombre_lista'], (int) $provincia));
+    }
+    if (isset($_FILES['partidos']['tmp_name'])) {
+        $gestor = @fopen($_FILES['partidos']['tmp_name'], "r");
+        $sql = "INSERT INTO partido_lista VALUES(NULL,?,?,?,?,0,NULL,?,null)";
+        while (($bufer = fgets($gestor, 4096)) !== false) {
+            if (trim($bufer) != "") {
+                $bufer = explode(";", $bufer);
+                if ($bufer[0] != "" && $bufer[1] != "" && $bufer[2] != "" && $bufer[3] != "") {
+
+                    $app['db']->executeQuery($sql, array($bufer[0], $bufer[1],
+                        $bufer[2], $bufer[3], (int) $provincia));
+                }
+            }
+        }
     }
     $partidos2 = $app['db']->fetchAll("SELECT * FROM partido_lista where provincia_id=$provincia and especial=0 order by id_partido");
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $partidos[] = $item;
     }
+
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/partidos.html.twig', array('provincia' => $provincia, 'partidos' => $partidos));
 })->bind('partidosp');
@@ -799,8 +830,6 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-
- 
     if (isset($_GET['borrar'])) {
         $id_borrar = $_GET['borrar'];
         $sql = "DELETE FROM renglon_nacional WHERE lista_nacional_id=?";
@@ -842,13 +871,14 @@ $app->get('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     }
     return $app['twig']->render('nomencladores/partidosnacionales.html.twig', array('partidos' => $partidos, 'provincia' => $provincia));
 })->bind('partidosnacionales');
+
 $app->post('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-if (isset($_POST['color'])) {
+    if (isset($_POST['color'])) {
         $sql = "UPDATE partido_lista_nacional set color=? where id_partido=?";
-        $app['db']->executeQuery($sql, array("#".$_POST['color'], $_POST['id_partido']));
+        $app['db']->executeQuery($sql, array("#" . $_POST['color'], $_POST['id_partido']));
     }
     if (isset($_POST['cargo_id'])) {
         $cargo_id = $_POST['cargo_id'];
@@ -873,9 +903,23 @@ if (isset($_POST['color'])) {
     }
 
     if (isset($_POST['nombre_partido'])) {
-        $sql = "INSERT INTO partido_lista_nacional VALUES(NULL,?,?,?,?,0,?)";
+        $sql = "INSERT INTO partido_lista_nacional VALUES(NULL,?,?,?,?,0,?,'',NULL)";
         $app['db']->executeQuery($sql, array($_POST['id_partido'], $_POST['nombre_partido'],
             (int) $_POST['id_lista'], $_POST['nombre_lista'], (int) $provincia));
+    }
+    if (isset($_FILES['partidos']['tmp_name'])) {
+        $gestor = @fopen($_FILES['partidos']['tmp_name'], "r");
+        $sql = "INSERT INTO partido_lista_nacional VALUES(NULL,?,?,?,?,0,?,'',NULL)";
+        while (($bufer = fgets($gestor, 4096)) !== false) {
+            if (trim($bufer) != "") {
+                $bufer = explode(";", $bufer);
+                if ($bufer[0] != "" && $bufer[1] != "" && $bufer[2] != "" && $bufer[3] != "") {
+
+                    $app['db']->executeQuery($sql, array($bufer[0], $bufer[1],
+                        $bufer[2], $bufer[3], (int) $provincia));
+                }
+            }
+        }
     }
     $partidos2 = $app['db']->fetchAll("SELECT p.*,cnd.tipo as diputado,cns.id as cansen_id,cnd.id as candip_id,cns.tipo as senador,"
             . "cnd.id_dip as dip_id,cnd.apellido as dip_apellido, cnd.foto as dip_foto ,cns.id_sen as sen_id,cns.apellido as sen_apellido,"
@@ -884,6 +928,7 @@ if (isset($_POST['color'])) {
             . "cnd on p.id=cnd.lista_nacional_id LEFT JOIN (select tipo,lista_nacional_id,can2.id,can2.apellido,can2.foto,cn2.id as "
             . "id_sen from cargo_nacional cn2 left join candidato can2 on cn2.candidato_id= can2.id where tipo='S') cns on"
             . " p.id=cns.lista_nacional_id where p.provincia_id=$provincia");
+    
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $item['dip_foto'] = base64_encode($item['dip_foto']);

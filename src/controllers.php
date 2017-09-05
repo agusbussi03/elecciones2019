@@ -116,15 +116,45 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     if (isset($_GET['nueva'])) {
         Mesa::setTestigo($_GET['numero'], $_GET['electores_provincia'], $_GET['electores_nacion'], $circuito['id'], $_GET['seccional_id'], $app);
     }
+    if (isset($_GET['cambiar'])) {
+        if ($_GET['destino'] > $circuito['mesahasta'] || $_GET['destino'] < $circuito['mesadesde']) {
+            return json_encode("Ingrese una mesa entre " . $circuito['mesadesde'] . " y " . $circuito['mesahasta']);
+            die;
+        }
+        $sql = "update mesa set numero=? where numero=?";
+        $app['db']->executeQuery($sql, array((int) $_GET['destino'], (int) $_GET['origen']));
+        return json_encode("Cambiado " . $_GET['origen'] . " por " . $_GET['destino']);
+        die;
+    }
+
+
     if (isset($_GET['borrar'])) {
         Mesa::unsetTestigo($_GET['borrar'], $app);
     }
     if (isset($_GET['responsable'])) {
         Mesa::setResponsable($_GET['mesa'], $_GET['responsable'], $app);
     }
-    $filtro="";
-    if (isset($_GET['filtro'])) $filtro=$_GET['filtro'];
-    $mesas = Mesa::testigosporcircuito($circuito['id'], $filtro,$app);
+    $filtro = "";
+    if (isset($_GET['filtro']))
+        $filtro = $_GET['filtro'];
+    $mesas = Mesa::testigosporcircuito($circuito['id'], $filtro, $app);
+    if (isset($_GET['exportar'])) {
+        header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
+        header("Content-Disposition: attachment; filename=mesas.xls");  //File name extension was wrong
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        $texto = "id;numero;electores_provincia;electores_nacion;circuito_id;seccionales_id;"
+                . "gobernador;diputado;senador;intendente;concejal;diputado_nacional;"
+                . "senador_nacional;responsable;c_id;c_nombre;s_id;s_nombre;p_id;p_nombre;sec_id;"
+                . "sec_nombre";
+        foreach ($mesas as $mesa) {
+            $texto .= implode(";", $mesa);
+            $texto .= "\n\r";
+        }
+        echo $texto;
+        die;
+    }
     return $app['twig']->render('mesatestigo_accion.html.twig', array('circuito' => $circuito, 'testigos' => $mesas, 'seccionales' => $seccionales));
 })->bind('testigo_accion');
 
@@ -251,7 +281,7 @@ $app->post('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     return $app->redirect($app['url_generator']->generate('mesacarga_elige'));
 })->bind('mesanacionalcarga_p');
 
- 
+
 $app->get('/vaciarmesas/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect('login');
@@ -259,14 +289,14 @@ $app->get('/vaciarmesas/{provincia}', function ($provincia) use ($app) {
 
     if ($_GET['tipo'] == 'provincia')
         $app['db']->executeQuery("delete from renglon", array());
-    
+
     if ($_GET['tipo'] == 'nacion')
         $app['db']->executeQuery("delete from renglon_nacional", array());
-    
-        if ($_GET['tipo'] == 'responsables')
+
+    if ($_GET['tipo'] == 'responsables')
         $app['db']->executeQuery("update mesa set responsable=NULL", array());
 
-    return $app->redirect($app['url_generator']->generate('mesastestigoprovincia',array('provincia'=>$provincia)));
+    return $app->redirect($app['url_generator']->generate('mesastestigoprovincia', array('provincia' => $provincia)));
 })->bind('vaciarmesas');
 
 /* * ************** C O N F I G U  R A C I O N *********************************** */
