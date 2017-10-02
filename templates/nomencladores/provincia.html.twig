@@ -28,6 +28,12 @@
                                         <th>Nombre</th>
                                         <th>Votantes N</th><th>Votantes P</th>
                                         <th>Mesas</th>
+                                        <th>Dip. Titular</th>
+                                        <th>Dip. Suplente</th>
+                                        <th>Sen. Titular</th>
+                                        <th>Sen. Suplente</th>
+                                        <th>Parlasur Tit.</th>
+                                        <th>Parlasur Sup.</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -38,6 +44,12 @@
                                             <td>{{item.votantes_nacion}}</td>
                                             <td>{{item.votantes_provincia}}</td>
                                             <td>{{item.mesas}}</td>
+                                            <td>{{item.dip_titular}}</td>
+                                            <td>{{item.dip_suplente}}</td>
+                                            <td>{{item.sen_titular}}</td>
+                                            <td>{{item.sen_suplente}}</td>
+                                            <td>{{item.parlasur_titular}}</td>
+                                            <td>{{item.parlasur_suplente}}</td>
                                             <td>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('secciones',{'provincia':item.id}) }}';">Departamentos</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('cargosgobernador',{'provincia':item.id}) }}';">C. Gobernador</button>
@@ -79,6 +91,26 @@
                                 <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
                                 <label>Cantidad de mesas</label>
                                 <input class="form-control" name="mesas" type="number" size="4" min="1">
+                                
+                                <label>Diputados Nacionales Titulares</label>
+                                <input class="form-control" name="dip_titular" type="number" size="4" min="1">
+                                
+                                <label>Diputados Nacionales Suplentes</label>
+                                <input class="form-control" name="dip_suplente" type="number" size="4" min="1">
+                                
+                                <label>Senadores Nacionales Titulares</label>
+                                <input class="form-control" name="sen_titular" type="number" size="4" min="1">
+                                
+                                <label>Senadores Nacionales Suplentes</label>
+                                <input class="form-control" name="sen_suplente" type="number" size="4" min="1">
+                                
+                                <label>Parlasur Titulares</label>
+                                <input class="form-control" name="parlasur_titular" type="number" size="4" min="1">
+                                
+                                <label>Parlasur Suplentes</label>
+                                <input class="form-control" name="parlasur_suplente" type="number" size="4" min="1">
+                                
+                               
                                 <input type="submit"  class="btn btn-primary" value="Crear nueva">
                             </div>
                         </form>

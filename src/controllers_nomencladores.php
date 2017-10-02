@@ -14,8 +14,11 @@ $app->post('/provincia_add', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $sql = "INSERT INTO provincia VALUES (NULL,?,?,?,?)";
-    $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'], (int) $_POST['electores_provincia'], (int) $_POST['mesas']));
+    $sql = "INSERT INTO provincia VALUES (NULL,?,?,?,?,?,?,?,?,?,?)";
+    $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'], 
+        (int) $_POST['electores_provincia'], (int) $_POST['mesas'],
+        (int) $_POST['dip_titular'],(int) $_POST['dip_suplente'],(int) $_POST['sen_titular'],
+        (int) $_POST['sen_suplente'],(int) $_POST['parlasur_titular'],(int) $_POST['parlasur_suplente'],));
     $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
     $mensaje = array('codigo' => 0, 'texto' => "La provincia fue cargada");
     return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
@@ -48,9 +51,13 @@ $app->post('/provincia_edit/{id}', function ($id) use ($app) {
     $mensaje = array('codigo' => 0, 'texto' => "La provincia fue modificada");
     try {
         $sql = "UPDATE provincia SET nombre=?,votantes_nacion=?,votantes_provincia=?,"
-                . "mesas=? WHERE id=?";
+                . "mesas=?,dip_titular=?,dip_suplente=?,sen_titular=?,"
+                . "sen_suplente=?,parlasur_titular=?,parlasur_suplente=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['votantes_nacion'],
-            (int) $_POST['votantes_provincia'], $_POST['mesas'], (int) $id));
+            (int) $_POST['votantes_provincia'], $_POST['mesas'], 
+             (int) $_POST['dip_titular'],(int) $_POST['dip_suplente'], (int) $_POST['sen_titular'], 
+             (int) $_POST['sen_suplente'],(int) $_POST['parlasur_titular'], (int) $_POST['parlasur_suplente'], 
+            (int) $id));
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
     }
@@ -711,18 +718,20 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
     }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     if (isset($_GET['xls'])) {
-        $texto = "";
+
+        $texto = "id_partido;nombre_partido;id_lista;nombre_lista";
+        $texto .= "\n\r";
         foreach ($partidos as $item) {
             if ($item['especial'] == 0) {
-                $texto .= '"' . $item['id_partido'] . '",';
-                $texto .= '"' . $item['nombre_partido'] . '","' . $item['id_lista'] . '",';
-                $texto .= '"' . $item['nombre_lista'] . '","' . $item['nombre_lista'] . '",';
+                $texto .= '"' . $item['id_partido'] . '";';
+                $texto .= '"' . $item['nombre_partido'] . '";"' . $item['id_lista'] . '";';
+                $texto .= '"' . $item['nombre_lista']  . '"';
                 $texto .= "\n\r";
             }
         }
         header('Content-Description: File Transfer');
         header("Content-type: application/vnd.ms-excel");
-        header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+        header("Content-disposition: attachment;filename=partidos.csv");
         echo $texto;
         die;
     }

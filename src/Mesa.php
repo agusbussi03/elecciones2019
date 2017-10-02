@@ -339,6 +339,16 @@ function getLocal() {
         $app['db']->executeQuery($sql, array($responsable,(int) $mesa));
         return;
     }
+     static function setTelefono($mesa,$telefono, $app) {
+        $sql = "UPDATE mesa set telefono=? where id=?";
+        $app['db']->executeQuery($sql, array($telefono,(int) $mesa));
+        return;
+    }
+     static function setMail($mesa,$mail, $app) {
+        $sql = "UPDATE mesa set mail=? where id=?";
+        $app['db']->executeQuery($sql, array($mail,(int) $mesa));
+        return;
+    }
     static function cargoquitar($datos, $app) {
         $columnas = array('G' => 'gobernador', 'D' => 'diputado', 'S' => 'senador',
             'I' => 'intendente', 'C' => 'concejal', 'DN' => 'diputado_nacional', 'SN' => 'senador_nacional');

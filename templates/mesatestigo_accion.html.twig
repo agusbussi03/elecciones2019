@@ -50,6 +50,7 @@
         </ol>
         <div class="panel panel-default">
           <div class="panel-body">
+              <p>Mostrando {{testigos|length}} registros</p>
             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
               <thead>
                 <tr>
@@ -89,7 +90,7 @@
                         {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                         {%endif%}
                         <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="G,{{item.id}}">
-                          <i class="fa {{clasetilde}} fa-check"></i>
+                          <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                         </button>
                       </td>
                       <td>
@@ -98,7 +99,7 @@
                           {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                           {%endif%}
                           <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="D,{{item.id}}">
-                            <i class="fa {{clasetilde}} fa-check"></i>
+                            <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                           </button>
                         </td>
                         <td>
@@ -107,7 +108,7 @@
                             {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                             {%endif%}
                             <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="S,{{item.id}}">
-                              <i class="fa {{clasetilde}} fa-check"></i>
+                              <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                             </button>
                           </td>
                           <td>
@@ -116,7 +117,7 @@
                               {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                               {%endif%}
                               <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="I,{{item.id}}">
-                                <i class="fa {{clasetilde}} fa-check"></i>
+                                <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                               </button>
                             </td>
                             <td>
@@ -125,7 +126,7 @@
                                 {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                                 {%endif%}
                                 <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="C,{{item.id}}">
-                                  <i class="fa {{clasetilde}} fa-check"></i>
+                                  <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                                 </button>
                               </td>
                               <td>
@@ -134,7 +135,7 @@
                                   {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                                   {%endif%}
                                   <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="DN,{{item.id}}">
-                                    <i class="fa {{clasetilde}} fa-check"></i>
+                                      <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                                   </button>
                                 </td>
                                 <td>
@@ -143,15 +144,17 @@
                                     {%set value=0 %}{%set claseboton='btn-warning' %}{%set clasetilde='fa-times' %}
                                     {%endif%}
                                     <button type="button" class="btn {{claseboton}} btn-circle" value={{value}} name="SN,{{item.id}}">
-                                      <i class="fa {{clasetilde}} fa-check"></i>
+                                      <i class="fa {{clasetilde}} fa-check"><span style="font-size:0px">{{value}}</span></i>
                                     </button>
                                   </td>
                                   <td>
                                     <form action='{{ path('testigo_accion',{'circuito':circuito.id}) }}' method=GET>
-                                      {{item.responsable}}<br>
+                                      {{item.responsable}}/{{item.telefono}}/{{item.mail}}<br>
                                       <input type=text value="" name=responsable id="r_{{item.id}}">
                                       <input type=hidden value="{{item.id}}" name=mesa>
                                       <button type="button" onclick="buscapadron({{item.id}} );" >Buscar DNI</button>  
+                                        <input type=text value="" name=telefono id="t_{{item.id}}">
+                                          <input type=text value="" name=mail id="m_{{item.id}}">
                                       <input type=submit class="btn btn-info" value=Grabar />
                                     </form>
                                   </td>
@@ -214,7 +217,7 @@
                       <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                       <script>
                         $(document).ready(function() {
-                         // $('#dataTables-example').DataTable({responsive: false});
+                          $('#dataTables-example').DataTable({responsive: false});
                         });
                         $(".btn-circle").click(function() {
                           if (this.value == 0) {
@@ -241,7 +244,10 @@
                         
                           function buscapadron(nummesa) {
                                                $.getJSON("{{ path('padron') }}" + "?dni=" + $("#r_" + nummesa).val(), "", function (data, textStatus, jqxhr) {
-                                                    $("#r_" + nummesa).val(data.nombre + '-'+data.telefono+'-'+data.mail);
+                                                    $("#r_" + nummesa).val(data.nombre);
+                                                     $("#t_" + nummesa).val(data.telefono);
+                                                      $("#m_" + nummesa).val(data.mail);
+                                                   
                                                 });
                                             }
                       </script>

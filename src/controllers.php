@@ -133,6 +133,8 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
     }
     if (isset($_GET['responsable'])) {
         Mesa::setResponsable($_GET['mesa'], $_GET['responsable'], $app);
+        Mesa::setTelefono($_GET['mesa'], $_GET['telefono'], $app);
+        Mesa::setMail($_GET['mesa'], $_GET['mail'], $app);
     }
     $filtro = "";
     if (isset($_GET['filtro']))
@@ -148,6 +150,7 @@ $app->get('/testigo_accion/{circuito}', function ($circuito) use ($app) {
                 . "gobernador;diputado;senador;intendente;concejal;diputado_nacional;"
                 . "senador_nacional;responsable;c_id;c_nombre;s_id;s_nombre;p_id;p_nombre;sec_id;"
                 . "sec_nombre";
+         $texto .= "\n\r";
         foreach ($mesas as $mesa) {
             $texto .= implode(";", $mesa);
             $texto .= "\n\r";
