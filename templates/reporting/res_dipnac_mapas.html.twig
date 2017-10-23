@@ -17,7 +17,8 @@
         <div>
             <div style='width: 65%;float: left'>
                 <h1 class="page-header">Diputados nacionales - VOTOS</h1>
-                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}</b>
+                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
+                - Avance: {{config.avancedipnac(1)}}%</b>
             </div>
             <div style='float: right;width:35%'>
                 {%if session.admin==1%}
@@ -49,7 +50,7 @@
             {{mensaje.texto}} 
         </div>
         {%else%}
-            <div {#class="row"#}>
+            <div  style="width:900px;margin:auto;">
 
                 <div id='map'></div>
 
@@ -86,15 +87,30 @@
                                     mouseout: resetHighlight,
                                     click: zoomToFeature
                                 });
+                                console.log(layer);
+                                if (layer.feature.properties.NOMBRE=='Rosario') {layer.bringToFront();layer.zindex=99}
+                                if (layer.feature.properties.NOMBRE=='Rosario (Campaña)') {layer.bringToBack();}
                             }
                             function style(feature) {
+                                if (feature.properties.NOMBRE=='Rosario' || feature.properties.NOMBRE=='La Capital' )
+                                return {
+                                    fillColor: getColor(feature.properties.NOMBRE),
+                                    weight: 2,
+                                    opacity: 1,
+                                    "color": 'white',
+                                    dashArray: '3',
+                                    fillOpacity: 0.7,
+                                    "z-index" : 7 ,
+                                };
+                                    
                                 return {
                                     fillColor: getColor(feature.properties.NOMBRE),
                                     weight: 2,
                                     opacity: 1,
                                     color: 'white',
                                     dashArray: '3',
-                                    fillOpacity: 0.7
+                                    fillOpacity: 0.7,
+                                    "z-index" : 1 ,
                                 };
                             }
 
@@ -122,7 +138,7 @@
 
                                             function highlightFeature(e) {
                                                 var layer = e.target;
-
+                                                //alert(layer.feature.properties.NOMBRE)
                                                 layer.setStyle({
                                                     weight: 5,
                                                     color: '#666',

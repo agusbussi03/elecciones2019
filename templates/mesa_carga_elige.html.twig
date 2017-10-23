@@ -64,7 +64,9 @@
                                         {% if  mesa is defined %}
 
                                       
-                                        <div class="row"><h4>Mesa: {{mesa.numero}} - {{config.localmesa(mesa.numero)}}</h4></div>
+                                        <div class="row"><h4>Mesa: {{mesa.numero}} - {{config.localmesa(mesa.numero)}}
+                                                <a href='{{ path('mesa',{'nro':mesa.numero}) }}'>VER</a>
+                                            </h4></div>
 
                                         {%if mesa.gobernador==1%}  
                                             <button type="button" class="btn btn-primary btn-lg btn-block"

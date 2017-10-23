@@ -129,8 +129,9 @@ class DiputadosNacionales {
                     $total_partido+=$item['porcentaje'];
             }
         }
-        $titulares = 9;
-        $suplentes = 9;
+        $provincia = $this->app['db']->fetchAssoc("SELECT * FROM provincia where id=".$this->id);
+        $titulares = $provincia['dip_titular'];
+        $suplentes = $provincia['dip_suplente'];
         $dhont = array();
         $total_concejales = $titulares + $suplentes;
         $i = 1;
@@ -173,7 +174,12 @@ class DiputadosNacionales {
             $total += $item['electores_nacion'];
         }
         foreach ($departamentos as $item) {
+            $sql2="select count(distinct numero) as cuenta from mesa, renglon_nacional,circuito where renglon_nacional.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=? "
+                    . "and renglon_nacional.diputado>0 ";
+                 $cargadas = $this->app['db']->fetchAssoc($sql2, array((int)  $item['id']));
+            
             $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                 'mesas_cargadas'=>$cargadas['cuenta'],
                 'electores' => $item['electores_provincia'], 'peso' => round($item['electores_nacion'] / $total * 100, 200));
         }
 

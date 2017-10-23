@@ -122,10 +122,11 @@
                                                    
                                                     <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                                 onclick="window.location.href = '{{path('mesas_dipnac',{provincia:provincia.datos.id})}}'">Mesas (XLS)</button>
-                                                   <button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                   
+                                                     {%endif%}
+                                                     <button type="button" class="btn btn-outline btn-primary btn-xs"
                                                     onclick="window.location.href = '{{path('rep_dipnac_seccion',{tipo:'mapa',id:provincia.datos.id})}}'">MAPA</button>
                                                   
-                                                     {%endif%}
                                                      </td>
                                     </tr>
                             </tbody>

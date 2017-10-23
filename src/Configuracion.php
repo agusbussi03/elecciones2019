@@ -134,12 +134,13 @@ class Configuracion {
         require_once 'Mesa.php';
         $mesa = new Mesa($numero, $this->app);
         $localidad = $mesa->getCircuito_nombre();
+        $seccion=$mesa->getSeccion_nombre();
         $seccional = $mesa->getSeccional();
         if ($seccional > 0) {
             $seccional = $this->app['db']->fetchAssoc("SELECT nombre FROM seccional where id=$seccional ");
             $seccional = $seccional['nombre'] . "/";
         }
-        return $localidad . "/" . $seccional . $mesa->getLocal();
+        return $localidad . "/" . $seccional . $mesa->getLocal()." (".$seccion.")";
     }
 
     function getResponsableLocalmesa($numero) {
@@ -157,9 +158,35 @@ class Configuracion {
         and mesa1.concejal=1 and mesa2.concejal=1 and mesa1.id  in 
         (select mesa_id from renglon where concejal>0) and 
         mesa2.id not in (select mesa_id from renglon where concejal>0)");
+    if ($carga['cargada']+$carga['no_cargada']==0 ) {
+        $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa 
+            where renglon.mesa_id=mesa.id and mesa.circuito_id=$numero and renglon.concejal>0 ");
+        if ($carga['cuenta']==0) return "0";
+        return "100";
+    
+    }
     return number_format($carga['cargada']/($carga['cargada']+$carga['no_cargada'])*100,2,",",".");
-    
-    
+     }
+     
+     function getAvanceDipNac($numero) {
+    $carga = $this->app['db']->fetchAssoc("
+         SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2,circuito as circuito1,circuito as circuito2,seccion as seccion1,seccion as seccion2 where
+        mesa1.circuito_id=circuito1.id and mesa2.circuito_id=circuito2.id and
+        circuito1.seccion_id=seccion1.id and circuito2.seccion_id=seccion2.id and 
+        
+        seccion1.provincia_id=$numero and seccion2.provincia_id=$numero 
+        and mesa1.diputado_nacional=1 and mesa2.diputado_nacional=1 and mesa1.id  in 
+        (select mesa_id from renglon_nacional where diputado>0) and 
+        mesa2.id not in (select mesa_id from renglon_nacional where diputado>0)");
+    if ($carga['cargada']+$carga['no_cargada']==0 ) {
+        $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon_nacional,mesa,circuito,seccion 
+where renglon_nacional.diputado>0 and renglon_nacional.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=seccion.id 
+and seccion.provincia_id=$numero");
+        if ($carga['cuenta']==0) return "0";
+        return "100";
+    }
+    return number_format($carga['cargada']/($carga['cargada']+$carga['no_cargada'])*100,2,",",".");
      }
     
     function getOrdenaCandidatos($arreglo) {
@@ -189,6 +216,12 @@ class Configuracion {
    function getColorpartido($clave) {
        $color = $this->app['db']->fetchAssoc("
         SELECT color FROM partido_lista where id_partido=".$clave);
+       if ($color['color']!="") return $color['color'];
+        return "red";
+    }
+     function getColorpartidopornombre($clave) {
+        $color = $this->app['db']->fetchAssoc("
+        SELECT color FROM partido_lista where nombre_partido='$clave'");
        if ($color['color']!="") return $color['color'];
         return "red";
     }

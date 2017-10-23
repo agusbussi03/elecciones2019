@@ -77,7 +77,7 @@ include("controllers_fiscales.php");
 /* * ************** M E S A S *********************************** */
 
 $app->get('/mesa/{nro}', function ($nro) use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('carga')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require_once'Mesa.php';
@@ -235,7 +235,7 @@ $app->post('/mesacarga_elige', function () use ($app) {
 
 
 $app->get('/mesanacional/{nro}', function ($nro) use ($app) {
-    if (!validar('admin')) {
+    if (!validar('admin') && !validar('carga')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     require_once'MesaNacional.php';
@@ -261,7 +261,7 @@ $app->get('/mesanacionalcarga/{nro}', function ($nro) use ($app) {
     $categoria = 'D';
     if (isset($_GET['categoria']))
         $categoria = $_GET['categoria'];
-    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin')) {
+    if ($mesa->votosporcargo($categoria) > 0 && !validar('admin') && !validar('carga')) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
     }
     $mascara = $mesa->getMascara();

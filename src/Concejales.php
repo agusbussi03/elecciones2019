@@ -53,13 +53,13 @@ class Concejales {
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccional sec, partido_lista p "
                 . "WHERE r.mesa_id=m.id and m.seccionales_id=sec.id and r.lista_id=p.id "
-                . "and m.circuito_id=? and r.concejal>0 and p.especial=1 "
+                . "and m.circuito_id=? and r.concejal>=0 and p.especial=1 "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         if ($this->seccionales == 0) {
             $sql = "SELECT 'LOCALIDAD','1' as id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,p.nombre_lista,sum(r.concejal) as suma,count(m.id) as cuenta "
                     . "FROM renglon r, mesa m, partido_lista p "
-                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and r.concejal>0 and p.especial=1 "
+                    . "WHERE r.mesa_id=m.id and r.lista_id=p.id and m.circuito_id=296 and r.concejal>=0 and p.especial=1 "
                     . "group by 'LOCALIDAD','1',p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                     . "ORDER BY p.id_partido ASC, p.nombre_lista asc ";
         }
@@ -124,9 +124,15 @@ class Concejales {
     }
 
     function getDistribucion($id) {
-        $porcentajes_peso = $this->getPorcentajeponderado();
+        //$porcentajes_peso = $this->getPorcentajeponderado();
+        $_porcentajes_peso = $this->getPorcentajeponderado();
+        $porcentajes_peso=array();
+        foreach ($_porcentajes_peso as $clave=>$pp){
+            if ($pp['porcentaje']>3) $porcentajes_peso[$clave]=$pp;
+        }
         $partidos = $this->getPartidos();
         $total_partido = 0;
+        
         if ($id != 0) {
             foreach ($porcentajes_peso as $item) {
                 if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
@@ -172,7 +178,11 @@ class Concejales {
 
     
         function getDistribucionCompleta($id) {
-        $porcentajes_peso = $this->getPorcentajeponderado();
+        $_porcentajes_peso = $this->getPorcentajeponderado();
+        $porcentajes_peso=array();
+        foreach ($_porcentajes_peso as $clave=>$pp){
+            if ($pp['porcentaje']>3) $porcentajes_peso[$clave]=$pp;
+        }
         $partidos = $this->getPartidos();
         $total_partido = 0;
         if ($id != 0) {
@@ -181,6 +191,8 @@ class Concejales {
                     $total_partido += $item['porcentaje'];
             }
         }
+        
+        //print_r($porcentajes_peso);
         $sql = "SELECT * FROM circuito WHERE id=?  ";
         $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
         $titulares = $circuito['conc_titulares'];
@@ -231,7 +243,10 @@ class Concejales {
                 $total += $item['electores_provincia'];
             }
             foreach ($seccionales as $item) {
+                $sql2="select count(distinct numero) as cuenta from mesa, renglon where renglon.mesa_id=mesa.id and mesa.seccionales_id=? and renglon.concejal>0 ";
+                 $cargadas = $this->app['db']->fetchAssoc($sql2, array((int)  $item['id']));
                 $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                    'mesas_cargadas'=>$cargadas['cuenta'],
                     'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 200));
             }
         } else {   ///// NO TIENE SECCIONALES LA LOCALIDAD
@@ -290,7 +305,22 @@ class Concejales {
         }
         return $seccionales;
     }
-
+     function getFaltante_con_cargadas() {
+        $sql = "SELECT seccional.id,seccional.nombre as nombre,count(*) as mesas from seccional,mesa "
+                . "where seccional.circuito_id=" . $this->id . " and mesa.seccionales_id=seccional.id "
+                . " and mesa.concejal=1 "
+                . "group by seccional.id,seccional.nombre";
+        $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($_seccionales as $item) {
+            $sql = "select  * from mesa "
+                    . " where  seccionales_id=" . $item['id']." and mesa.concejal=1";
+                    
+            $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
+            $item['faltantes']=$faltantes;
+            $seccionales[] = $item;
+        }
+        return $seccionales;
+    }
 }
 
 function ordena_dhont($a, $b) { {

@@ -86,7 +86,9 @@
            </div>
         </div>
         <div style="clear: both;height:0px;"></div>
-        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Listas</h2>
+        
+        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">
+                {% if config.tipo==0%}Listas{% else %}Partidos{% endif %}</h2>
             {% for clave,item in totales %}
                 {%if loop.index>0%}
                     {%if (clave|trim!="BLANCOS" and clave!="NULOS") or 
@@ -119,6 +121,7 @@
                 {%endif%}
             {%endfor%}
         </div>
+        {% if config.tipo==0%}
         <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Partido</h2>
             {% for clave,item in totales_partido %}
                 {%if loop.index>0%}
@@ -164,6 +167,7 @@
                         {%endfor%}        
 
                     </div>
+                    {% endif %}
                     {#<div style="width:33%;float:left;">
                         {%set candidatos=config.ordenacandidatos(totales)%}
                         {% for clave,item in candidatos %}

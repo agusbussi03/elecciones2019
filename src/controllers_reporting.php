@@ -127,7 +127,11 @@ $app->get('/faltante_circuito/{circuito}', function ($circuito) use ($app) {
     require_once 'Concejales.php';
     $concejales = new Concejales($circuito, $app);
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $faltantes = $concejales->getFaltante();
+    if (isset($_GET['completo']))
+        $faltantes = $concejales->getFaltante_con_cargadas();
+    else
+        $faltantes = $concejales->getFaltante();
+
     return $app['twig']->render('reporting/res_concejales_faltante.html.twig', array('faltantes' => $faltantes, 'circuito' => $circuito));
 })->bind('faltante_circuito');
 
@@ -299,7 +303,52 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         return $app['twig']->render('reporting/res_concejales_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
                     'totales' => $total_ponderado, 'seccionales' => $concejales->getSeccionales()));
     }
+    if ($tipo == 'mapa') {
+        $resultado = $concejales->getPorcentajes();
+        $seccionales = $concejales->getSeccionales();
+        $partidos = $concejales->getPartidos();
+        foreach ($seccionales as $seccional) {
+            //$totales[$departamento['nombre']]['electores']=$departamento['electores'];
+            foreach ($resultado['porcentajes'][$seccional['id']] as $clave => $item) {
+                if (!(in_array($clave, array("EMITIDOS", "BLANCOS--", "NULOS--","OTROS--")))) {
+                    $partido = strtok($clave, "-");
+                    if (isset($totales[$seccional['nombre']][$partido]))
+                        $totales[$seccional['nombre']][$partido] += $item['porcentaje'];
+                    else
+                        $totales[$seccional['nombre']][$partido] = $item['porcentaje'];
+                }
+            }
+        }
+        require_once('Configuracion.php');
+        $configuracion = new Configuracion($app);
+        $partidos2 = array();
+        foreach ($partidos as $clave => $item) {
+            if (!(isset($partidos2[$item['id_partido']]))) {
+                $partidos2[$item['id_partido']]['nombre_partido'] = $item['nombre_partido'];
+                $partidos2[$item['id_partido']]['color'] = $configuracion->getColorpartido($item['id_partido']);
+            }
+        }
 
+        $totales2 = array();
+        foreach ($totales as $clave => $item) {
+            foreach ($item as $clave2 => $item2) {
+                $totales2[$clave][$clave2] = number_format($item2, 2, ".", ",");
+            }
+        }
+        $totales = array();
+        foreach ($totales2 as $clave => $item) {
+            arsort($item);
+            $totales[$clave] = $item;
+        }
+
+        $colores_seccional = array();
+        foreach ($totales as $clave => $item) {
+            $colores_seccional[$clave] = $configuracion->getColorpartidopornombre(array_keys($item)[0]);
+        }
+       // print_r($colores_seccional);
+        return $app['twig']->render('reporting/res_concejales_mapas.html.twig', array('circuito' => $circuito, 'totales' => $totales, 'partidos' => $partidos2,
+                    'colores_seccional' => $colores_seccional));
+    }
     if ($tipo == 'graficos') {
         $resultado = $concejales->getPorcentajeponderado();
         $partidos = $concejales->getPartidos();
@@ -345,11 +394,14 @@ $app->get('/rep_concejales_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
             $partidos[$item['id_partido']] = $item['nombre_partido'];
         }
         $suma = array();
+        $i=0;
+        
         foreach ($resultado as $item) {
             if (isset($suma[$item['partido']]))
                 $suma[$item['partido']] ++;
             else
                 $suma[$item['partido']] = 1;
+            if (++$i == $circuito['conc_titulares']) break;
         }
         //print_r($resultado);
         $grafico = array();
@@ -395,22 +447,22 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
     require_once 'DiputadosNacionales.php';
     $diputados = new DiputadosNacionales($id, $app);
     //print_r($concejales->getSeccionales());
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
+    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$id");
 
     if ($tipo == 'votos') {
         $resultado = $diputados->getResultados();
-        return $app['twig']->render('reporting/res_dipnac_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'departamentos' => $diputados->getDepartamentos()));
+        return $app['twig']->render('reporting/res_dipnac_votos.html.twig', array('votos' => $resultado['votos'], 'provincia' => $provincia, 'totales' => $resultado['totales'], 'departamentos' => $diputados->getDepartamentos()));
     }
     if ($tipo == 'porcentajes') {
         $resultado = $diputados->getPorcentajes();
 
-        return $app['twig']->render('reporting/res_dipnac_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+        return $app['twig']->render('reporting/res_dipnac_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'provincia' => $provincia,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $diputados->getDepartamentos()));
     }
     if ($tipo == 'porcentajes_ponderado') {
         $total_ponderado = $diputados->getPorcentajeponderado();
         $resultado = $diputados->getPorcentajes();
-        return $app['twig']->render('reporting/res_dipnac_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+        return $app['twig']->render('reporting/res_dipnac_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'provincia' => $provincia,
                     'totales' => $total_ponderado, 'seccionales' => $diputados->getDepartamentos()));
     }
     if ($tipo == 'mapa') {
@@ -420,7 +472,7 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         foreach ($departamentos as $departamento) {
             //$totales[$departamento['nombre']]['electores']=$departamento['electores'];
             foreach ($resultado['porcentajes'][$departamento['id']] as $clave => $item) {
-                if (!(in_array($clave, array("EMITIDOS", "BLANCOS--", "NULOS--")))) {
+                if (!(in_array($clave, array("EMITIDOS", "BLANCOS--", "NULOS--","OTROS--")))) {
                     $partido = strtok($clave, "-");
                     if (isset($totales[$departamento['nombre']][$partido]))
                         $totales[$departamento['nombre']][$partido] += $item['porcentaje'];
@@ -450,13 +502,12 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
             arsort($item);
             $totales[$clave] = $item;
         }
-       
+
         $colores_departamento = array();
         foreach ($totales as $clave => $item) {
-            $colores_departamento[$clave]= $configuracion->getColorpartidonacionalpornombre(array_keys($item)[0]);
+            $colores_departamento[$clave] = $configuracion->getColorpartidonacionalpornombre(array_keys($item)[0]);
         }
-        return $app['twig']->render('reporting/res_dipnac_mapas.html.twig', 
-                array('totales' => $totales, 'partidos' => $partidos2,'colores_departamento' => $colores_departamento));
+        return $app['twig']->render('reporting/res_dipnac_mapas.html.twig', array('totales' => $totales, 'partidos' => $partidos2, 'colores_departamento' => $colores_departamento));
     }
     if ($tipo == 'graficos') {
         $resultado = $diputados->getPorcentajeponderado();
@@ -491,7 +542,7 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
 
-        return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
+        return $app['twig']->render('reporting/res_dipnac_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'provincia' => $provincia, 'partidos' => $partidos));
     }
 
     if ($tipo == 'distribucion') {
@@ -506,11 +557,13 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
             $partidos[$item['id_partido']] = $item['nombre_partido'];
         }
         $suma = array();
+        $i=0;
         foreach ($resultado as $item) {
             if (isset($suma[$item['partido']]))
                 $suma[$item['partido']] ++;
             else
                 $suma[$item['partido']] = 1;
+            if (++$i == $provincia['dip_titular']) break;
         }
         $grafico = array();
         if ($id > 0) {
@@ -519,11 +572,11 @@ $app->get('/rep_dipnac_seccion/{tipo}/{id}', function ($tipo, $id) use ($app) {
                     $grafico[$item['partido']] = $item;
             }
         }
-        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
+        return $app['twig']->render('reporting/res_dipnac_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'provincia' => $provincia, 'totales' => $resultado, 'suma' => $suma));
     }
     if ($tipo == 'avance') {
         $avance = $diputados->getAvance();
-        return $app['twig']->render('reporting/res_dipnac_avance.html.twig', array('circuito' => $circuito, 'avance' => $avance));
+        return $app['twig']->render('reporting/res_dipnac_avance.html.twig', array('provincia' => $provincia, 'avance' => $avance));
     }
 })->bind('rep_dipnac_seccion');
 
@@ -563,12 +616,17 @@ function ordena($a, $b) {
 $app->get('/logo_partido/{id}', function ($id) use ($app) {
     $logo = $app['db']->fetchAssoc("SELECT logo FROM partido_lista where id=$id");
     header('Content-Type: image/jpeg');
+     header("Cache-Control: max-age=3600");
+     header("Pragma: cache");
     echo $logo['logo'];
     die;
 })->bind('logo_partido');
 $app->get('/logo_partido_nacional/{id}', function ($id) use ($app) {
     $logo = $app['db']->fetchAssoc("SELECT logo FROM partido_lista_nacional where id=$id");
     header('Content-Type: image/jpeg');
+    header("Cache-Control: max-age=3600");
+    header("Pragma: cache");
+
     echo $logo['logo'];
     die;
 })->bind('logo_partido_nacional');
@@ -576,6 +634,8 @@ $app->get('/logo_candidato/{nombre}', function ($nombre) use ($app) {
     $candidato = $app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
             . "partido_lista l where tipo='C' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
     header('Content-Type: image/jpeg');
+    header("Cache-Control: max-age=3600");
+    header("Pragma: cache");
     if ($candidato['apellido'] == "")
         echo file_get_contents("imagenes/default.jpg");
     echo $candidato['foto'];
@@ -587,6 +647,9 @@ $app->get('/logo_candidato_nacional/{nombre}', function ($nombre) use ($app) {
             . "and c.lista_nacional_id=l.id "
             . "and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre'");
     header('Content-Type: image/jpeg');
+    header("Cache-Control: max-age=3600");
+    header("Pragma: cache");
+
     if ($candidato['apellido'] == "")
         echo file_get_contents("imagenes/default.jpg");
     echo $candidato['foto'];

@@ -15,10 +15,10 @@ $app->post('/provincia_add', function () use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $sql = "INSERT INTO provincia VALUES (NULL,?,?,?,?,?,?,?,?,?,?)";
-    $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'], 
+    $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['electores_nacion'],
         (int) $_POST['electores_provincia'], (int) $_POST['mesas'],
-        (int) $_POST['dip_titular'],(int) $_POST['dip_suplente'],(int) $_POST['sen_titular'],
-        (int) $_POST['sen_suplente'],(int) $_POST['parlasur_titular'],(int) $_POST['parlasur_suplente'],));
+        (int) $_POST['dip_titular'], (int) $_POST['dip_suplente'], (int) $_POST['sen_titular'],
+        (int) $_POST['sen_suplente'], (int) $_POST['parlasur_titular'], (int) $_POST['parlasur_suplente'],));
     $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
     $mensaje = array('codigo' => 0, 'texto' => "La provincia fue cargada");
     return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
@@ -54,9 +54,9 @@ $app->post('/provincia_edit/{id}', function ($id) use ($app) {
                 . "mesas=?,dip_titular=?,dip_suplente=?,sen_titular=?,"
                 . "sen_suplente=?,parlasur_titular=?,parlasur_suplente=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], (int) $_POST['votantes_nacion'],
-            (int) $_POST['votantes_provincia'], $_POST['mesas'], 
-             (int) $_POST['dip_titular'],(int) $_POST['dip_suplente'], (int) $_POST['sen_titular'], 
-             (int) $_POST['sen_suplente'],(int) $_POST['parlasur_titular'], (int) $_POST['parlasur_suplente'], 
+            (int) $_POST['votantes_provincia'], $_POST['mesas'],
+            (int) $_POST['dip_titular'], (int) $_POST['dip_suplente'], (int) $_POST['sen_titular'],
+            (int) $_POST['sen_suplente'], (int) $_POST['parlasur_titular'], (int) $_POST['parlasur_suplente'],
             (int) $id));
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion");
@@ -562,6 +562,22 @@ $app->get('/locales/{provincia}', function ($provincia) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $locales = $app['db']->fetchAll("SELECT * FROM locales where provincia_id=$provincia");
+     if (isset($_GET['xls'])) {
+        $texto = "";
+        foreach ($locales as $local) {
+            $texto .= '"' . $local['nombre'] . '",';
+            $texto .= '"' . $local['direccion'] . '","' . $local['telefono'] . '",';
+            $texto .= '"' . $local['contacto'] . '","' . $local['mesadesde'] . '",';
+            $texto .= '"' . $local['mesahasta'] . '","' . $local['lat'] . '",';
+            $texto .= '"' . $local['lon'] . '"' ;
+            $texto .= "\n\r";
+        }
+        header('Content-Description: File Transfer');
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-disposition: csv" . date("Y-m-d") . ".csv");
+        echo $texto;
+        die;
+    }
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/locales.html.twig', array('provincia' => $provincia, 'locales' => $locales));
 })->bind('locales');
@@ -576,6 +592,7 @@ $app->post('/local_add', function () use ($app) {
     $provincia = 1;
 
     $locales = $app['db']->fetchAll("SELECT * FROM locales where provincia_id=$provincia");
+   
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/locales.html.twig', array('provincia' => $provincia, 'locales' => $locales));
 })->bind('local_add');
@@ -612,7 +629,7 @@ $app->post('/local_edit/{id}', function ($id) use ($app) {
         $sql = "UPDATE locales SET nombre=?,direccion=?,telefono=?,"
                 . "contacto=?,lat=?,lon=?,mesadesde=?,mesahasta=? WHERE id=?";
         $app['db']->executeQuery($sql, array($_POST['nombre'], $_POST['direccion'], $_POST['telefono'],
-            $_POST['contacto'], (float)$_POST['lat'], (float)$_POST['lon'],
+            $_POST['contacto'], (float) $_POST['lat'], (float) $_POST['lon'],
             (int) $_POST['mesa_desde'], (int) $_POST['mesa_hasta'], (int) $id));
     } catch (Exception $ex) {
         $mensaje = array('codigo' => 1, 'texto' => "Error de actualizacion:" . $ex->getMessage());
@@ -725,7 +742,7 @@ $app->get('/partidos/{provincia}', function ($provincia) use ($app) {
             if ($item['especial'] == 0) {
                 $texto .= '"' . $item['id_partido'] . '";';
                 $texto .= '"' . $item['nombre_partido'] . '";"' . $item['id_lista'] . '";';
-                $texto .= '"' . $item['nombre_lista']  . '"';
+                $texto .= '"' . $item['nombre_lista'] . '"';
                 $texto .= "\n\r";
             }
         }
@@ -937,7 +954,7 @@ $app->post('/partidosnacionales/{provincia}', function ($provincia) use ($app) {
             . "cnd on p.id=cnd.lista_nacional_id LEFT JOIN (select tipo,lista_nacional_id,can2.id,can2.apellido,can2.foto,cn2.id as "
             . "id_sen from cargo_nacional cn2 left join candidato can2 on cn2.candidato_id= can2.id where tipo='S') cns on"
             . " p.id=cns.lista_nacional_id where p.provincia_id=$provincia");
-    
+
     foreach ($partidos2 as $item) {
         $item['logo'] = base64_encode($item['logo']);
         $item['dip_foto'] = base64_encode($item['dip_foto']);

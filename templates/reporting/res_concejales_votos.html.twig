@@ -46,7 +46,9 @@
                         <td style="font-size:12px;width:400px;">
                             Seccional
                         </td>
-                        {#{dump(votos)}#}
+                       <td style="font-size:12px;width:40px;">
+                            Mesas C.
+                        </td>
                         {% for clave,item in votos|first %}
                             <td style="font-size:10px; word-wrap: break-word;margin:0;width:50px">
                                 {{clave}}
@@ -57,11 +59,15 @@
                         </td>
                     </tr>
                     <!--/thead-->
-
+ {% set total_mesas=0 %}
                     {% for clave,item in votos %}
                         <tr class="odd gradeX" id="r_{{loop.index}}">
                             <td style="width:400px;">
                                 {{ seccionales[clave].nombre }}
+                            </td> 
+                             <td style="text-align: right;">
+                                {{ seccionales[clave].mesas_cargadas }}
+                                {% set total_mesas=total_mesas+seccionales[clave].mesas_cargadas %}
                             </td> 
                             {% set total=0 %}
                             {% for item2 in item %}
@@ -76,12 +82,16 @@
                     <tr class="odd gradeX" id="tr_TOTAL">
                         <td style="width:300px;">
                             <b>TOTAL</b>
-                        </td> 
+                        </td>  
+                        <td style="text-align: right;"> 
+                                <b>{{total_mesas}}</b>
+                            </td>
                         {% set total=0 %}
                         {% for item2 in totales %}
                             <td style="text-align: right;"> 
                                 <b>{{item2.votos}}</b>
                             </td>
+                           
                             {%set total=total+item2.votos %}
                         {%endfor%}
                         <td style="text-align: right;"><b>{{total}}</b></td>

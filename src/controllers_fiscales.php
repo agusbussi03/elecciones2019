@@ -126,7 +126,7 @@ function imprime($app,$seccion=0,$circuito=0){
         $pdf->Row_b(array(utf8_decode($i['departamento']),utf8_decode($i['locest']),utf8_decode($i['direst']),
                 utf8_decode($i['desest']),utf8_decode($i['dni']),utf8_decode($i['nombre']),
                 utf8_decode($i['telefono']),utf8_decode($i['mail'])));
-        $sql="SELECT mesa,dni,nombre,telefono,mail,numero as testigo,responsable "
+        $sql="SELECT mesa,dni,nombre,t.telefono,t.mail,numero as testigo,responsable "
                 . "FROM tbmesas t left join mesa m on t.mesa=m.numero "
                 . "where t.mesa BETWEEN ".$i['desde']." and ".$i['hasta'];
         $mesas = $app['db']->fetchAll($sql);
