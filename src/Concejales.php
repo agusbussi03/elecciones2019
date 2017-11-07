@@ -25,7 +25,7 @@ class Concejales {
                 . "and m.circuito_id=? and r.concejal>=0 and car.lista_id=r.lista_id "
                 . "and car.circuito_id=m.circuito_id and car.tipo='C' and "
                 . " mesa_id in ("
-                . "select mesa_id from renglon group by mesa_id HAVING sum(concejal)>0 ) "
+                . "select mesa_id from renglon where concejal>0 ) "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         if ($this->seccionales == 0) {

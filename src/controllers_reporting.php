@@ -657,4 +657,59 @@ $app->get('/logo_candidato_nacional/{nombre}', function ($nombre) use ($app) {
 })->bind('logo_candidato_nacional');
 
 
-
+$app->get('/provisorio', function () use ($app) {
+    $ganadores=array();
+    $array_votos=array();
+    $circuitos = $app['db']->fetchAll("SELECT distinct circuito,letra FROM resultados where concejal>0");
+    foreach ($circuitos as $circuito){
+        $ganador = $app['db']->fetchAssoc("SELECT nropartido,concejal FROM resultados_agrupados ".
+                "where concejal>0 and circuito=".$circuito['circuito']." and letra='".$circuito['letra']."'"
+                . "  order by concejal desc");
+        $color="";
+        if($ganador['nropartido']==26) $color="red";
+        if($ganador['nropartido']==27) $color="yellow";
+        if($ganador['nropartido']==32) $color="blue";
+        $ganadores[str_pad($circuito['circuito'],3,0,STR_PAD_LEFT).$circuito['letra']]=array('partido'=>$ganador['nropartido'],
+            'color'=>$color);
+        $votos = $app['db']->fetchAll("SELECT nombrepartido,concejal FROM resultados_agrupados ".
+                "where concejal>0 and circuito=".$circuito['circuito']." and letra='".$circuito['letra']."'"
+                . "  order by concejal desc");
+        foreach ($votos as $voto){
+             $array_votos[str_pad($circuito['circuito'],3,0,STR_PAD_LEFT).$circuito['letra']][]=array('partido'=>$voto['nombrepartido'],
+            'votos'=>$voto['concejal']);
+        }
+        
+    }
+    
+     $circuitos = $app['db']->fetchAll("SELECT distinct circuito,letra FROM resultados where comunal>0");
+    foreach ($circuitos as $circuito){
+        $ganador = $app['db']->fetchAssoc("SELECT nropartido,comunal FROM resultados_agrupados ".
+                "where comunal>0 and circuito=".$circuito['circuito']." and letra='".$circuito['letra']."'"
+                . " order by comunal desc");
+        $color="";
+        if($ganador['nropartido']==26) $color="red";
+        if($ganador['nropartido']==27) $color="yellow";
+        if($ganador['nropartido']==32) $color="blue";
+        if($ganador['nropartido']==4) $color="green";
+        $ganadores[str_pad($circuito['circuito'],3,0,STR_PAD_LEFT).$circuito['letra']]=array('partido'=>$ganador['nropartido'],
+            'color'=>$color);
+        $votos = $app['db']->fetchAll("SELECT nombrepartido,comunal FROM resultados_agrupados ".
+                "where comunal>0 and circuito=".$circuito['circuito']." and letra='".$circuito['letra']."'"
+                . "  order by comunal desc");
+        foreach ($votos as $voto){
+             $array_votos[str_pad($circuito['circuito'],3,0,STR_PAD_LEFT).$circuito['letra']][]=array('partido'=>$voto['nombrepartido'],
+            'votos'=>$voto['comunal']);
+        }
+    }
+    //print_r($ganadores);die;
+    
+    $partidos=array(
+        array("nombre_partido"=>"Frente Justicialista","color"=> "blue"),
+        array("nombre_partido"=>"FPCS","color"=> "red"),
+        array("nombre_partido"=>"Cambiemos","color"=> "yellow",
+            array("nombre_partido"=>"Frente para el Cambio","color"=> "green")),
+        
+    );
+   return $app['twig']->render('provisorios_mapas.html.twig', 
+           array('ganadores' => $ganadores,'votos' => $array_votos, 'partidos' => $partidos));
+})->bind('provisorio');
