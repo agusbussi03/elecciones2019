@@ -38,5 +38,7 @@ class Moneda
 public function getnombre(){
   return $this->nombre;
 }
-
+public function getid(){
+  return $this->id;
+}
 }

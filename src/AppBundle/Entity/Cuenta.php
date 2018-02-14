@@ -55,6 +55,25 @@ class Cuenta
      */
     private $moneda;
 
-
+public function getid(){
+  return $this->id;
 }
-
+public function getmoneda(){
+  return $this->moneda;
+}
+public function getsaldo(){
+  return $this->saldo;
+}
+public function setsaldo($saldo){
+  $this->saldo=$saldo;
+}
+public function setdireccion($direccion){
+  $this->direccion=$direccion;
+}
+public function setmoneda($moneda){
+  $this->moneda=$moneda;
+}
+public function setfosUser($fosUser){
+  $this->fosUser=$fosUser;
+}
+}
