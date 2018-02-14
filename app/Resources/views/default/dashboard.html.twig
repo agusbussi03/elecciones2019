@@ -1,29 +1,48 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-    <h1 class="page-header">Cuentas</h2>
-    {% for cuenta in cuentas%}
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="row">
-                    <div class="col-xs-3">
-                        <i class="fa fa-money fa-5x"></i>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                        <div class="huge">  {{cuenta.saldo}}</div>
-                        <div>  {{cuenta.moneda.nombre}}</div>
-                    </div>
-                </div>
+  <h1 class="page-header">Cuentas</h2>
+  {% for cuenta in cuentas%}
+    <div class="col-lg-6 col-md-6">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-money fa-5x"></i>
             </div>
-            <a href="#">
-                <div class="panel-footer">
-                    <span class="pull-left">Detalles</span>
-                    <span class="pull-right">
-                        <i class="fa fa-arrow-circle-right"></i>
-                    </span>
-                    <div class="clearfix"></div>
-                </div>
-            </a>
+            <div class="col-xs-9 text-right">
+              <div class="huge">
+                {{cuenta.saldo}}</div>
+              <div>
+                {{cuenta.moneda.nombre}}</div>
+            </div>
+          </div>
         </div>
-    {% endfor %}
-{% endblock body %}
+        <a href="#">
+          <div class="panel-footer">
+            <span class="pull-left">Detalles</span>
+            <span class="pull-right">
+              <i class="fa fa-arrow-circle-right"></i>
+            </span>
+            <div class="clearfix"></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+
+  {# COTIZACION  #}
+  <div class="col-lg-12 col-md-6">
+    <div class="panel panel-green">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-xs-12 text-right">
+            <div class="huge">
+              BTC Compra: {{cotizacion*0.95}} /   BTC Venta: {{cotizacion*1.05}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  {% endblock body %}

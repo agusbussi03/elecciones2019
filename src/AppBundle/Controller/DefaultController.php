@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Moneda;
 use AppBundle\Entity\Cuenta;
 use AppBundle\Entity\FosUser;
+use AppBundle\Services\Helpers;
 
 class DefaultController extends Controller
 {
@@ -65,6 +66,8 @@ class DefaultController extends Controller
         ->setParameter('usuario', $user->getId())
         ->orderBy('c.moneda', 'ASC')
         ->getQuery();
-      return $this->render('default/dashboard.html.twig', array('cuentas'=>$query->getResult()));
+      $helpers = new Helpers();
+      $cotizacion=$helpers->cotizacionARS_BTC();
+      return $this->render('default/dashboard.html.twig', array('cuentas'=>$query->getResult(),'cotizacion'=>$cotizacion));
   }
 }
