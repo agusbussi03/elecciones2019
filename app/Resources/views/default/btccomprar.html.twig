@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <h1 class="page-header">Comprar Bitcoins</h2>
+    
+    
+     <div class="row">
+        <div class="col-lg-6">
+    
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="alert alert-success">
+            Disponible para operar: {{cuenta.saldo}} - Cotización aproximada: {{helpers.cotizacionARS_BTC}}
+        </div>
+        
+        {{ form_end(form) }}
+        </div>
+     </div>
+    
+
+{% endblock body %}

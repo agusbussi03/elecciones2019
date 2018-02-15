@@ -1,0 +1,54 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <h1 class="page-header">Informar depósito</h2>
+     <div class="row">
+        <div class="col-lg-6">
+    
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        {{ form_end(form) }}
+        </div>
+     </div>
+    <h2 class="panel-default">Depósitos</h2>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Historial de depositos
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Detalle</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transferencia in transferencias%}
+                                    <tr>
+                                        <td>{{transferencia.fecha|date('d/m/Y')}}</td>
+                                        <td>{{transferencia.detalle}}</td>
+                                        <td>{{transferencia.importe}}</td>
+                                        <td>{%if transferencia.confirmacion is empty %}
+                                            No confirmado
+                                            {%else%}
+                                                {{transferencia.confirmacion|date('d/m/Y')}}
+                                            {%endif%}
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}
