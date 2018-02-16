@@ -11,8 +11,15 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  */
 class Moneda
-{
-    /**
+{    function getSimbolo() {
+        return $this->simbolo;
+    }
+
+    function setSimbolo($simbolo) {
+        $this->simbolo = $simbolo;
+    }
+
+        /**
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=45, nullable=false)

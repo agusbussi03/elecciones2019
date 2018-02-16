@@ -7,13 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Operaciones
  *
- * @ORM\Table(name="operaciones", indexes={@ORM\Index(name="fk_operaciones_cuenta1_idx", columns={"cuenta_id"})})
+ * @ORM\Table(name="operaciones", indexes={@ORM\Index(name="fk_operaciones_cuenta1_idx", columns={"origen_cuenta_id"}), @ORM\Index(name="fk_operaciones_cuenta2_idx", columns={"destino_cuenta_id"})})
  * @ORM\Entity
  */
 class Operaciones
 {
     /**
-     * @var string
+     * @var \DateTime
      *
      * @ORM\Column(name="fecha", type="datetime", nullable=false)
      */
@@ -29,9 +29,30 @@ class Operaciones
     /**
      * @var float
      *
-     * @ORM\Column(name="importe", type="float", precision=10, scale=0, nullable=false)
+     * @ORM\Column(name="origen_importe", type="float", precision=10, scale=0, nullable=true)
      */
-    private $importe;
+    private $origenImporte;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="destino_importe", type="float", precision=10, scale=0, nullable=true)
+     */
+    private $destinoImporte;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="cotizacion", type="float", precision=10, scale=0, nullable=true)
+     */
+    private $cotizacion;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="comision", type="float", precision=10, scale=0, nullable=true)
+     */
+    private $comision;
 
     /**
      * @var integer
@@ -47,11 +68,21 @@ class Operaciones
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Cuenta")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cuenta_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="origen_cuenta_id", referencedColumnName="id")
      * })
      */
-    private $cuenta;
-    function getFecha() {
+    private $origenCuenta;
+
+    /**
+     * @var \AppBundle\Entity\Cuenta
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Cuenta")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="destino_cuenta_id", referencedColumnName="id")
+     * })
+     */
+    private $destinoCuenta;
+    function getFecha(): \DateTime {
         return $this->fecha;
     }
 
@@ -59,19 +90,35 @@ class Operaciones
         return $this->detalle;
     }
 
-    function getImporte() {
-        return $this->importe;
+    function getOrigenImporte() {
+        return $this->origenImporte;
+    }
+
+    function getDestinoImporte() {
+        return $this->destinoImporte;
+    }
+
+    function getCotizacion() {
+        return $this->cotizacion;
+    }
+
+    function getComision() {
+        return $this->comision;
     }
 
     function getId() {
         return $this->id;
     }
 
-    function getCuenta(): \AppBundle\Entity\Cuenta {
-        return $this->cuenta;
+    function getOrigenCuenta(): \AppBundle\Entity\Cuenta {
+        return $this->origenCuenta;
     }
 
-    function setFecha($fecha) {
+    function getDestinoCuenta(): \AppBundle\Entity\Cuenta {
+        return $this->destinoCuenta;
+    }
+
+    function setFecha(\DateTime $fecha) {
         $this->fecha = $fecha;
     }
 
@@ -79,16 +126,32 @@ class Operaciones
         $this->detalle = $detalle;
     }
 
-    function setImporte($importe) {
-        $this->importe = $importe;
+    function setOrigenImporte($origenImporte) {
+        $this->origenImporte = $origenImporte;
+    }
+
+    function setDestinoImporte($destinoImporte) {
+        $this->destinoImporte = $destinoImporte;
+    }
+
+    function setCotizacion($cotizacion) {
+        $this->cotizacion = $cotizacion;
+    }
+
+    function setComision($comision) {
+        $this->comision = $comision;
     }
 
     function setId($id) {
         $this->id = $id;
     }
 
-    function setCuenta(\AppBundle\Entity\Cuenta $cuenta) {
-        $this->cuenta = $cuenta;
+    function setOrigenCuenta(\AppBundle\Entity\Cuenta $origenCuenta) {
+        $this->origenCuenta = $origenCuenta;
+    }
+
+    function setDestinoCuenta(\AppBundle\Entity\Cuenta $destinoCuenta) {
+        $this->destinoCuenta = $destinoCuenta;
     }
 
 
