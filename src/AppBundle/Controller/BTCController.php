@@ -33,7 +33,7 @@ class BTCController extends Controller {
         $cuenta = $cuenta[0];
         $operacion = new \AppBundle\Entity\Operaciones();
         $form = $this->createFormBuilder($operacion)
-                ->add('origen_importe', MoneyType::class)
+                ->add('origen_importe', MoneyType::class,array('currency'=>'USD','label'=>'Importe:'))
                 ->add('save', SubmitType::class, array('label' => 'Comprar'))
                 ->getForm();
         $form->handleRequest($request);
@@ -52,6 +52,7 @@ class BTCController extends Controller {
                 // SE CREA LA OPERACION BTC
                 $helpers=new Helpers();
                 $cotizacion=$helpers->cotizacionARS_BTC();
+                $cotizacion=$cotizacion->bpi->ARS->rate_float;
                 $operacion->setOrigenCuenta($cuenta);
                 $operacion->setDetalle("Compra BTC");
                 $operacion->setFecha(new \DateTime('now'));
@@ -149,4 +150,27 @@ class BTCController extends Controller {
         ));
     }
 
+    
+/**
+     * @Route("/btcrecibir", name="btcrecibir")
+     */
+    public function btcrecibirAction(Request $request) {
+        $user = $this->getUser();
+        $db = $this->getDoctrine();
+        $cuenta_repository = $db->getRepository(Cuenta::class);
+        $query = $cuenta_repository->createQueryBuilder('c')
+                ->where('c.fosUser = :usuario and c.moneda= :moneda')
+                ->setParameter('usuario', $user->getId())
+                ->setParameter('moneda', 2)
+                ->getQuery();
+        $cuentaBTC = $query->getResult();
+        $cuentaBTC = $cuentaBTC[0];
+       
+        return $this->render('default/btcrecibir.html.twig', array(
+                     'cuenta' => $cuentaBTC,  ));
+    }
+    
+    
+    
+    
 }
