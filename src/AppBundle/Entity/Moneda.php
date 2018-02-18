@@ -11,7 +11,11 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  */
 class Moneda
-{    function getSimbolo() {
+{    
+    const ARS = 1;
+    const BTC = 2;
+    
+    function getSimbolo() {
         return $this->simbolo;
     }
 

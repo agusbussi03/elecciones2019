@@ -20,6 +20,8 @@ class PesosController extends Controller {
      * @Route("/depositar", name="depositar")
      */
     public function depositarAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $this->getUser();
         $transferencia = new Transferencia();
         $transferencia->setFecha(new \DateTime('now'));
@@ -33,10 +35,10 @@ class PesosController extends Controller {
         $cuenta = $query->getResult();
         $transferencia->setCuenta($cuenta[0]);
         $form = $this->createFormBuilder($transferencia)
-                ->add('detalle', TextType::class)
+                ->add('detalle', TextType::class, array('attr' => array('class' => 'form-control')))
                 ->add('fecha', DateType::class)
-                ->add('importe', MoneyType::class)
-                ->add('save', SubmitType::class, array('label' => 'Informar deposito'))
+                ->add('importe', MoneyType::class, array('attr' => array('class' => 'form-control','style' => 'width:200px')))
+                ->add('save', SubmitType::class, array('label' => 'Informar deposito','attr' => array('class' => 'btn btn-primary')))
                 ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -57,10 +59,12 @@ class PesosController extends Controller {
         ));
     }
 
-        /**
+    /**
      * @Route("/extraer", name="extraer")
      */
     public function extraerAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $this->getUser();
         $transferencia = new Transferencia();
         $transferencia->setFecha(new \DateTime('now'));
@@ -82,7 +86,7 @@ class PesosController extends Controller {
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $transferencia = $form->getData();
-            $transferencia->setImporte($transferencia->getImporte()*-1);
+            $transferencia->setImporte($transferencia->getImporte() * -1);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transferencia);
             $em->flush();
@@ -99,5 +103,4 @@ class PesosController extends Controller {
         ));
     }
 
-    
 }

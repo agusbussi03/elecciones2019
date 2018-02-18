@@ -26,7 +26,10 @@
                                     <tr>
                                         <td>{{operacion.fecha|date('d/m/Y h:m:i')}}</td>
                                         <td>{{operacion.detalle}}</td>
-                                        <td>{{operacion.origenCuenta.moneda.simbolo}} {{operacion.origenImporte}}</td>
+                                        <td>{%if operacion.origenCuenta is not null%}
+                                            {{operacion.origenCuenta.moneda.simbolo}} {{operacion.origenImporte}}
+                                            {%endif%}
+                                        </td>
                                         <td>{{operacion.destinoCuenta.moneda.simbolo}} {{operacion.destinoImporte}}</td>
                                     </tr>
                                 {%endfor%}

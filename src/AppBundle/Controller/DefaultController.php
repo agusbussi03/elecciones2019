@@ -57,6 +57,7 @@ class DefaultController extends Controller {
      * @Route("/dashboard", name="dashboard")
      */
     public function dashboardAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
@@ -75,6 +76,7 @@ class DefaultController extends Controller {
      * @Route("/cuenta/{cuenta_id}", name="cuenta")
      */
     public function cuentaAction($cuenta_id) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $user = $this->getUser();
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
@@ -90,12 +92,13 @@ class DefaultController extends Controller {
         $query = $db->getRepository(Operaciones::class)->createQueryBuilder('o')
                 ->where('o.origenCuenta=:cuenta or o.destinoCuenta=:cuenta')
                 ->setParameter('cuenta', $cuenta)
+                ->orderBy('o.fecha','DESC')
                 ->getQuery();
         $operaciones = $query->getResult();
-        
-        
-        
-        return $this->render('default/cuenta.html.twig', array('cuenta' => $cuenta,'operaciones'=>$operaciones));
+
+
+
+        return $this->render('default/cuenta.html.twig', array('cuenta' => $cuenta, 'operaciones' => $operaciones));
     }
 
 }

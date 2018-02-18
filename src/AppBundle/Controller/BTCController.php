@@ -9,6 +9,7 @@ use AppBundle\Entity\FosUser;
 use AppBundle\Services\Helpers;
 use AppBundle\Entity\Transferencia;
 use AppBundle\Entity\Cuenta;
+use AppBundle\Entity\Moneda;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -21,19 +22,21 @@ class BTCController extends Controller {
      * @Route("/btccomprar", name="btccomprar")
      */
     public function btccomprarAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $this->getUser();
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
         $query = $cuenta_repository->createQueryBuilder('c')
                 ->where('c.fosUser = :usuario and c.moneda= :moneda')
                 ->setParameter('usuario', $user->getId())
-                ->setParameter('moneda', 1)
+                ->setParameter('moneda', Moneda::ARS)
                 ->getQuery();
         $cuenta = $query->getResult();
         $cuenta = $cuenta[0];
         $operacion = new \AppBundle\Entity\Operaciones();
         $form = $this->createFormBuilder($operacion)
-                ->add('origen_importe', MoneyType::class,array('currency'=>'USD','label'=>'Importe:'))
+                ->add('origen_importe', MoneyType::class, array('currency' => 'USD', 'label' => 'Importe:'))
                 ->add('save', SubmitType::class, array('label' => 'Comprar'))
                 ->getForm();
         $form->handleRequest($request);
@@ -41,7 +44,7 @@ class BTCController extends Controller {
             $query = $cuenta_repository->createQueryBuilder('c')
                     ->where('c.fosUser = :usuario and c.moneda= :moneda')
                     ->setParameter('usuario', $user->getId())
-                    ->setParameter('moneda', 2)
+                    ->setParameter('moneda', Moneda::BTC)
                     ->getQuery();
             $cuentaBTC = $query->getResult();
             $cuentaBTC = $cuentaBTC[0];
@@ -50,13 +53,13 @@ class BTCController extends Controller {
             $em->getConnection()->beginTransaction();
             try {
                 // SE CREA LA OPERACION BTC
-                $helpers=new Helpers();
-                $cotizacion=$helpers->cotizacionARS_BTC();
-                $cotizacion=$cotizacion->bpi->ARS->rate_float;
+                $helpers = new Helpers();
+                $cotizacion = $helpers->cotizacionARS_BTC();
+                $cotizacion = $cotizacion->bpi->ARS->rate_float;
                 $operacion->setOrigenCuenta($cuenta);
                 $operacion->setDetalle("Compra BTC");
                 $operacion->setFecha(new \DateTime('now'));
-                $btc=round($operacion->getOrigenImporte() / ($cotizacion*1.05),8);
+                $btc = round($operacion->getOrigenImporte() / ($cotizacion * 1.05), 8);
                 $operacion->setDestinoImporte($btc);
                 $operacion->setCotizacion($cotizacion);
                 $operacion->setDestinoCuenta($cuentaBTC);
@@ -67,7 +70,7 @@ class BTCController extends Controller {
                 $em->persist($cuenta);
                 $em->flush();
 
-                $cuentaBTC->setsaldo($cuentaBTC->getsaldo()+$btc);
+                $cuentaBTC->setsaldo($cuentaBTC->getsaldo() + $btc);
                 $em->persist($cuentaBTC);
                 $em->flush();
 
@@ -76,7 +79,7 @@ class BTCController extends Controller {
                 $em->getConnection()->rollback();
                 throw $e;
             }
-            $this->addFlash('notice', "Operacion terminada. ".$btc." adquiridos.");
+            $this->addFlash('notice', "Operacion terminada. " . $btc . " adquiridos.");
             return $this->redirectToRoute('dashboard');
         }
         return $this->render('default/btccomprar.html.twig', array(
@@ -88,13 +91,15 @@ class BTCController extends Controller {
      * @Route("/btcvender", name="btcvender")
      */
     public function btcvenderAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $this->getUser();
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
         $query = $cuenta_repository->createQueryBuilder('c')
                 ->where('c.fosUser = :usuario and c.moneda= :moneda')
                 ->setParameter('usuario', $user->getId())
-                ->setParameter('moneda', 2)
+                ->setParameter('moneda', Moneda::BTC)
                 ->getQuery();
         $cuentaBTC = $query->getResult();
         $cuentaBTC = $cuentaBTC[0];
@@ -108,7 +113,7 @@ class BTCController extends Controller {
             $query = $cuenta_repository->createQueryBuilder('c')
                     ->where('c.fosUser = :usuario and c.moneda= :moneda')
                     ->setParameter('usuario', $user->getId())
-                    ->setParameter('moneda', 1)
+                    ->setParameter('moneda', Moneda::ARS)
                     ->getQuery();
             $cuenta = $query->getResult();
             $cuenta = $cuenta[0];
@@ -117,12 +122,12 @@ class BTCController extends Controller {
             $em->getConnection()->beginTransaction();
             try {
                 // SE CREA LA OPERACION BTC
-                $helpers=new Helpers();
-                $cotizacion=$helpers->cotizacionARS_BTC();
+                $helpers = new Helpers();
+                $cotizacion = $helpers->cotizacionARS_BTC();
                 $operacion->setOrigenCuenta($cuentaBTC);
                 $operacion->setDetalle("Venta BTC");
                 $operacion->setFecha(new \DateTime('now'));
-                $pesos=$operacion->getOrigenImporte() * ($cotizacion*0.95);
+                $pesos = $operacion->getOrigenImporte() * ($cotizacion * 0.95);
                 $operacion->setDestinoImporte($pesos);
                 $operacion->setCotizacion($cotizacion);
                 $operacion->setDestinoCuenta($cuenta);
@@ -133,7 +138,7 @@ class BTCController extends Controller {
                 $em->persist($cuentaBTC);
                 $em->flush();
 
-                $cuenta->setsaldo($cuenta->getsaldo()+$pesos);
+                $cuenta->setsaldo($cuenta->getsaldo() + $pesos);
                 $em->persist($cuenta);
                 $em->flush();
 
@@ -142,7 +147,7 @@ class BTCController extends Controller {
                 $em->getConnection()->rollback();
                 throw $e;
             }
-            $this->addFlash('notice', "Operacion terminada. ".$pesos." vendidos.");
+            $this->addFlash('notice', "Operacion terminada. " . $pesos . " vendidos.");
             return $this->redirectToRoute('dashboard');
         }
         return $this->render('default/btcvender.html.twig', array(
@@ -150,27 +155,174 @@ class BTCController extends Controller {
         ));
     }
 
-    
-/**
+    /**
      * @Route("/btcrecibir", name="btcrecibir")
      */
     public function btcrecibirAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $this->getUser();
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
         $query = $cuenta_repository->createQueryBuilder('c')
                 ->where('c.fosUser = :usuario and c.moneda= :moneda')
                 ->setParameter('usuario', $user->getId())
-                ->setParameter('moneda', 2)
+                ->setParameter('moneda', Moneda::BTC)
                 ->getQuery();
         $cuentaBTC = $query->getResult();
         $cuentaBTC = $cuentaBTC[0];
-       
+
+        if ($cuentaBTC->getdireccion() == "") {
+            try {
+                require_once('jsonRPCClient.php');
+                $bitcoin = new \jsonRPCClient('http://someuser:12345678@127.0.0.1:18332/');
+                $username = "";
+                $sendaddress = $bitcoin->getnewaddress($username);
+                $cuentaBTC->setdireccion($sendaddress);
+                $db->getManager()->persist($cuentaBTC);
+                $db->getManager()->flush();
+            } catch (Exception $e) {
+                die("<p>Server error! Please contact the admin.</p>");
+            }
+        }
         return $this->render('default/btcrecibir.html.twig', array(
-                     'cuenta' => $cuentaBTC,  ));
+                    'cuenta' => $cuentaBTC,));
     }
-    
-    
-    
-    
+
+    /**
+     * @Route("/btcenviar", name="btcenviar")
+     */
+    public function btcenviarAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $user = $this->getUser();
+        $db = $this->getDoctrine();
+        $cuenta_repository = $db->getRepository(Cuenta::class);
+        $query = $cuenta_repository->createQueryBuilder('c')
+                ->where('c.fosUser = :usuario and c.moneda= :moneda')
+                ->setParameter('usuario', $user->getId())
+                ->setParameter('moneda', Moneda::BTC)
+                ->getQuery();
+        $cuentaBTC = $query->getResult();
+        $cuentaBTC = $cuentaBTC[0];
+
+        $form = $this->createFormBuilder()
+                ->add('importe', \Symfony\Component\Form\Extension\Core\Type\NumberType::class)
+                ->add('direccion', \Symfony\Component\Form\Extension\Core\Type\TextType::class)
+                ->add('save', SubmitType::class, array('label' => 'Enviar'))
+                ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $operacion = new \AppBundle\Entity\Operaciones();
+            $datos = $form->getData();
+            $em = $this->getDoctrine()->getManager();
+
+            $em->getConnection()->beginTransaction();
+            try {
+                // SE CREA LA OPERACION BTC
+
+                $operacion->setOrigenCuenta($cuentaBTC);
+                $operacion->setDetalle("Envio BTC");
+                $operacion->setFecha(new \DateTime('now'));
+                $operacion->setOrigenImporte($datos['importe']);
+                $operacion->setCotizacion(0);
+                $em->persist($operacion);
+                $em->flush();
+
+                $cuentaBTC->setsaldo($cuentaBTC->getsaldo() - $datos['importe']);
+                $em->persist($cuentaBTC);
+                $em->flush();
+
+                require_once('jsonRPCClient.php');
+                $bitcoin = new \jsonRPCClient('http://someuser:12345678@127.0.0.1:18332/');
+                $username = "";
+                $sendaddress = $bitcoin->sendtoaddress($datos['direccion'], $datos['importe']);
+
+                $transaccion_obj = new \AppBundle\Entity\Transacciones();
+                $transaccion_obj->settxid($sendaddress);
+                $transaccion_obj->setoperaciones($operacion);
+                $em->persist($transaccion_obj);
+                $em->flush();
+
+                $em->getConnection()->commit();
+            } catch (Exception $e) {
+                $em->getConnection()->rollback();
+                throw $e;
+            }
+            $this->addFlash('notice', "Operacion terminada. " . $datos['importe'] . " transferidos.");
+            return $this->redirectToRoute('dashboard');
+        }
+        return $this->render('default/btcenviar.html.twig', array(
+                    'form' => $form->createView(), 'cuenta' => $cuentaBTC,));
+    }
+
+    /**
+     * @Route("/btccron", name="btccron")
+     */
+    public function btccron(Request $request) {
+
+        require_once('jsonRPCClient.php');
+        $bitcoin = new \jsonRPCClient('http://someuser:12345678@127.0.0.1:18332/');
+        $recibidos = $bitcoin->listreceivedbyaddress();
+        foreach ($recibidos as $recibido) {
+            echo $recibido['address'] . ":...<br>";
+            $db = $this->getDoctrine();
+            $query = $db->getRepository(Cuenta::class)
+                    ->createQueryBuilder('c')
+                    ->where('c.direccion = :direccion and c.moneda= 2')
+                    ->setParameter('direccion', $recibido['address'])
+                    ->getQuery();
+            $cuentaBTC = $query->getResult();
+            if (count($cuentaBTC) == 1) {
+                echo "en wallet";
+                $cuentaBTC = $cuentaBTC[0];
+                foreach ($recibido['txids'] as $transaccion) {
+                    echo $transaccion . "...<br>";
+                    $query = $db->getRepository(\AppBundle\Entity\Transacciones::class)
+                            ->createQueryBuilder('t')
+                            ->where('t.txid = :transaccion')
+                            ->setParameter('transaccion', $transaccion)
+                            ->getQuery();
+                    $transaccion_query = $query->getResult();
+                    if (count($transaccion_query) == 0) {
+                        $transaccion_detalle = $bitcoin->gettransaction($transaccion);
+                        $em = $this->getDoctrine()->getManager();
+                        $em->getConnection()->beginTransaction();
+                        try {
+
+                            // SE CREA LA OPERACION BTC
+                            $operacion = new \AppBundle\Entity\Operaciones();
+                            //$operacion->setOrigenCuenta(NULL);
+                            $operacion->setDetalle("Recibo BTC");
+                            $operacion->setFecha(new \DateTime('now'));
+                            $operacion->setDestinoImporte($transaccion_detalle['amount']);
+                            $operacion->setCotizacion(0);
+                            $operacion->setDestinoCuenta($cuentaBTC);
+                            $em->persist($operacion);
+                            $em->flush();
+
+                            $transaccion_obj = new \AppBundle\Entity\Transacciones();
+                            $transaccion_obj->settxid($transaccion);
+                            $transaccion_obj->setoperaciones($operacion);
+                            $em->persist($transaccion_obj);
+                            $em->flush();
+
+                            $cuentaBTC->setsaldo($cuentaBTC->getsaldo() + $transaccion_detalle['amount']);
+                            $em->persist($cuentaBTC);
+                            $em->flush();
+
+                            $em->getConnection()->commit();
+                        } catch (Exception $e) {
+                            $em->getConnection()->rollback();
+                            throw $e;
+                        }
+                    }
+                }
+            }
+        }
+
+        /* return $this->render('default/btcrecibir.html.twig', array(
+          'cuenta' => $cuentaBTC,)); */
+    }
+
 }

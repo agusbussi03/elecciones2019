@@ -110,7 +110,7 @@ class Operaciones
         return $this->id;
     }
 
-    function getOrigenCuenta(): \AppBundle\Entity\Cuenta {
+    function getOrigenCuenta() {
         return $this->origenCuenta;
     }
 
