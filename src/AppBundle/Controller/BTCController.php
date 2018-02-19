@@ -36,8 +36,8 @@ class BTCController extends Controller {
         $cuenta = $cuenta[0];
         $operacion = new \AppBundle\Entity\Operaciones();
         $form = $this->createFormBuilder($operacion)
-                ->add('origen_importe', MoneyType::class, array('currency' => 'USD', 'label' => 'Importe:'))
-                ->add('save', SubmitType::class, array('label' => 'Comprar'))
+                ->add('origen_importe', MoneyType::class, array('currency' => 'USD', 'label' => 'Importe:', 'attr' => array('class' => 'form-control', 'style' => 'width:200px;')))
+                ->add('save', SubmitType::class, array('label' => 'Comprar', 'attr' => array('class' => 'btn btn-primary')))
                 ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -105,8 +105,8 @@ class BTCController extends Controller {
         $cuentaBTC = $cuentaBTC[0];
         $operacion = new \AppBundle\Entity\Operaciones();
         $form = $this->createFormBuilder($operacion)
-                ->add('origen_importe', \Symfony\Component\Form\Extension\Core\Type\NumberType::class)
-                ->add('save', SubmitType::class, array('label' => 'Vender'))
+                ->add('origen_importe', \Symfony\Component\Form\Extension\Core\Type\NumberType::class, array('label' => 'Importe:', 'attr' => array('class' => 'form-control', 'style' => 'width:200px;')))
+                ->add('save', SubmitType::class, array('label' => 'Vender', 'attr' => array('class' => 'btn btn-primary')))
                 ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -124,9 +124,10 @@ class BTCController extends Controller {
                 // SE CREA LA OPERACION BTC
                 $helpers = new Helpers();
                 $cotizacion = $helpers->cotizacionARS_BTC();
+                $cotizacion = $cotizacion->bpi->ARS->rate_float;
                 $operacion->setOrigenCuenta($cuentaBTC);
                 $operacion->setDetalle("Venta BTC");
-                $operacion->setFecha(new \DateTime('now'));
+                $operacion->setFecha(new \DateTime());
                 $pesos = $operacion->getOrigenImporte() * ($cotizacion * 0.95);
                 $operacion->setDestinoImporte($pesos);
                 $operacion->setCotizacion($cotizacion);
@@ -207,9 +208,9 @@ class BTCController extends Controller {
         $cuentaBTC = $cuentaBTC[0];
 
         $form = $this->createFormBuilder()
-                ->add('importe', \Symfony\Component\Form\Extension\Core\Type\NumberType::class)
-                ->add('direccion', \Symfony\Component\Form\Extension\Core\Type\TextType::class)
-                ->add('save', SubmitType::class, array('label' => 'Enviar'))
+                ->add('importe', \Symfony\Component\Form\Extension\Core\Type\NumberType::class, array('label' => 'Importe:', 'attr' => array('class' => 'form-control', 'style' => 'width:200px;')))
+                ->add('direccion', \Symfony\Component\Form\Extension\Core\Type\TextType::class, array('label' => 'Dirección:', 'attr' => array('class' => 'form-control', 'style' => 'width:600px;')))
+                ->add('save', SubmitType::class, array('label' => 'Enviar', 'attr' => array('class' => 'btn btn-primary')))
                 ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

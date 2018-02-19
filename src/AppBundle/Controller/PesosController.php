@@ -24,7 +24,7 @@ class PesosController extends Controller {
 
         $user = $this->getUser();
         $transferencia = new Transferencia();
-        $transferencia->setFecha(new \DateTime('now'));
+        $transferencia->setFecha(new \DateTime());
         $db = $this->getDoctrine();
         $cuenta_repository = $db->getRepository(Cuenta::class);
         $query = $cuenta_repository->createQueryBuilder('c')
@@ -52,6 +52,7 @@ class PesosController extends Controller {
         $query = $db->getRepository(Transferencia::class)->createQueryBuilder('t')
                 ->where('t.importe>0 and t.cuenta= :cuenta')
                 ->setParameter('cuenta', $cuenta[0])
+                ->orderBy('t.fecha','DESC')
                 ->getQuery();
         $transferencias = $query->getResult();
         return $this->render('default/deposito.html.twig', array(
@@ -78,14 +79,14 @@ class PesosController extends Controller {
         $cuenta = $query->getResult();
         $transferencia->setCuenta($cuenta[0]);
         $form = $this->createFormBuilder($transferencia)
-                ->add('detalle', TextType::class)
-                ->add('fecha', DateType::class)
-                ->add('importe', MoneyType::class)
-                ->add('save', SubmitType::class, array('label' => 'Informar extracción'))
+                ->add('detalle', TextType::class, array('attr' => array('class' => 'form-control')))
+                ->add('importe', MoneyType::class, array('attr' => array('class' => 'form-control','style' => 'width:200px')))
+                ->add('save', SubmitType::class, array('label' => 'Solicitar','attr' => array('class' => 'btn btn-primary')))
                 ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $transferencia = $form->getData();
+            $transferencia->setFecha(new \DateTime());
             $transferencia->setImporte($transferencia->getImporte() * -1);
             $em = $this->getDoctrine()->getManager();
             $em->persist($transferencia);

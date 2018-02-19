@@ -10,9 +10,11 @@
         {{ form_end(form) }}
         </div>
      </div>
+    <script src={{asset("vendor/jquery/jquery.min.js")}}></script>
+
     <h2 class="panel-default">Depósitos</h2>
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Historial de depositos
@@ -22,7 +24,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
+                                    <th>Fecha del Depósito</th>
                                     <th>Detalle</th>
                                     <th>Monto</th>
                                     <th>Estado</th>
@@ -49,6 +51,42 @@
             </div>
         </div>
     </div>
+
+ <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Se van a informar un depósito por <span id="cantidad"></span> pesos.<br>
+                    Desea continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save_changes">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("form[name$='form']").on('submit', function (event) {
+                $("#cantidad").html($("#form_importe").val());
+                $('#myModal').modal('show');
+                event.preventDefault();
+            });
+            $("#save_changes").click(function (event) {
+                $("form[name$='form']").unbind('submit');
+                $("form[name$='form']").submit();
+            });
+        });
+    </script>
 
 
 {% endblock body %}

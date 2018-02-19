@@ -2,7 +2,8 @@
 
 {% block body %}
     <h1 class="page-header">Enviar Bitcoins</h2>
-    
+        <script src={{asset("vendor/jquery/jquery.min.js")}}></script>
+
     
      <div class="row">
         <div class="col-lg-6">
@@ -17,5 +18,43 @@
         </div>
      </div>
     
+
+ <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Se van a enviar <span id="cantidad"></span> BTC a la cuenta <span id="direccion"></span>.<br>
+                    Esto es irreversible.<br>
+                    Desea continuar?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save_changes">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("form[name$='form']").on('submit', function (event) {
+                $("#cantidad").html($("#form_importe").val());
+                $("#direccion").html($("#form_direccion").val());
+                $('#myModal').modal('show');
+                event.preventDefault();
+            });
+            $("#save_changes").click(function (event) {
+                $("form[name$='form']").unbind('submit');
+                $("form[name$='form']").submit();
+            });
+        });
+    </script>
 
 {% endblock body %}
