@@ -39,10 +39,8 @@
         <div class="row">
           <div class="col-xs-12 text-right">
             <div class="huge">
-                BTC Compra: $ {{(cotizacion.bpi.ARS.rate_float*0.95)|number_format(2, ',', '.')}} 
-                /U$S {{(cotizacion.bpi.USD.rate_float*0.95)|number_format(2, ',', '.')}} 
-                <br>   BTC Venta: ${{(cotizacion.bpi.ARS.rate_float*1.05)|number_format(2, ',', '.')}}
-                / U$S {{(cotizacion.bpi.USD.rate_float*1.05)|number_format(2, ',', '.')}} 
+                BTC - Compra: U$S {{(cotizacion.bpi.USD.rate_float*0.95)|number_format(2, ',', '.')}} 
+                   Venta: U$S {{(cotizacion.bpi.USD.rate_float*1.05)|number_format(2, ',', '.')}} 
             </div>
           </div>
         </div>
