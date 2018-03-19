@@ -33,6 +33,13 @@ class Transferencia
      */
     private $importe;
 
+ /**
+     * @var integer
+     *
+     * @ORM\Column(name="estado", type="integer", precision=10, scale=0, nullable=true)
+     */
+    private $estado;    
+    
     /**
      * @var \DateTime
      *
@@ -104,6 +111,14 @@ class Transferencia
 
     function setCuenta(\AppBundle\Entity\Cuenta $cuenta) {
         $this->cuenta = $cuenta;
+    }
+
+    function getEstado() {
+        return $this->estado;
+    }
+
+    function setEstado($estado) {
+        $this->estado = $estado;
     }
 
 

@@ -76,6 +76,9 @@ public function setmoneda($moneda){
 public function setfosUser($fosUser){
   $this->fosUser=$fosUser;
 }
+public function getfosUser(){
+ return $this->fosUser;
+}
 public function getdireccion(){
   return $this->direccion;
 }

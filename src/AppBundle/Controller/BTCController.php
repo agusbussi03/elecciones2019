@@ -322,8 +322,7 @@ class BTCController extends Controller {
             }
         }
 
-        /* return $this->render('default/btcrecibir.html.twig', array(
-          'cuenta' => $cuentaBTC,)); */
+        return 'listo';
     }
 
 }
