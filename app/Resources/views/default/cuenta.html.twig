@@ -19,6 +19,7 @@
                                     <th>Detalle</th>
                                     <th>Origen</th>
                                     <th>Destino</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -31,6 +32,12 @@
                                             {%endif%}
                                         </td>
                                         <td>{{operacion.destinoCuenta.moneda.simbolo}} {{operacion.destinoImporte}}</td>
+                                         <td>{%if operacion.confirmacion is empty %}
+                                            No confirmado
+                                        {%else%}
+                                            {{operacion.confirmacion|date('d/m/Y')}}
+                                            {%endif%}
+                                            </td>
                                     </tr>
                                 {%endfor%}
                             </tbody>

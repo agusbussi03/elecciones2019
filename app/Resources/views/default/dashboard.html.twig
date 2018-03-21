@@ -12,7 +12,7 @@
             </div>
             <div class="col-xs-9 text-right">
               <div class="huge">
-                {%if (cuenta.moneda.simbolo=='ARS')%}{{cuenta.saldo|number_format(2,',','.')}}
+                {%if (cuenta.moneda.simbolo!='BTC')%}{{cuenta.saldo|number_format(2,',','.')}}
                 {%else%}{{cuenta.saldo}}{%endif%}</div>
               <div>
                 {{cuenta.moneda.nombre}}</div>
@@ -39,8 +39,8 @@
         <div class="row">
           <div class="col-xs-12 text-right">
             <div class="huge">
-                BTC - Compra: U$S {{(cotizacion.bpi.USD.rate_float*0.95)|number_format(2, ',', '.')}} 
-                   Venta: U$S {{(cotizacion.bpi.USD.rate_float*1.05)|number_format(2, ',', '.')}} 
+                BTC - Compra: U$S {{(cotizacion.bpi.USD.rate_float*0.97)|number_format(2, ',', '.')}} 
+                   Venta: U$S {{(cotizacion.bpi.USD.rate_float*1.03)|number_format(2, ',', '.')}} 
             </div>
           </div>
         </div>

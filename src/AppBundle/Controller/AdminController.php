@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\FosUser;
 use AppBundle\Services\Helpers;
 use AppBundle\Entity\Transferencia;
+use AppBundle\Entity\Operaciones;
 use AppBundle\Entity\Cuenta;
 use AppBundle\Entity\Moneda;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -108,5 +109,53 @@ class AdminController extends Controller {
         $em->flush();
         return $this->redirectToRoute('adminextracciones');
     }
+    
+    
+      /**
+     * @Route("/admin/operaciones", name="adminoperaciones")
+     */
+    public function adminoperacionesAction(Request $request) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
+        $db = $this->getDoctrine();
+        $query = $db->getRepository(Operaciones::class)->createQueryBuilder('t')
+                ->orderBy('t.fecha', 'DESC')
+                ->getQuery();
+        $operaciones = $query->getResult();
+        return $this->render('default/admin_operacion.html.twig', array(
+                    'operaciones' => $operaciones, 'helpers' => new Helpers()
+        ));
+    }
+    
 
+      /**
+     * @Route("/admin_operaciones/{operacion}/{id}", name="adminoperacionesoperacion")
+     */
+    public function adminoperacionesoperacionAction($operacion, $id) {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
+        $db = $this->getDoctrine()->getRepository(Operaciones::class);
+        $BTCoperacion = $db->find($id);
+        $db = $this->getDoctrine()->getRepository(Cuenta::class);
+        $cuenta = $db->find($BTCoperacion->getDestinoCuenta()->getId());
+        $BTCoperacion->setConfirmacion(new \DateTime('now'));
+        
+        if ($operacion == "aprobar") {
+            $BTCoperacion->setEstado(1);
+            $cuenta->setSaldo($cuenta->getSaldo()+$BTCoperacion->getDestinoImporte());
+            $em->persist($cuenta);
+            $this->addFlash('notice', 'Operacion aprobada');
+        }
+        if ($operacion == "denegar") {
+            $BTCoperacion->setEstado(2);
+            $this->addFlash('notice', 'Extraccion denegada');
+        }
+        $em->persist($BTCoperacion);
+        $em->flush();
+        return $this->redirectToRoute('adminoperaciones');
+    }
+    
+    
+    
 }

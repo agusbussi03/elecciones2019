@@ -82,6 +82,25 @@ class Operaciones
      * })
      */
     private $destinoCuenta;
+    
+    
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="confirmacion", type="datetime", nullable=true)
+     */
+    private $confirmacion;
+    
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="estado", type="integer", nullable=true)
+     */
+    private $estado;
+
+    
+    
+    
     function getFecha(): \DateTime {
         return $this->fecha;
     }
@@ -154,6 +173,22 @@ class Operaciones
         $this->destinoCuenta = $destinoCuenta;
     }
 
+
+    function getConfirmacion() {
+        return $this->confirmacion;
+    }
+
+    function getEstado() {
+        return $this->estado;
+    }
+
+    function setConfirmacion(\DateTime $confirmacion) {
+        $this->confirmacion = $confirmacion;
+    }
+
+    function setEstado($estado) {
+        $this->estado = $estado;
+    }
 
 
 }

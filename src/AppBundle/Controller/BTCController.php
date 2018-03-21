@@ -55,7 +55,7 @@ class BTCController extends Controller {
                 // SE CREA LA OPERACION BTC
                 $helpers = new Helpers();
                 $cotizacion = $helpers->cotizacionARS_BTC();
-                $cotizacion = $cotizacion->bpi->ARS->rate_float;
+                $cotizacion = $cotizacion->bpi->USD->rate_float;
                 $operacion->setOrigenCuenta($cuenta);
                 $operacion->setDetalle("Compra BTC");
                 $operacion->setFecha(new \DateTime('now'));
@@ -70,16 +70,16 @@ class BTCController extends Controller {
                 $em->persist($cuenta);
                 $em->flush();
 
-                $cuentaBTC->setsaldo($cuentaBTC->getsaldo() + $btc);
-                $em->persist($cuentaBTC);
-                $em->flush();
+                //$cuentaBTC->setsaldo($cuentaBTC->getsaldo() + $btc);
+               // $em->persist($cuentaBTC);
+               // $em->flush();
 
                 $em->getConnection()->commit();
             } catch (Exception $e) {
                 $em->getConnection()->rollback();
                 throw $e;
             }
-            $this->addFlash('notice', "Operacion terminada. " . $btc . " adquiridos.");
+            $this->addFlash('notice', "Operacion registrada.");
             return $this->redirectToRoute('dashboard');
         }
         return $this->render('default/btccomprar.html.twig', array(
@@ -124,7 +124,7 @@ class BTCController extends Controller {
                 // SE CREA LA OPERACION BTC
                 $helpers = new Helpers();
                 $cotizacion = $helpers->cotizacionARS_BTC();
-                $cotizacion = $cotizacion->bpi->ARS->rate_float;
+                $cotizacion = $cotizacion->bpi->USD->rate_float;
                 $operacion->setOrigenCuenta($cuentaBTC);
                 $operacion->setDetalle("Venta BTC");
                 $operacion->setFecha(new \DateTime());
@@ -139,16 +139,16 @@ class BTCController extends Controller {
                 $em->persist($cuentaBTC);
                 $em->flush();
 
-                $cuenta->setsaldo($cuenta->getsaldo() + $pesos);
-                $em->persist($cuenta);
-                $em->flush();
+                //$cuenta->setsaldo($cuenta->getsaldo() + $pesos);
+                //$em->persist($cuenta);
+               // $em->flush();
 
                 $em->getConnection()->commit();
             } catch (Exception $e) {
                 $em->getConnection()->rollback();
                 throw $e;
             }
-            $this->addFlash('notice', "Operacion terminada. " . $pesos . " vendidos.");
+            $this->addFlash('notice', "Operacion registrada.");
             return $this->redirectToRoute('dashboard');
         }
         return $this->render('default/btcvender.html.twig', array(
