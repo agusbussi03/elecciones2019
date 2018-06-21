@@ -11,7 +11,7 @@ $app->register(new ServiceControllerServiceProvider());
 $app->register(new AssetServiceProvider());
 $app->register(new TwigServiceProvider());
 $app->register(new HttpFragmentServiceProvider());
-
+//$app->register(new Silex\Provider\SessionServiceProvider());
 $datos_conexion=array (
             'driver'    => 'pdo_mysql',
             'host'      => 'localhost',

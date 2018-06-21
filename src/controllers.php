@@ -184,10 +184,13 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     if ($mesa->votosporcargo($categoria) > 0 && !validar('admin') && !validar('carga')) {
         return $app['twig']->render('mesa_carga_elige.html.twig', array('mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa')));
     }
+    
     $mascara = $mesa->getMascara();
+    print_r($mascara);
     if ($mesa->votosporcargo($categoria) > 0) {
         return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app), 'mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa. Modifica los datos?')));
     }
+    
     return $app['twig']->render('mesa_carga.html.twig', array('mensaje' => '', 'mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app)));
 })->bind('mesacarga');
 
@@ -473,6 +476,12 @@ $app->error(function (\Exception $e, Request $request, $code) use ($app) {
 });
 
 include('controllers_reporting.php');
+include('controllers_reporting_concejales.php');
+include('controllers_reporting_intendente.php');
+
+include('controllers_reporting_gobernador.php');
+include('controllers_reporting_dipnac.php');
+
 
 function validar($rol) {
     if (!isset($_SESSION['usuario']))

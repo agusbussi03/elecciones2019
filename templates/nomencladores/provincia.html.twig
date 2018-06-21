@@ -19,6 +19,7 @@
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                     {{mensaje.texto}} 
                 </div>
+              
                 {% endif %}
                     <div class="panel panel-default">
                         <div class="panel-body">
@@ -59,14 +60,14 @@
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('partidosnacionales',{'provincia':item.id}) }}';">Partidos/Listas Nacionales</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('locales',{'provincia':item.id}) }}';">Escuelas</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-sm" onclick="window.location.href = '{{ path('mesastestigoprovincia',{'provincia':item.id}) }}';">Mesas</button>
-                                    {%if config.cerrada==0%}              
-                                     
-                                    <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
-                                    <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('provincia_delete',{'id':item.id}) }}';">Borrar</button>
-                                    {%endif%}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
+                                                {%if config.cerrada==0%}              
+
+                                                    <button type="button" class="btn btn-info" onclick="window.location.href = '{{ path('provincia_edit',{'id':item.id}) }}';">Editar</button>
+                                                    <button type="button" class="btn btn-danger" onclick="window.location.href = '{{ path('provincia_delete',{'id':item.id}) }}';">Borrar</button>
+                                                {%endif%}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>     
@@ -78,47 +79,47 @@
                     <div class="panel-heading">
                         Nueva provincia
                     </div>
-                                               
+
                     <div class="panel-body"> 
                         {%if config.cerrada==0%}
-                        <form role="form" action="{{path('provincia_add')}}" method="POST">
-                            <div class="form-group">
-                                <label>Nombre</label>
-                                <input class="form-control" name="nombre" type="text" size="40">
-                                <label>Votantes Nacionales</label>
-                                <input class="form-control" name="electores_nacion" type="number" size="4" min="1" >
-                                <label>Votantes Provinciales</label>
-                                <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
-                                <label>Cantidad de mesas</label>
-                                <input class="form-control" name="mesas" type="number" size="4" min="1">
-                                
-                                <label>Diputados Nacionales Titulares</label>
-                                <input class="form-control" name="dip_titular" type="number" size="4" min="1">
-                                
-                                <label>Diputados Nacionales Suplentes</label>
-                                <input class="form-control" name="dip_suplente" type="number" size="4" min="1">
-                                
-                                <label>Senadores Nacionales Titulares</label>
-                                <input class="form-control" name="sen_titular" type="number" size="4" min="1">
-                                
-                                <label>Senadores Nacionales Suplentes</label>
-                                <input class="form-control" name="sen_suplente" type="number" size="4" min="1">
-                                
-                                <label>Parlasur Titulares</label>
-                                <input class="form-control" name="parlasur_titular" type="number" size="4" min="1">
-                                
-                                <label>Parlasur Suplentes</label>
-                                <input class="form-control" name="parlasur_suplente" type="number" size="4" min="1">
-                                
-                               
-                                <input type="submit"  class="btn btn-primary" value="Crear nueva">
-                            </div>
-                        </form>
+                            <form role="form" action="{{path('provincia_add')}}" method="POST">
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    <input class="form-control" name="nombre" type="text" size="40">
+                                    <label>Votantes Nacionales</label>
+                                    <input class="form-control" name="electores_nacion" type="number" size="4" min="1" >
+                                    <label>Votantes Provinciales</label>
+                                    <input class="form-control" name="electores_provincia" type="number" size="4" min="1">
+                                    <label>Cantidad de mesas</label>
+                                    <input class="form-control" name="mesas" type="number" size="4" min="1">
+
+                                    <label>Diputados Nacionales Titulares</label>
+                                    <input class="form-control" name="dip_titular" type="number" size="4" min="1">
+
+                                    <label>Diputados Nacionales Suplentes</label>
+                                    <input class="form-control" name="dip_suplente" type="number" size="4" min="1">
+
+                                    <label>Senadores Nacionales Titulares</label>
+                                    <input class="form-control" name="sen_titular" type="number" size="4" min="1">
+
+                                    <label>Senadores Nacionales Suplentes</label>
+                                    <input class="form-control" name="sen_suplente" type="number" size="4" min="1">
+
+                                    <label>Parlasur Titulares</label>
+                                    <input class="form-control" name="parlasur_titular" type="number" size="4" min="1">
+
+                                    <label>Parlasur Suplentes</label>
+                                    <input class="form-control" name="parlasur_suplente" type="number" size="4" min="1">
+
+
+                                    <input type="submit"  class="btn btn-primary" value="Crear nueva">
+                                </div>
+                            </form>
                         {%else%}
                             Configuracion cerrada
                         {%endif%}
                     </div>
-                           
+
                 </div>
             </div>
         </div>
@@ -128,10 +129,10 @@
                 <script src="{{ asset('/vendor/datatables-plugins/dataTables.bootstrap.min.js') }}"></script>
                 <script src="{{ asset('vendor/datatables-responsive/dataTables.responsive.js') }}"></script>
                 <script>
-                                        $(document).ready(function () {
-                                            $('#dataTables-example').DataTable({
-                                                responsive: true
-                                            });
-                                        });
+                                                        $(document).ready(function () {
+                                                            $('#dataTables-example').DataTable({
+                                                                responsive: true
+                                                            });
+                                                        });
                 </script>
             {% endblock %}

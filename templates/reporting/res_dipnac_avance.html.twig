@@ -10,24 +10,7 @@
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
                 - Avance: {{config.avancedipnac(1)}}%</b>
             </div>
-            <div style='float: right;width:35%'>
-                 {%if session.admin==1%}
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
-               {%endif%}
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
-                <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
-           <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'avance'}) }}';">Avance</button>
-           <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
-            </div>
+            {% include "reporting/res_dipnac_menu.html.twig" %}
         </div>
         {% if mensaje is defined %}   
             <div {% if mensaje.codigo==0 %}class="alert alert-success alert-dismissable"

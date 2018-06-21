@@ -1,0 +1,18 @@
+<div style='float: right;width:35%'>
+    {%if session.admin==1%} <button type="button" class="btn btn-sm btn-default"
+            onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'votos'}) }}';">Votos</button>
+        <button type="button" class="btn btn-sm btn-default"
+                onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
+
+        <button type="button" class="btn btn-sm btn-default"
+                onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+    {%endif%}
+    <button type="button" class="btn btn-sm btn-default"
+            onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+    <button disabled type="button" class="btn btn-sm btn-default"
+            onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'distribucion'}) }}';">Distribución</button>
+    <button type="button" class="btn btn-sm btn-default"
+            onclick="window.location.href = '{{ path('rep_intendente_seccional',{'id':circuito.id,tipo:'avance'}) }}';">Avance</button>
+    <button type="button" class="btn btn-sm btn-default"
+            onclick="window.location.href = '{{ path('rep_circuito') }}';">Home</button>
+</div>

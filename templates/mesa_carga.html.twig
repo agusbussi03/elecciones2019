@@ -73,7 +73,7 @@
                                             {{ item.datos.id_lista }} - {{ item.datos.nombre_lista }}
                                         </td>
                                     {%endif%} 
-                                    {%if configuracion.intermedia==1%}
+                                    {#%if configuracion.intermedia==1%#}
                                         {%if categoria=='G'%}
                                             <td>
                                                 {% if 'G' in item.cargos %}
@@ -95,7 +95,7 @@
                                                 {% endif %}
                                             </td>
                                         {%endif%} 
-                                    {%endif%}
+                                    {#%endif%#}
                                     {%if categoria=='I'%}
                                         <td>
                                             {% if 'I' in item.cargos %}

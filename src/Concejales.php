@@ -38,6 +38,7 @@ class Concejales {
         }
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         //print_r($votos);
+        $seccionales = $this->getSeccionales();
         $resultado = $totales = array();
         foreach ($votos as $item) {
             $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
@@ -65,39 +66,44 @@ class Concejales {
         }
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($votos as $item) {
-            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
-            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
-            if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
-                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] += $item['suma'];
-            else
-                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
-            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+            if (isset($seccionales[$item['id']])) {
+                $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+                $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+                if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
+                    $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] += $item['suma'];
+                else
+                    $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+            }
         }
         return(array('votos' => $resultado, 'totales' => $totales));
     }
 
     function getPorcentajes() {
+        $seccionales = $this->getSeccionales();
         $porcentajes = $totales_porcentajes = array();
         $totales_porcentajes['EMITIDOS'] = 0;
         $general = 0;
         $resultado = $this->getResultados();
         foreach ($resultado['votos'] as $clave => $valor) {
-            if ($_SESSION['tiporeporte'] == 'VALIDOS')
-                $suma = sumavalidos($valor);
-            elseif ($_SESSION['tiporeporte'] == 'AFIRMATIVOS')
-                $suma = sumaafirmativos($valor);
-            else
-                $suma = suma($valor);
-            $general += $suma;
-            $porcentajes[$clave]['EMITIDOS'] = $suma;
-            foreach ($valor as $clave2 => $valor2) {
-                $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
-                $porcentajes[$clave][$clave2]['id'] = $valor2['id'];
-                if (!isset($totales_porcentajes[$clave2]))
-                    $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
+            if (isset($seccionales[$clave])) {
+                if ($_SESSION['tiporeporte'] == 'VALIDOS')
+                    $suma = sumavalidos($valor);
+                elseif ($_SESSION['tiporeporte'] == 'AFIRMATIVOS')
+                    $suma = sumaafirmativos($valor);
                 else
-                    $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
-                $totales_porcentajes[$clave2]['id'] = $valor2['id'];
+                    $suma = suma($valor);
+                $general += $suma;
+                $porcentajes[$clave]['EMITIDOS'] = $suma;
+                foreach ($valor as $clave2 => $valor2) {
+                    $porcentajes[$clave][$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
+                    $porcentajes[$clave][$clave2]['id'] = $valor2['id'];
+                    if (!isset($totales_porcentajes[$clave2]))
+                        $totales_porcentajes[$clave2]['porcentaje'] = ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
+                    else
+                        $totales_porcentajes[$clave2]['porcentaje'] += ($suma > 0) ? round($valor2['votos'] / $suma * 100, 200) : 0;
+                    $totales_porcentajes[$clave2]['id'] = $valor2['id'];
+                }
             }
         }
         $totales_porcentajes['EMITIDOS'] = $general;
@@ -110,15 +116,17 @@ class Concejales {
         $resultado = $resultado['porcentajes'];
         $porcentajes_peso = array();
         foreach ($resultado as $clave => $item) {
-            foreach ($item as $clave2 => $item2) {
-                /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') { */
-                if (!isset($porcentajes_peso[$clave2]))
-                    $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
-                else
-                    $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
-                $porcentajes_peso[$clave2]['id'] = $item2['id'];
-                /* } */
-            }
+            if (isset($seccionales[$clave]))
+                foreach ($item as $clave2 => $item2) {
+                    /* if ($clave2 != 'EMITIDOS' && $clave2 != 'BLANCOS--' && $clave2 != 'NULOS--' && $clave2 != 'OTROS--') { */
+
+                    if (!isset($porcentajes_peso[$clave2]))
+                        $porcentajes_peso[$clave2]['porcentaje'] = round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
+                    else
+                        $porcentajes_peso[$clave2]['porcentaje'] += round($item2['porcentaje'] * $seccionales[$clave]['peso'] / 100, 200);
+                    $porcentajes_peso[$clave2]['id'] = $item2['id'];
+                    /* } */
+                }
         }
         return($porcentajes_peso);
     }
@@ -126,13 +134,14 @@ class Concejales {
     function getDistribucion($id) {
         //$porcentajes_peso = $this->getPorcentajeponderado();
         $_porcentajes_peso = $this->getPorcentajeponderado();
-        $porcentajes_peso=array();
-        foreach ($_porcentajes_peso as $clave=>$pp){
-            if ($pp['porcentaje']>3) $porcentajes_peso[$clave]=$pp;
+        $porcentajes_peso = array();
+        foreach ($_porcentajes_peso as $clave => $pp) {
+            if ($pp['porcentaje'] > 3)
+                $porcentajes_peso[$clave] = $pp;
         }
         $partidos = $this->getPartidos();
         $total_partido = 0;
-        
+
         if ($id != 0) {
             foreach ($porcentajes_peso as $item) {
                 if ($item['id'] > 0 && isset($partidos[$item['id']]) && $partidos[$item['id']]['id_partido'] == $id)
@@ -176,12 +185,12 @@ class Concejales {
         return($dhont);
     }
 
-    
-        function getDistribucionCompleta($id) {
+    function getDistribucionCompleta($id) {
         $_porcentajes_peso = $this->getPorcentajeponderado();
-        $porcentajes_peso=array();
-        foreach ($_porcentajes_peso as $clave=>$pp){
-            if ($pp['porcentaje']>3) $porcentajes_peso[$clave]=$pp;
+        $porcentajes_peso = array();
+        foreach ($_porcentajes_peso as $clave => $pp) {
+            if ($pp['porcentaje'] > 3)
+                $porcentajes_peso[$clave] = $pp;
         }
         $partidos = $this->getPartidos();
         $total_partido = 0;
@@ -191,7 +200,7 @@ class Concejales {
                     $total_partido += $item['porcentaje'];
             }
         }
-        
+
         //print_r($porcentajes_peso);
         $sql = "SELECT * FROM circuito WHERE id=?  ";
         $circuito = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
@@ -229,9 +238,7 @@ class Concejales {
 
         return($dhont);
     }
-    
-    
-    
+
     function getSeccionales() {
         $total = 0;
         $resultado = array();
@@ -243,10 +250,10 @@ class Concejales {
                 $total += $item['electores_provincia'];
             }
             foreach ($seccionales as $item) {
-                $sql2="select count(distinct numero) as cuenta from mesa, renglon where renglon.mesa_id=mesa.id and mesa.seccionales_id=? and renglon.concejal>0 ";
-                 $cargadas = $this->app['db']->fetchAssoc($sql2, array((int)  $item['id']));
+                $sql2 = "select count(distinct numero) as cuenta from mesa, renglon where renglon.mesa_id=mesa.id and mesa.seccionales_id=? and renglon.concejal>0 ";
+                $cargadas = $this->app['db']->fetchAssoc($sql2, array((int) $item['id']));
                 $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
-                    'mesas_cargadas'=>$cargadas['cuenta'],
+                    'mesas_cargadas' => $cargadas['cuenta'],
                     'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 200));
             }
         } else {   ///// NO TIENE SECCIONALES LA LOCALIDAD
@@ -283,12 +290,13 @@ class Concejales {
                     . "where renglon.mesa_id=mesa.id and renglon.concejal>0 "
                     . " and mesa.seccionales_id=" . $item['id'];
             $cargadas = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
-            $item['cargadas']=$cargadas['cargadas'];
+            $item['cargadas'] = $cargadas['cargadas'];
             $seccionales[] = $item;
         }
         return $seccionales;
     }
-     function getFaltante() {
+
+    function getFaltante() {
         $sql = "SELECT seccional.id,seccional.nombre as nombre,count(*) as mesas from seccional,mesa "
                 . "where seccional.circuito_id=" . $this->id . " and mesa.seccionales_id=seccional.id "
                 . " and mesa.concejal=1 "
@@ -296,16 +304,17 @@ class Concejales {
         $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($_seccionales as $item) {
             $sql = "select  * from mesa "
-                    . " where  seccionales_id=" . $item['id']." and mesa.concejal=1 and id not in (select mesa_id from renglon "
+                    . " where  seccionales_id=" . $item['id'] . " and mesa.concejal=1 and id not in (select mesa_id from renglon "
                     . " where renglon.concejal>0 )";
-                    
+
             $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
-            $item['faltantes']=$faltantes;
+            $item['faltantes'] = $faltantes;
             $seccionales[] = $item;
         }
         return $seccionales;
     }
-     function getFaltante_con_cargadas() {
+
+    function getFaltante_con_cargadas() {
         $sql = "SELECT seccional.id,seccional.nombre as nombre,count(*) as mesas from seccional,mesa "
                 . "where seccional.circuito_id=" . $this->id . " and mesa.seccionales_id=seccional.id "
                 . " and mesa.concejal=1 "
@@ -313,14 +322,15 @@ class Concejales {
         $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($_seccionales as $item) {
             $sql = "select  * from mesa "
-                    . " where  seccionales_id=" . $item['id']." and mesa.concejal=1";
-                    
+                    . " where  seccionales_id=" . $item['id'] . " and mesa.concejal=1";
+
             $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
-            $item['faltantes']=$faltantes;
+            $item['faltantes'] = $faltantes;
             $seccionales[] = $item;
         }
         return $seccionales;
     }
+
 }
 
 function ordena_dhont($a, $b) { {

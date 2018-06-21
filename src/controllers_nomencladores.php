@@ -10,6 +10,7 @@ $app->get('/provincia', function () use ($app) {
     $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
     return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia));
 })->bind('provincia');
+
 $app->post('/provincia_add', function () use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -19,9 +20,7 @@ $app->post('/provincia_add', function () use ($app) {
         (int) $_POST['electores_provincia'], (int) $_POST['mesas'],
         (int) $_POST['dip_titular'], (int) $_POST['dip_suplente'], (int) $_POST['sen_titular'],
         (int) $_POST['sen_suplente'], (int) $_POST['parlasur_titular'], (int) $_POST['parlasur_suplente'],));
-    $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
-    $mensaje = array('codigo' => 0, 'texto' => "La provincia fue cargada");
-    return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
+    return $app->redirect($app['url_generator']->generate('provincia'));
 })->bind('provincia_add');
 $app->get('/provincia_delete/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
@@ -31,11 +30,10 @@ $app->get('/provincia_delete/{id}', function ($id) use ($app) {
     try {
         $sql = "DELETE FROM provincia WHERE id=?";
         $app['db']->executeQuery($sql, array((int) $id));
+        return $app->redirect($app['url_generator']->generate('provincia'));
     } catch (Exception $ex) {
-        $mensaje = array('codigo' => 1, 'texto' => "La provincia tiene informacion cargada");
+        die("La provincia tiene informacion cargada");
     }
-    $provincia = $app['db']->fetchAll('SELECT * FROM provincia');
-    return $app['twig']->render('nomencladores/provincia.html.twig', array('provincia' => $provincia, 'mensaje' => $mensaje));
 })->bind('provincia_delete');
 $app->get('/provincia_edit/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
@@ -224,44 +222,65 @@ $app->get('/cargosgobernador/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
+
+    if (isset($_GET['apellido'])) {
+        $sql = "INSERT INTO candidato VALUES (NULL,?,?,0,NULL);";
+        $app['db']->executeQuery($sql, array($_GET['apellido'], $_GET['nombre']));
+        $candidato_id = $app['db']->lastInsertId();
+        $sql = "UPDATE cargo_provincial set candidato_id=$candidato_id where id=" . $_GET['cargo'];
+        $app['db']->executeQuery($sql);
+    }
+    $cargos=array();
+    $cargos2 = $app['db']->fetchAll("SELECT *,cargo_provincial.id as id_cargo  FROM partido_lista,cargo_provincial   left join candidato on candidato.id=candidato_id 
              WHERE cargo_provincial.provincia_id=$provincia and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
+    foreach ($cargos2 as $item) {
+        $item['foto'] = base64_encode($item['foto']);
+        $cargos[] = $item;
+    }
     $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosgobernador');
+
+
 $app->get('/cargosgobernador_delete/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $cargo = $app['db']->fetchAssoc("SELECT provincia_id FROM cargo_provincial WHERE id=$id");
-    $provincia = $cargo['provincia_id'];
-    $sql = "DELETE from cargo_provincial WHERE id=?";
-    $app['db']->executeQuery($sql, array((int) $id));
-    $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
-             WHERE provincia_id=1 and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
-    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
+    $app['db']->executeQuery("DELETE from cargo_provincial WHERE id=?", array((int) $id));
+    return $app->redirect($app['url_generator']->generate('cargosgobernador', array("provincia" => $cargo['provincia_id'])));
 })->bind('cargosgobernador_delete');
+
 $app->post('/cargosgobernador_add/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $provincia = $id;
     try {
         $sql = "INSERT into cargo_provincial values(NULL,?,?,'G',NULL)";
         $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
+        return $app->redirect($app['url_generator']->generate('cargosgobernador', array("provincia" => $id)));
     } catch (Exception $ex) {
-        echo $ex->getMessage();
-        return $app->redirect($app['url_generator']->generate('provincia'));
+        die($ex->getMessage());
     }
-    $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_provincial 
-             WHERE provincia_id=$provincia and tipo='G' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista  where especial=0 order by id_partido,id_lista");
-    $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
-    return $app['twig']->render('nomencladores/cargosgobernador.html.twig', array('provincia' => $provincia, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosgobernador_add');
+
+
+$app->post('/cargosgobernador_logo/{id}', function ($id) use ($app) {
+    if (!validar('admin')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    if (isset($_FILES['logo']['tmp_name'])) {
+        $logo = file_get_contents($_FILES['logo']['tmp_name']);
+        $sql = "UPDATE candidato SET foto=? WHERE id=?";
+        $app['db']->executeQuery($sql, array($logo, (int) $_POST['candidato_id']));
+    }
+    return $app->redirect($app['url_generator']->generate('cargosgobernador', array('provincia' => $id)));
+})->bind('cargosgobernador_logo');
+
+
+
+
 $app->get('/cargosdiputado/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -409,37 +428,31 @@ $app->get('/cargosintendente/{circuito}', function ($circuito) use ($app) {
     $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
     return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente');
+
 $app->get('/cargosintendente_delete/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $cargo = $app['db']->fetchAssoc("SELECT circuito_id FROM cargo_local WHERE id=$id");
     $circuito = $cargo['circuito_id'];
-    $sql = "DELETE from cargo_local WHERE id=?";
-    $app['db']->executeQuery($sql, array((int) $id));
-    $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local 
-             WHERE circuito_id=$circuito and tipo='I' and lista_id=partido_lista.id order by id_partido,id_lista");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
+    $app['db']->executeQuery("DELETE from cargo_local WHERE id=?", array((int) $id));
+    return $app->redirect($app['url_generator']->generate('cargosintendente', array("circuito" => $circuito)));
 })->bind('cargosintendente_delete');
+
 $app->post('/cargosintendente_add/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $circuito = $id;
     try {
         $sql = "INSERT into cargo_local values(NULL,'I',?,?,null)";
         $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
-        $cargos = $app['db']->fetchAll("SELECT * FROM partido_lista,cargo_local
-             WHERE circuito_id=$circuito and tipo='I' and lista_id=partido_lista.id order by id_partido,id_lista");
+        return $app->redirect($app['url_generator']->generate('cargosintendente', array("circuito" => $id)));
     } catch (Exception $ex) {
         return $app->redirect($app['url_generator']->generate('provincia'));
     }
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
-    return $app['twig']->render('nomencladores/cargosintendente.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
 })->bind('cargosintendente_add');
+
+
 $app->post('/cargosintendente_logo/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -451,6 +464,7 @@ $app->post('/cargosintendente_logo/{id}', function ($id) use ($app) {
     }
     return $app->redirect($app['url_generator']->generate('cargosintendente', array('circuito' => $id)));
 })->bind('cargosintendente_logo');
+
 $app->get('/cargosconcejal/{circuito}', function ($circuito) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -492,51 +506,29 @@ $app->get('/cargosconcejal_delete/{id}', function ($id) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $cargo = $app['db']->fetchAssoc("SELECT circuito_id FROM cargo_local WHERE id=$id");
-    $circuito = $cargo['circuito_id'];
-    $sql = "DELETE from cargo_local WHERE id=?";
-    $app['db']->executeQuery($sql, array((int) $id));
-    $cargos2 = $app['db']->fetchAll("SELECT * ,cargo_local.id as id_cargo FROM partido_lista,cargo_local  left join candidato on candidato.id=candidato_id 
-             WHERE circuito_id=$circuito and tipo='C' and lista_id=partido_lista.id order by id_partido,id_lista");
-    foreach ($cargos2 as $item) {
-        $item['foto'] = base64_encode($item['foto']);
-        $cargos[] = $item;
-    }
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
+    $app['db']->executeQuery("DELETE from cargo_local WHERE id=?", array((int) $id));
+    return $app->redirect($app['url_generator']->generate('cargosconcejal', array("circuito" => $cargo['circuito_id'])));
 })->bind('cargosconcejal_delete');
+
 $app->post('/cargosconcejal_add/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    $circuito = $id;
-    /* try { */
-    $sql = "INSERT into cargo_local values(NULL,'C',?,?,null)";
-    $app['db']->executeQuery($sql, array((int) $_POST['id_lista'], (int) $id));
-    $cargos2 = $app['db']->fetchAll("SELECT * ,cargo_local.id as id_cargo FROM partido_lista,cargo_local  left join candidato on candidato.id=candidato_id 
-             WHERE circuito_id=$circuito and tipo='C' and lista_id=partido_lista.id order by id_partido,id_lista");
-    /*  } catch (Exception $ex) {
-      return $app->redirect($app['url_generator']->generate('provincia'));
-      } */
-    foreach ($cargos2 as $item) {
-        $item['foto'] = base64_encode($item['foto']);
-        $cargos[] = $item;
-    }
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
-    $partido_lista = $app['db']->fetchAll("SELECT * FROM partido_lista where especial=0 order by id_partido,id_lista");
-    return $app['twig']->render('nomencladores/cargosconcejal.html.twig', array('circuito' => $circuito, 'partido_lista' => $partido_lista, 'cargos' => $cargos));
+    $app['db']->executeQuery("INSERT into cargo_local values(NULL,'C',?,?,null)", array((int) $_POST['id_lista'], (int) $id));
+    return $app->redirect($app['url_generator']->generate('cargosconcejal', array("circuito" => $id)));
 })->bind('cargosconcejal_add');
+
 $app->post('/cargosconcejal_logo/{id}', function ($id) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     if (isset($_FILES['logo']['tmp_name'])) {
         $logo = file_get_contents($_FILES['logo']['tmp_name']);
-        $sql = "UPDATE candidato SET foto=? WHERE id=?";
-        $app['db']->executeQuery($sql, array($logo, (int) $_POST['candidato_id']));
+        $app['db']->executeQuery($sql, array("UPDATE candidato SET foto=? WHERE id=?", (int) $_POST['candidato_id']));
     }
     return $app->redirect($app['url_generator']->generate('cargosconcejal', array('circuito' => $id)));
 })->bind('cargosconcejal_logo');
+
 $app->post('/cargosnacionales/{provincia}', function ($provincia) use ($app) {
     if (!validar('admin')) {
         return $app->redirect($app['url_generator']->generate('login'));
@@ -562,14 +554,14 @@ $app->get('/locales/{provincia}', function ($provincia) use ($app) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
     $locales = $app['db']->fetchAll("SELECT * FROM locales where provincia_id=$provincia");
-     if (isset($_GET['xls'])) {
+    if (isset($_GET['xls'])) {
         $texto = "";
         foreach ($locales as $local) {
             $texto .= '"' . $local['nombre'] . '",';
             $texto .= '"' . $local['direccion'] . '","' . $local['telefono'] . '",';
             $texto .= '"' . $local['contacto'] . '","' . $local['mesadesde'] . '",';
             $texto .= '"' . $local['mesahasta'] . '","' . $local['lat'] . '",';
-            $texto .= '"' . $local['lon'] . '"' ;
+            $texto .= '"' . $local['lon'] . '"';
             $texto .= "\n\r";
         }
         header('Content-Description: File Transfer');
@@ -592,7 +584,7 @@ $app->post('/local_add', function () use ($app) {
     $provincia = 1;
 
     $locales = $app['db']->fetchAll("SELECT * FROM locales where provincia_id=$provincia");
-   
+
     $provincia = $app['db']->fetchAssoc("SELECT * FROM provincia where id=$provincia");
     return $app['twig']->render('nomencladores/locales.html.twig', array('provincia' => $provincia, 'locales' => $locales));
 })->bind('local_add');

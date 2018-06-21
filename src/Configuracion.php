@@ -80,10 +80,12 @@ class Configuracion {
         return $_SESSION['usuario'];
     }
 
-    function getUltimaactualizacion($tipo="",$circuito=0) {
-        $where="";
-        if ($tipo!="") $where=" where datos like '%[$tipo%' ";
-        if ($circuito>0) $where.=" and texto in (select numero from mesa where circuito_id=$circuito) ";
+    function getUltimaactualizacion($tipo = "", $circuito = 0) {
+        $where = "";
+        if ($tipo != "")
+            $where = " where datos like '%[$tipo%' ";
+        if ($circuito > 0)
+            $where .= " and texto in (select numero from mesa where circuito_id=$circuito) ";
         $hora = $this->app['db']->fetchAssoc("SELECT DATE_FORMAT(tiempo,'%d/%m/%Y %H:%i') as hora "
                 . "FROM log $where order by tiempo desc LIMIT 1 ");
         return $hora['hora'];
@@ -113,6 +115,31 @@ class Configuracion {
         return base64_encode($candidato['foto']);
     }
 
+    function getObtieneintendente($nombre) {
+        $datos = explode("-", $nombre);
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_local c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='I' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
+    }
+
+     function getObtienegobernador($nombre) {
+        $datos = explode("-", $nombre);
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='G' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
+    }
+    
+       function getObtienegobernadorfoto($nombre) {
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='G' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return base64_encode(file_get_contents("imagenes/default.jpg"));
+        return base64_encode($candidato['foto']);
+    }
     function getObtienedipnac($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
@@ -134,42 +161,60 @@ class Configuracion {
         require_once 'Mesa.php';
         $mesa = new Mesa($numero, $this->app);
         $localidad = $mesa->getCircuito_nombre();
-        $seccion=$mesa->getSeccion_nombre();
+        $seccion = $mesa->getSeccion_nombre();
         $seccional = $mesa->getSeccional();
         if ($seccional > 0) {
             $seccional = $this->app['db']->fetchAssoc("SELECT nombre FROM seccional where id=$seccional ");
             $seccional = $seccional['nombre'] . "/";
         }
-        return $localidad . "/" . $seccional . $mesa->getLocal()." (".$seccion.")";
+        return $localidad . "/" . $seccional . $mesa->getLocal() . " (" . $seccion . ")";
     }
 
     function getResponsableLocalmesa($numero) {
         require_once 'Mesa.php';
         $escuela = $this->app['db']->fetchAssoc("SELECT * FROM locales where mesadesde<=$numero and mesahasta>=$numero ");
-            
-        if (isset($escuela['contacto']) and $escuela['contacto']!="") return " (".$escuela['contacto']." - ".$escuela['telefono'].")";
+
+        if (isset($escuela['contacto']) and $escuela['contacto'] != "")
+            return " (" . $escuela['contacto'] . " - " . $escuela['telefono'] . ")";
         return "";
     }
-    
-     function getAvanceConcejal($numero) {
-    $carga = $this->app['db']->fetchAssoc("
+
+    function getAvanceConcejal($numero) {
+        $carga = $this->app['db']->fetchAssoc("
         SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
         FROM mesa as mesa1,mesa as mesa2 where mesa1.circuito_id=$numero and mesa2.circuito_id=$numero 
         and mesa1.concejal=1 and mesa2.concejal=1 and mesa1.id  in 
         (select mesa_id from renglon where concejal>0) and 
         mesa2.id not in (select mesa_id from renglon where concejal>0)");
-    if ($carga['cargada']+$carga['no_cargada']==0 ) {
-        $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa 
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa 
             where renglon.mesa_id=mesa.id and mesa.circuito_id=$numero and renglon.concejal>0 ");
-        if ($carga['cuenta']==0) return "0";
-        return "100";
-    
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
     }
-    return number_format($carga['cargada']/($carga['cargada']+$carga['no_cargada'])*100,2,",",".");
-     }
-     
-     function getAvanceDipNac($numero) {
-    $carga = $this->app['db']->fetchAssoc("
+
+    function getAvanceIntendente($numero) {
+        $carga = $this->app['db']->fetchAssoc("
+        SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2 where mesa1.circuito_id=$numero and mesa2.circuito_id=$numero 
+        and mesa1.intendente=1 and mesa2.intendente=1 and mesa1.id  in 
+        (select mesa_id from renglon where intendente>0) and 
+        mesa2.id not in (select mesa_id from renglon where intendente>0)");
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa 
+            where renglon.mesa_id=mesa.id and mesa.circuito_id=$numero and renglon.intendente>0 ");
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
+    }
+
+    function getAvanceDipNac($numero) {
+        $carga = $this->app['db']->fetchAssoc("
          SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
         FROM mesa as mesa1,mesa as mesa2,circuito as circuito1,circuito as circuito2,seccion as seccion1,seccion as seccion2 where
         mesa1.circuito_id=circuito1.id and mesa2.circuito_id=circuito2.id and
@@ -179,16 +224,40 @@ class Configuracion {
         and mesa1.diputado_nacional=1 and mesa2.diputado_nacional=1 and mesa1.id  in 
         (select mesa_id from renglon_nacional where diputado>0) and 
         mesa2.id not in (select mesa_id from renglon_nacional where diputado>0)");
-    if ($carga['cargada']+$carga['no_cargada']==0 ) {
-        $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon_nacional,mesa,circuito,seccion 
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon_nacional,mesa,circuito,seccion 
 where renglon_nacional.diputado>0 and renglon_nacional.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=seccion.id 
 and seccion.provincia_id=$numero");
-        if ($carga['cuenta']==0) return "0";
-        return "100";
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
     }
-    return number_format($carga['cargada']/($carga['cargada']+$carga['no_cargada'])*100,2,",",".");
-     }
     
+    function getAvanceGobernador($numero) {
+        $carga = $this->app['db']->fetchAssoc("
+         SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2,circuito as circuito1,circuito as circuito2,seccion as seccion1,seccion as seccion2 where
+        mesa1.circuito_id=circuito1.id and mesa2.circuito_id=circuito2.id and
+        circuito1.seccion_id=seccion1.id and circuito2.seccion_id=seccion2.id and 
+        
+        seccion1.provincia_id=$numero and seccion2.provincia_id=$numero 
+        and mesa1.gobernador=1 and mesa2.gobernador=1 and mesa1.id  in 
+        (select mesa_id from renglon where gobernador>0) and 
+        mesa2.id not in (select mesa_id from renglon where gobernador>0)");
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa,circuito,seccion 
+where renglon.gobernador>0 and renglon.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=seccion.id 
+and seccion.provincia_id=$numero");
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
+    }
+    
+
     function getOrdenaCandidatos($arreglo) {
         $divididos = array();
         //print_r($arreglo);
@@ -210,33 +279,43 @@ and seccion.provincia_id=$numero");
 
     function getLimpianombre($clave) {
         $clave2 = explode("-", $clave);
-        if (isset($clave2[2]))  return $clave2[0] . "/" . $clave2[2];
+        if (isset($clave2[2]))
+            return $clave2[0] . "/" . $clave2[2];
         return $clave;
     }
-   function getColorpartido($clave) {
-       $color = $this->app['db']->fetchAssoc("
-        SELECT color FROM partido_lista where id_partido=".$clave);
-       if ($color['color']!="") return $color['color'];
+
+    function getColorpartido($clave) {
+        $color = $this->app['db']->fetchAssoc("
+        SELECT color FROM partido_lista where id_partido=" . $clave);
+        if ($color['color'] != "")
+            return $color['color'];
         return "red";
     }
-     function getColorpartidopornombre($clave) {
+
+    function getColorpartidopornombre($clave) {
         $color = $this->app['db']->fetchAssoc("
         SELECT color FROM partido_lista where nombre_partido='$clave'");
-       if ($color['color']!="") return $color['color'];
+        if ($color['color'] != "")
+            return $color['color'];
         return "red";
     }
-       function getColorpartidonacional($clave) {
+
+    function getColorpartidonacional($clave) {
         $color = $this->app['db']->fetchAssoc("
-        SELECT color FROM partido_lista_nacional where id_partido=".$clave);
-       if ($color['color']!="") return $color['color'];
+        SELECT color FROM partido_lista_nacional where id_partido=" . $clave);
+        if ($color['color'] != "")
+            return $color['color'];
         return "red";
     }
-  function getColorpartidonacionalpornombre($clave) {
+
+    function getColorpartidonacionalpornombre($clave) {
         $color = $this->app['db']->fetchAssoc("
         SELECT color FROM partido_lista_nacional where nombre_partido='$clave'");
-       if ($color['color']!="") return $color['color'];
+        if ($color['color'] != "")
+            return $color['color'];
         return "red";
     }
+
 }
 
 function cmp($a, $b) {

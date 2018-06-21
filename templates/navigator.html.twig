@@ -13,7 +13,7 @@
     <!-- /.navbar-header -->
 
     <ul class="nav navbar-top-links navbar-right">
-         <a class="navbar-brand" href="{{path('homepage')}}">.Inicio.</a>
+        <a class="navbar-brand" href="{{path('homepage')}}">.Inicio.</a>
         {{session.usuario}}({{session.provincia}})
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -49,62 +49,65 @@
                     </form>
                 </li>
                 {%if session.admin==1 %}
-                <li>
-                    <a href="{{ path('homepage') }}">
-                        <i class="fa fa-dashboard fa-fw"></i>
-                        Panel de Control</a>
-                </li>
+                    <li>
+                        <a href="{{ path('homepage') }}">
+                            <i class="fa fa-dashboard fa-fw"></i>
+                            Panel de Control</a>
+                    </li>
                 {%endif%}
                 {%if session.admin==1%}
-                <li>
-                    <a href="{{ path('provincia') }}">
-                        <i class="fa fa-check-square-o  fa-fw"></i>
-                        Nomencladores
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ path('provincia') }}">
+                            <i class="fa fa-check-square-o  fa-fw"></i>
+                            Nomencladores
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="{{path('mesacarga_elige')}}">
-                        <i class="fa fa-edit fa-fw"></i>
-                        Cargar mesa</a>
-                </li>
-                <li>
-                    <a href="{{path('configuracion')}}">
-                        <i class="fa fa-gear fa-fw"></i>
-                        Configuracion</a>
-                </li>
-                <li>
-                    <a href="{{path('usuarios')}}">
-                        <i class="fa fa-user fa-fw"></i>
-                        Usuarios</a>
-                </li>
-                
+                    <li>
+                        <a href="{{path('mesacarga_elige')}}">
+                            <i class="fa fa-edit fa-fw"></i>
+                            Cargar mesa</a>
+                    </li>
+                    <li>
+                        <a href="{{path('configuracion')}}">
+                            <i class="fa fa-gear fa-fw"></i>
+                            Configuracion</a>
+                    </li>
+                    <li>
+                        <a href="{{path('usuarios')}}">
+                            <i class="fa fa-user fa-fw"></i>
+                            Usuarios</a>
+                    </li>
+
                 {%endif%}
-                 {%if session.admin==1 or session.fiscal==1%}
-                <li>
-                    <a href="{{ path('fiscales_seccion') }}">
-                        <i class="fa fa-check-square-o  fa-fw"></i>
-                        Fiscales
-                    </a>
-                </li>
+                {%if session.admin==1 or session.fiscal==1%}
+                    <li>
+                        <a href="{{ path('fiscales_seccion') }}">
+                            <i class="fa fa-check-square-o  fa-fw"></i>
+                            Fiscales
+                        </a>
+                    </li>
                 {%endif%}
-                 {%if session.admin==1 or session.lectura %}
-                <li>
-                    <a href="#">
-                        <i class="fa fa-wrench fa-fw"></i>
-                        Reportes<span class="fa arrow"></span>
-                    </a>
-                    <ul class="nav nav-second-level">
-                        <li>
-                            <a href="{{path('rep_circuito')}}">Por Ciudades</a>
-                        </li>
-                        <li>
-                            <a href="{{path('rep_nacional')}}">Nacional</a>
-                        </li>
-                    </ul>
-                </li>
+                {%if session.admin==1 or session.lectura %}
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-wrench fa-fw"></i>
+                            Reportes<span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a href="{{path('rep_circuito')}}">Por Ciudades</a>
+                            </li>
+                            <li>
+                                <a href="{{path('rep_provincia')}}">Por Provincia</a>
+                            </li>
+                            <li>
+                                <a href="{{path('rep_nacional')}}">Nacional</a>
+                            </li>
+                        </ul>
+                    </li>
                 {%endif%}
-                
+
             </ul>
         </div>
     </div>
