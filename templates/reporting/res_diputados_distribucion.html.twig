@@ -57,11 +57,11 @@
     <div {#class="container"#}>
         <div>
             <div style='width: 55%;float: left'>
-                <h1>Dip. Nacionales - Distribución</h1>
+                <h1>Diputados - Distribución</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
-                - Avance: {{config.avancedipnac(1)}}%</b>
+                - Avance: {{config.avancediputados(1)}}%</b>
             </div>
-             {% include "reporting/res_dipnac_menu.html.twig" %}
+             {% include "reporting/res_diputados_menu.html.twig" %}
         </div>
         <div style="clear:both" />  
         <div>
@@ -111,7 +111,7 @@
                             <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:80%;">
                                 {{config.obtienedipnac(clave)|slice(0, 20)}}</p>
                             <img src="data:image/gif;base64,{{item.logo}}" width="30px" style="float:right;"/>
-                            <img src="data:image/gif;base64,{{config.obtienedipnacfoto(clave)}}" width="30px" style="float:right;"/>
+                            <img src="data:image/gif;base64,{{config.obtienediputadosfoto(clave)}}" width="30px" style="float:right;"/>
 
                         </div>
                         <div style="width:45%;float:left;text-align:left;">

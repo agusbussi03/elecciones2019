@@ -16,11 +16,11 @@
     <div {#class="container"#}>
         <div>
             <div style='width: 65%;float: left'>
-                <h1 class="page-header">Diputados nacionales - VOTOS</h1>
+                <h1 class="page-header">Diputados - VOTOS</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
-                - Avance: {{config.avancedipnac(1)}}%</b>
+                - Avance: {{config.avancediputados(1)}}%</b>
             </div>
-             {% include "reporting/res_dipnac_menu.html.twig" %}
+             {% include "reporting/res_diputados_menu.html.twig" %}
         </div>
         <div style="clear:both"></div>
         {% if mensaje is defined %}   
@@ -151,7 +151,7 @@
                                             };
 
                                             info.update = function (props) {
-                                                this._div.innerHTML = '<h3>Diputados Nacionales</h3>';
+                                                this._div.innerHTML = '<h3>Diputados</h3>';
                                                 if (props) {
                                                     this._div.innerHTML += '<h4>' + props.properties.NOMBRE.toUpperCase() + '</h4>';
                     {%for clave,item in totales %}

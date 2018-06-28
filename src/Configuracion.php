@@ -124,7 +124,7 @@ class Configuracion {
         return $candidato['apellido'] . "($datos[0])";
     }
 
-     function getObtienegobernador($nombre) {
+    function getObtienegobernador($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista l where tipo='G' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
@@ -132,14 +132,32 @@ class Configuracion {
             return "Candidato " . "($datos[0])";
         return $candidato['apellido'] . "($datos[0])";
     }
-    
-       function getObtienegobernadorfoto($nombre) {
+
+    function getObtienegobernadorfoto($nombre) {
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
                 . "partido_lista l where tipo='G' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
         if ($candidato['apellido'] == "")
             return base64_encode(file_get_contents("imagenes/default.jpg"));
         return base64_encode($candidato['foto']);
     }
+    
+        function getObtienediputados($nombre) {
+        $datos = explode("-", $nombre);
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='D' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
+    }
+
+    function getObtienediputadosfoto($nombre) {
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='D' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return base64_encode(file_get_contents("imagenes/default.jpg"));
+        return base64_encode($candidato['foto']);
+    }
+
     function getObtienedipnac($nombre) {
         $datos = explode("-", $nombre);
         $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can on c.candidato_id=can.id ,"
@@ -234,7 +252,7 @@ and seccion.provincia_id=$numero");
         }
         return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
     }
-    
+
     function getAvanceGobernador($numero) {
         $carga = $this->app['db']->fetchAssoc("
          SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
@@ -256,8 +274,30 @@ and seccion.provincia_id=$numero");
         }
         return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
     }
-    
 
+      function getAvanceDiputados($numero) {
+        $carga = $this->app['db']->fetchAssoc("
+         SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2,circuito as circuito1,circuito as circuito2,seccion as seccion1,seccion as seccion2 where
+        mesa1.circuito_id=circuito1.id and mesa2.circuito_id=circuito2.id and
+        circuito1.seccion_id=seccion1.id and circuito2.seccion_id=seccion2.id and 
+        
+        seccion1.provincia_id=$numero and seccion2.provincia_id=$numero 
+        and mesa1.diputado=1 and mesa2.diputado=1 and mesa1.id  in 
+        (select mesa_id from renglon where diputado>0) and 
+        mesa2.id not in (select mesa_id from renglon where diputado>0)");
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa,circuito,seccion 
+where renglon.diputado>0 and renglon.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=seccion.id 
+and seccion.provincia_id=$numero");
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
+    }
+    
+    
     function getOrdenaCandidatos($arreglo) {
         $divididos = array();
         //print_r($arreglo);

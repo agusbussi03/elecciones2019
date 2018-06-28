@@ -6,13 +6,13 @@
     <div {#class="container"#}>
         <div>
             <div style='width: 65%;float: left'>
-                <h1 class="page-header">Diputados nacionales - FALTANTE</h1>
+                <h1 class="page-header">Diputados  - FALTANTE</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
-                - Avance: {{config.avancedipnac(1)}}%</b>
+                - Avance: {{config.avancediputados(1)}}%</b>
             </div>
             <div style='float: right;width:35%'>
              <button type="button" class="btn btn-sm btn-default"
-                        onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
+                        onclick="window.location.href = '{{ path('rep_provincia') }}';">Home</button>
             </div>
         </div>
         <div style="clear: both;height:10px;"></div>

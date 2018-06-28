@@ -480,6 +480,8 @@ include('controllers_reporting_concejales.php');
 include('controllers_reporting_intendente.php');
 
 include('controllers_reporting_gobernador.php');
+include('controllers_reporting_diputados.php');
+
 include('controllers_reporting_dipnac.php');
 
 

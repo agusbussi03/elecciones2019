@@ -339,6 +339,18 @@ $app->get('/logo_candidato_gobernador/{nombre}', function ($nombre) use ($app) {
     die;
 })->bind('logo_candidato_gobernador');
 
+$app->get('/logo_candidato_diputado/{nombre}', function ($nombre) use ($app) {
+    $candidato = $app['db']->fetchAssoc("SELECT * FROM cargo_provincial c left join candidato can on c.candidato_id=can.id ,"
+            . "partido_lista l where tipo='D' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+    header('Content-Type: image/jpeg');
+    header("Cache-Control: max-age=3600");
+    header("Pragma: cache");
+    if ($candidato['apellido'] == "")
+        echo file_get_contents("imagenes/default.jpg");
+    echo $candidato['foto'];
+    die;
+})->bind('logo_candidato_diputado');
+
 $app->get('/logo_candidato_nacional/{nombre}', function ($nombre) use ($app) {
     $candidato = $app['db']->fetchAssoc("SELECT * FROM cargo_nacional c left join candidato can "
             . "on c.candidato_id=can.id ,partido_lista_nacional l where tipo='D' "

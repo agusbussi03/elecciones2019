@@ -135,20 +135,20 @@
                                                 {%endif%}
                                             </h4></td>
 
-                                       {# <td><button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'graficos',id:item.datos.id})}}'">Resultados</button>
+                                        <td><button type="button" class="btn btn-outline btn-primary btn-xs"
+                                                    onclick="window.location.href = '{{path('rep_diputados_seccion',{tipo:'graficos',id:item.datos.id})}}'">Resultados</button>
                                            <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                    onclick="window.location.href = '{{path('rep_concejales_seccional',{tipo:'mapa',id:item.datos.id})}}'">Mapa</button>
+                                                    onclick="window.location.href = '{{path('rep_diputados_seccion',{tipo:'mapa',id:item.datos.id})}}'">Mapa</button>
 
                                             {%if session.admin==1 %}
                                                 <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                        onclick="window.location.href = '{{path('concejales_faltante_circuito',{circuito:item.datos.id})}}'"> Faltantes</button>
+                                                        onclick="window.location.href = '{{path('faltante_diputados',{provincia:item.datos.id})}}'"> Faltantes</button>
                                                 <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                        onclick="window.location.href = '{{path('concejales_faltante_circuito',{circuito:item.datos.id})}}?completo=1'">Completo</button>
+                                                        onclick="window.location.href = '{{path('faltante_diputados',{provincia:item.datos.id})}}?completo=1'">Completo</button>
                                               <button type="button" class="btn btn-outline btn-primary btn-xs"
-                                                        onclick="window.location.href = '{{path('mesas_circuito_concejal',{circuito:item.datos.id})}}'">Mesas (XLS)</button>
+                                                        onclick="window.location.href = '{{path('mesas_diputados',{provincia:item.datos.id})}}'">Mesas (XLS)</button>
                                             {%endif%}
-                                        </td>#}
+                                        </td>
                                     </tr>
                                 {% endfor %}
 

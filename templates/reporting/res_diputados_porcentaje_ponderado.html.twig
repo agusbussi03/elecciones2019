@@ -5,15 +5,15 @@
     <div {#class="container"#}>
         <div>
             <div style='width: 65%;float: left'>
-                <h1 class="page-header">Diputados Nacionales - PORC. PONDERADO ({{session.tiporeporte}})</h1>
+                <h1 class="page-header">Diputados  - PORC. PONDERADO ({{session.tiporeporte}})</h1>
                 <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('D')}}
-                - Avance: {{config.avancedipnac(1)}}%</b>
+                - Avance: {{config.avancediputados(1)}}%</b>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
 
             </div>
-            {% include "reporting/res_dipnac_menu.html.twig" %}
+            {% include "reporting/res_diputados_menu.html.twig" %}
         {% if mensaje is defined %}   
             <div {% if mensaje.codigo==0 %}class="alert alert-success alert-dismissable"
             {%endif%}

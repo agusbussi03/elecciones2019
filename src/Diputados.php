@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Description of intendente
+ * Description of diputados
  *
  * @author pablo
  */
-class Gobernador {
+class Diputados {
 
     private $id = 0;
     private $app;
@@ -20,12 +20,12 @@ class Gobernador {
 
     function getResultados() {
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
-                . "p.nombre_lista,sum(r.gobernador) as suma,count(m.id) as cuenta "
+                . "p.nombre_lista,sum(r.diputado) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m, seccion sec, partido_lista p, "
                 . "cargo_provincial car "
                 . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
                 . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
-                . "r.gobernador>0 and car.lista_id=r.lista_id and car.tipo='G' "
+                . "r.diputado>0 and car.lista_id=r.lista_id and car.tipo='D' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
@@ -42,11 +42,11 @@ class Gobernador {
         }
         //especiales
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
-                . "p.nombre_lista,sum(r.gobernador) as suma,count(m.id) as cuenta "
+                . "p.nombre_lista,sum(r.diputado) as suma,count(m.id) as cuenta "
                 . "FROM renglon r, mesa m,seccion sec, partido_lista p "
                 . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
                 . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
-                . "r.gobernador>0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
+                . "r.diputado>0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
                 . "p.id,p.id_lista,p.nombre_lista ORDER BY sec.nombre asc,`p`.`id_partido` ASC,"
                 . " p.nombre_lista asc ";
         
@@ -165,15 +165,15 @@ class Gobernador {
         $total = 0;
         $resultado = array();
         $sql = "SELECT * FROM seccion WHERE id in (select seccion_id from circuito,mesa,renglon "
-                . "where circuito.id=mesa.circuito_id and mesa.gobernador>0 "
-                . "and renglon.mesa_id=mesa.id and renglon.gobernador>=0)";
+                . "where circuito.id=mesa.circuito_id and mesa.diputado>0 "
+                . "and renglon.mesa_id=mesa.id and renglon.diputado>=0)";
         $departamentos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($departamentos as $item) {
             $total += $item['electores_nacion'];
         }
         foreach ($departamentos as $item) {
             $sql2="select count(distinct numero) as cuenta from mesa, renglon,circuito where renglon.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.seccion_id=? "
-                    . "and renglon.gobernador>0 ";
+                    . "and renglon.diputado>0 ";
                  $cargadas = $this->app['db']->fetchAssoc($sql2, array((int)  $item['id']));
             
             $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
@@ -201,14 +201,14 @@ class Gobernador {
      function getAvance() {
         $sql = "SELECT seccion.id,seccion.nombre,count(DISTINCT mesa.id) as mesas "
                 . "FROM seccion,mesa,circuito where mesa.circuito_id=circuito.id "
-                . "and circuito.seccion_id=seccion.id and mesa.gobernador=1 "
+                . "and circuito.seccion_id=seccion.id and mesa.diputado=1 "
                 . "group by seccion.id,seccion.nombre ";
         $_secciones = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($_secciones as $item) {
             $sql = "SELECT count(DISTINCT mesa.id) as cargadas FROM mesa,circuito,renglon "
                     . "where mesa.circuito_id=circuito.id and circuito.seccion_id=". $item['id'] 
-                    . " and mesa.gobernador=1 and renglon.mesa_id=mesa.id "
-                    . " and renglon.gobernador>0 ";
+                    . " and mesa.diputado=1 and renglon.mesa_id=mesa.id "
+                    . " and renglon.diputado>0 ";
             $cargadas = $this->app['db']->fetchAssoc($sql, array((int) $this->id));
             $item['cargadas']=$cargadas['cargadas'];
             $secciones[] = $item;
@@ -218,14 +218,14 @@ class Gobernador {
   function getFaltante() {
         $sql = "SELECT seccion.id,seccion.nombre as nombre,count(*) as mesas "
                 . "from seccion,mesa,circuito where seccion.id=circuito.seccion_id and "
-                . "mesa.circuito_id=circuito.id and mesa.gobernador=1 "
+                . "mesa.circuito_id=circuito.id and mesa.diputado=1 "
                 . "and seccion.provincia_id=".$this->id." group by seccion.id,seccion.nombre ";
         $_seccionales = $this->app['db']->fetchAll($sql, array((int) $this->id));
         foreach ($_seccionales as $item) {
             $sql = "select mesa.* from mesa,circuito where circuito.seccion_id=".$item['id']
-                    . " and mesa.circuito_id=circuito.id and mesa.gobernador=1 "
+                    . " and mesa.circuito_id=circuito.id and mesa.diputado=1 "
                     . " and mesa.id not in (select renglon.mesa_id "
-                    . " from renglon where renglon.gobernador>0 )";
+                    . " from renglon where renglon.diputado>0 )";
                     
             $faltantes = $this->app['db']->fetchAll($sql, array((int) $this->id));
             $item['faltantes']=$faltantes;
