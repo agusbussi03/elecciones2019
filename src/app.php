@@ -17,7 +17,7 @@ $datos_conexion=array (
             'host'      => 'localhost',
             'dbname'    => 'elecciones',
             'user'      => 'root',
-            'password'  => 'root',
+            'password'  => 'colon',
             'charset'   => 'utf8mb4',
 );
 $app['datos_conexion']=$datos_conexion;
@@ -38,7 +38,7 @@ $app['twig'] = $app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
     $twig->addGlobal('session', $_SESSION);
     $twig->addGlobal('config', new Configuracion($app));
-   
+
     return $twig;
 });
 

@@ -186,7 +186,7 @@ $app->get('/mesacarga/{nro}', function ($nro) use ($app) {
     }
     
     $mascara = $mesa->getMascara();
-    print_r($mascara);
+   // print_r($mascara);
     if ($mesa->votosporcargo($categoria) > 0) {
         return $app['twig']->render('mesa_carga.html.twig', array('mesa' => $mesa, 'mascara' => $mascara, 'categoria' => $categoria, 'configuracion' => new Configuracion($app), 'mensaje' => array('codigo' => 1, 'texto' => 'Cargo ya ingresado para esta mesa. Modifica los datos?')));
     }
