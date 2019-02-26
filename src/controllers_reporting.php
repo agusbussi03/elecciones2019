@@ -28,6 +28,35 @@ $app->get('/rep_circuito', function () use ($app) {
 })->bind('rep_circuito');
 
 
+$app->get('/rep_seccion', function () use ($app) {
+    if (!validar('admin') && !validar('lectura')) {
+        return $app->redirect($app['url_generator']->generate('login'));
+    }
+    $sql = "SELECT distinct c.* from circuito c, mesa m where c.id=m.circuito_id and m.intendente+m.concejal>=1";
+    $resultado = $app['db']->fetchAll($sql);
+    foreach ($resultado as $item) {
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and concejal=1 and "
+                . "id not in (select mesa_id from renglon where concejal>0)";
+        $mesas_nocargadas_C = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and concejal=1 and "
+                . "id  in (select mesa_id from renglon where concejal>0)";
+        $mesas_cargadas_C = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and intendente=1 and "
+                . "id not in (select mesa_id from renglon where intendente>0)";
+        $mesas_nocargadas_I = $app['db']->fetchAll($sql);
+        $sql = "SELECT * FROM mesa where circuito_id=" . $item['id'] . " and intendente=1 and "
+                . "id  in (select mesa_id from renglon where intendente>0)";
+        $mesas_cargadas_I = $app['db']->fetchAll($sql);
+
+        $circuitos[] = array('datos' => $item,
+            'concejal' => array('cargadas' => $mesas_cargadas_C, 'nocargadas' => $mesas_nocargadas_C),
+            'intendente' => array('cargadas' => $mesas_cargadas_I, 'nocargadas' => $mesas_nocargadas_I,));
+    }
+    return $app['twig']->render('rep_circuitos.html.twig', array('circuitos' => $circuitos));
+})->bind('rep_seccion');
+
+
+
 $app->get('/rep_nacional', function () use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));

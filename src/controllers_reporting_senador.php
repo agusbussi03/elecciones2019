@@ -1,31 +1,31 @@
 <?php
 
 
-$app->get('/intendente_faltante_circuito/{circuito}', function ($circuito) use ($app) {
+$app->get('/senador_faltante_seccion/{seccion}', function ($seccion) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    require_once 'Intendente.php';
-    $intendente = new Intendente($circuito, $app);
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$circuito");
+    require_once 'Senador.php';
+    $senador = new Senador($seccion, $app);
+    $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$seccion");
     if (isset($_GET['completo']))
-        $faltantes = $intendente->getFaltante_con_cargadas();
+        $faltantes = $senador->getFaltante_con_cargadas();
     else
-        $faltantes = $intendente->getFaltante();
+        $faltantes = $senador->getFaltante();
 
-    return $app['twig']->render('reporting/res_intendente_faltante.html.twig', array('faltantes' => $faltantes, 'circuito' => $circuito));
-})->bind('intendente_faltante_circuito');
+    return $app['twig']->render('reporting/res_senador_faltante.html.twig', array('faltantes' => $faltantes, 'seccion' => $seccion));
+})->bind('senador_faltante_seccion');
 
-$app->get('/mesas_circuito_intendente/{circuito}', function ($circuito) use ($app) {
+$app->get('/mesas_circuito_senador/{seccion}', function ($seccion) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
-    require_once 'Intendente.php';
+    require_once 'Senador.php';
     require_once 'Configuracion.php';
-    $concejales = new Concejales($circuito, $app);
+    $senador = new Senador($seccion, $app);
     $configuracion = new Configuracion($app);
-    $partidos = $concejales->getPartidos();
-    $mesas = $app['db']->fetchAll("SELECT * FROM mesa where intendente=1 and circuito_id=$circuito");
+    $partidos = $senador->getPartidos();
+    $mesas = $app['db']->fetchAll("SELECT * FROM mesa where senador=1 and circuito_id=$circuito");
     $texto = "";
     $texto = "Mesa;Ubicacion;";
     //print_r($partidos);
@@ -39,13 +39,13 @@ $app->get('/mesas_circuito_intendente/{circuito}', function ($circuito) use ($ap
         foreach ($partidos as $partido) {
             $votos = $app['db']->fetchAssoc("SELECT * FROM renglon "
                     . "where mesa_id=" . $mesa['id'] . " and lista_id=" . $partido['id']);
-            $texto .= $votos['intendente'] . ";";
+            $texto .= $votos['senador'] . ";";
         }
 
         foreach (array(989, 990, 991) as $partido) {
             $votos = $app['db']->fetchAssoc("SELECT * FROM renglon "
                     . "where mesa_id=" . $mesa['id'] . " and lista_id=" . $partido);
-            $texto .= $votos['intendente'] . ";";
+            $texto .= $votos['senador'] . ";";
         }
         header("Content-Type:   application/vnd.ms-excel; charset=utf-8");
         header("Content-Disposition: attachment; filename=concejales.xls");  //File name extension was wrong
@@ -56,11 +56,11 @@ $app->get('/mesas_circuito_intendente/{circuito}', function ($circuito) use ($ap
     }
     echo $texto;
     die;
-})->bind('mesas_circuito_intendente');
+})->bind('mesas_seccion_senador');
 
 
 
-$app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($app) {
+$app->get('/rep_senador/{tipo}/{id}', function ($tipo, $id) use ($app) {
     if (!validar('admin') && !validar('lectura')) {
         return $app->redirect($app['url_generator']->generate('login'));
     }
@@ -69,30 +69,31 @@ $app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
     else
         $_SESSION['tiporeporte'] = "EMITIDOS";
     $app['twig']->addGlobal('session', $_SESSION);
-    require_once 'Intendente.php';
-    $intendente = new Intendente($id, $app);
-    $circuito = $app['db']->fetchAssoc("SELECT * FROM circuito where id=$id");
+    require_once 'Senador.php';
+    $senador = new Senador($id, $app);
+    $seccion = $app['db']->fetchAssoc("SELECT * FROM seccion where id=$id");
 
     if ($tipo == 'votos') {
-        $resultado = $intendente->getResultados();
-        return $app['twig']->render('reporting/res_intendente_votos.html.twig', array('votos' => $resultado['votos'], 'circuito' => $circuito, 'totales' => $resultado['totales'], 'seccionales' => $intendente->getSeccionales()));
+        $resultado = $senador->getResultados();
+        print_r($resultado);
+        return $app['twig']->render('reporting/res_senador_votos.html.twig', array('votos' => $resultado['votos'], 'seccion' => $seccion, 'totales' => $resultado['totales'], 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'porcentajes') {
-        $resultado = $intendente->getPorcentajes();
+        $resultado = $senador->getPorcentajes();
         //$resultado=ajustar($resultado);
-        return $app['twig']->render('reporting/res_intendente_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
-                    'totales' => $resultado['totales_porcentajes'], 'seccionales' => $intendente->getSeccionales()));
+        return $app['twig']->render('reporting/res_senador_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $resultado['totales_porcentajes'], 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'porcentajes_ponderado') {
-        $total_ponderado = $intendente->getPorcentajeponderado();
-        $resultado = $intendente->getPorcentajes();
-        return $app['twig']->render('reporting/res_intendente_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
-                    'totales' => $total_ponderado, 'seccionales' => $intendente->getSeccionales()));
+        $total_ponderado = $senador->getPorcentajeponderado();
+        $resultado = $senador->getPorcentajes();
+        return $app['twig']->render('reporting/res_senador_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+                    'totales' => $total_ponderado, 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'mapa') {
-        $resultado = $intendente->getPorcentajes();
-        $seccionales = $intendente->getSeccionales();
-        $partidos = $intendente->getPartidos();
+        $resultado = $senador->getPorcentajes();
+        $seccionales = $senador->getSeccionales();
+        $partidos = $senador->getPartidos();
         foreach ($seccionales as $seccional) {
             //$totales[$departamento['nombre']]['electores']=$departamento['electores'];
             foreach ($resultado['porcentajes'][$seccional['id']] as $clave => $item) {
@@ -132,12 +133,12 @@ $app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
             $colores_seccional[$clave] = $configuracion->getColorpartidopornombre(array_keys($item)[0]);
         }
        // print_r($colores_seccional);
-        return $app['twig']->render('reporting/res_intendente_mapas.html.twig', array('circuito' => $circuito, 'totales' => $totales, 'partidos' => $partidos2,
+        return $app['twig']->render('reporting/res_senador_mapas.html.twig', array('circuito' => $circuito, 'totales' => $totales, 'partidos' => $partidos2,
                     'colores_seccional' => $colores_seccional));
     }
     if ($tipo == 'graficos') {
-        $resultado = $intendente->getPorcentajeponderado();
-        $partidos = $intendente->getPartidos();
+        $resultado = $senador->getPorcentajeponderado();
+        $partidos = $senador->getPartidos();
         uasort($resultado, 'ordena');
         $otros = $blancos = $nulos = array();
         $resultado_limpio = $resultado_partido = array();
@@ -165,15 +166,15 @@ $app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
-        return $app['twig']->render('reporting/res_intendente_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
+        return $app['twig']->render('reporting/res_senador_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
     }
     if ($tipo == 'distribucion') {
 
         $id = 0;
         if (isset($_GET['id']))
             $id = $_GET['id'];
-        $resultado = $intendente->getDistribucion($id);
-        $_partidos = $intendente->getPartidos();
+        $resultado = $senador->getDistribucion($id);
+        $_partidos = $senador->getPartidos();
 
         $partidos = array();
         foreach ($_partidos as $item) {
@@ -191,7 +192,7 @@ $app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
         }
         //print_r($resultado);
         $grafico = array();
-        $resultado_grafico = $intendente->getDistribucionCompleta($id);
+        $resultado_grafico = $senador->getDistribucionCompleta($id);
         if ($id > 0) {
             foreach ($resultado_grafico as $clave => $item) {
                 if (!(isset($grafico[$item['partido']])))
@@ -199,23 +200,23 @@ $app->get('/rep_intendente_seccional/{tipo}/{id}', function ($tipo, $id) use ($a
             }
         }
         //print_r($grafico);
-        return $app['twig']->render('reporting/res_intendente_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
+        return $app['twig']->render('reporting/res_senador_distribucion.html.twig', array('grafico' => $grafico, 'partidos' => $partidos, 'circuito' => $circuito, 'totales' => $resultado, 'suma' => $suma));
     }
     if ($tipo == 'votos_grafico') {
-        $resultado = $intendente->getResultados();
+        $resultado = $senador->getResultados();
         $datos = array();
         $seccionales = array();
-        $temp = $intendente->getSeccionales();
+        $temp = $senador->getSeccionales();
         foreach ($resultado['votos'] as $clave => $item) {
             $seccionales[] = $temp[$clave]['nombre'];
             foreach ($item as $clave2 => $item2) {
                 $datos[$clave2][] = $item2['votos'];
             }
         }
-        return $app['twig']->render('reporting/res_intendente_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'datos' => $datos));
+        return $app['twig']->render('reporting/res_senador_votos_grafico.html.twig', array('circuito' => $circuito, 'seccionales' => $seccionales, 'datos' => $datos));
     }
     if ($tipo == 'avance') {
-        $avance = $intendente->getAvance();
-        return $app['twig']->render('reporting/res_intendente_avance.html.twig', array('circuito' => $circuito, 'avance' => $avance));
+        $avance = $senador->getAvance();
+        return $app['twig']->render('reporting/res_senador_avance.html.twig', array('circuito' => $circuito, 'avance' => $avance));
     }
-})->bind('rep_intendente_seccional');
+})->bind('rep_senador_seccional');

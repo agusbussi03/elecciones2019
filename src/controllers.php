@@ -479,6 +479,8 @@ include('controllers_reporting.php');
 include('controllers_reporting_concejales.php');
 include('controllers_reporting_intendente.php');
 
+include('controllers_reporting_senador.php');
+
 include('controllers_reporting_gobernador.php');
 include('controllers_reporting_diputados.php');
 
