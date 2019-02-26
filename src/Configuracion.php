@@ -123,6 +123,15 @@ class Configuracion {
             return "Candidato " . "($datos[0])";
         return $candidato['apellido'] . "($datos[0])";
     }
+    
+    function getObtienesenador($nombre) {
+        $datos = explode("-", $nombre);
+        $candidato = $this->app['db']->fetchAssoc("SELECT * FROM cargo_departamental c left join candidato can on c.candidato_id=can.id ,"
+                . "partido_lista l where tipo='S' and c.lista_id=l.id and concat(l.nombre_partido,'-',l.id_lista,'-',l.nombre_lista)='$nombre' ");
+        if ($candidato['apellido'] == "")
+            return "Candidato " . "($datos[0])";
+        return $candidato['apellido'] . "($datos[0])";
+    }
 
     function getObtienegobernador($nombre) {
         $datos = explode("-", $nombre);
@@ -230,7 +239,28 @@ class Configuracion {
         }
         return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
     }
-
+    function getAvanceSenador($numero) {
+        if ($numero==13) $criterio="13,14,15";
+        if ($numero==9) $criterio="9,10";
+        $carga = $this->app['db']->fetchAssoc("
+        SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 
+        FROM mesa as mesa1,mesa as mesa2, circuito as cir1,circuito as cir2
+        where mesa1.circuito_id=cir1.id and mesa2.circuito_id=cir2.id and
+        cir1.seccion_id in ($criterio) and cir2.seccion_id in ($criterio)
+        and mesa1.senador=1 and mesa2.senador=1 and mesa1.id  in 
+        (select mesa_id from renglon where senador>0) and 
+        mesa2.id not in (select mesa_id from renglon where senador>0)");
+        if ($carga['cargada'] + $carga['no_cargada'] == 0) {
+            $carga = $this->app['db']->fetchAssoc("select count(*) as cuenta from renglon,mesa,circuito 
+            where renglon.mesa_id=mesa.id and mesa.circuito_id=circuito.id 
+            and circuito.seccion_id in ($criterio) and renglon.senador>0 ");
+            if ($carga['cuenta'] == 0)
+                return "0";
+            return "100";
+        }
+        return number_format($carga['cargada'] / ($carga['cargada'] + $carga['no_cargada']) * 100, 2, ",", ".");
+    }
+    
     function getAvanceDipNac($numero) {
         $carga = $this->app['db']->fetchAssoc("
          SELECT count(distinct mesa1.id) as cargada,count(distinct mesa2.id) as no_cargada 

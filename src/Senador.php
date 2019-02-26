@@ -28,15 +28,20 @@ class Senador {
     }
 
     function getResultados() {
+        if ($this->id == 9)
+            $criterio = "2021";
+        if ($this->id == 13)
+            $criterio = "2069";
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
                 . "p.nombre_lista,sum(r.senador) as suma,count(m.id) as cuenta "
-                . "FROM renglon r, mesa m, seccion sec, partido_lista p, "
+                . "FROM renglon r, mesa m, seccional sec, partido_lista p, "
                 . "cargo_departamental car "
                 . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
-                . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
+                . "m.seccionales_id=sec.id and sec.circuito_id=$criterio and "
                 . "r.senador>0 and car.lista_id=r.lista_id and car.tipo='S' "
                 . "group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
                 . "ORDER BY sec.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+        //echo $sql;
         $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         $resultado = $totales = array();
         foreach ($votos as $item) {
@@ -52,9 +57,9 @@ class Senador {
         //especiales
         $sql = "SELECT sec.nombre,sec.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
                 . "p.nombre_lista,sum(r.senador) as suma,count(m.id) as cuenta "
-                . "FROM renglon r, mesa m,seccion sec, partido_lista p "
+                . "FROM renglon r, mesa m,seccional sec, partido_lista p "
                 . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
-                . "m.circuito_id in (select id from circuito c1 where c1.seccion_id=sec.id) and "
+                . "m.seccionales_id=sec.id and sec.circuito_id=$criterio and "
                 . "r.senador>0 and p.especial=1 group by sec.nombre,sec.id,p.id_partido,p.nombre_partido,"
                 . "p.id,p.id_lista,p.nombre_lista ORDER BY sec.nombre asc,`p`.`id_partido` ASC,"
                 . " p.nombre_lista asc ";
@@ -70,6 +75,56 @@ class Senador {
                 $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
             $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
         }
+        /// ciudades
+        
+        if ($this->id == 9)
+            $criterio = "10";
+        if ($this->id == 13)
+            $criterio = "15";
+        $sql = "SELECT cir.nombre,cir.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
+                . "p.nombre_lista,sum(r.senador) as suma,count(m.id) as cuenta "
+                . "FROM renglon r, mesa m, circuito cir, partido_lista p, "
+                . "cargo_departamental car "
+                . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
+                . "m.circuito_id=cir.id and cir.seccion_id in ($criterio) and "
+                . "r.senador>0 and car.lista_id=r.lista_id and car.tipo='S' "
+                . "group by cir.nombre,cir.id,p.id_partido,p.nombre_partido,p.id,p.id_lista,p.nombre_lista "
+                . "ORDER BY cir.nombre asc,`p`.`id_partido` ASC, p.nombre_lista asc  ";
+        //echo $sql;
+        $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        //$resultado = $totales = array();
+        foreach ($votos as $item) {
+            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+
+            if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
+                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] += $item['suma'];
+            else
+                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+        }
+        //especiales
+        $sql = "SELECT cir.nombre,cir.id,p.nombre_partido,p.id as plid,p.id_partido,p.id_lista,"
+                . "p.nombre_lista,sum(r.senador) as suma,count(m.id) as cuenta "
+                . "FROM renglon r, mesa m,circuito cir, partido_lista p "
+                . "WHERE r.mesa_id=m.id and r.lista_id=p.id and "
+                . "m.circuito_id=cir.id and cir.seccion_id in ($criterio) and "
+                . "r.senador>0 and p.especial=1 group by cir.nombre,cir.id,p.id_partido,p.nombre_partido,"
+                . "p.id,p.id_lista,p.nombre_lista ORDER BY cir.nombre asc,`p`.`id_partido` ASC,"
+                . " p.nombre_lista asc ";
+
+
+        $votos = $this->app['db']->fetchAll($sql, array((int) $this->id));
+        foreach ($votos as $item) {
+            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+            $resultado[$item['id']][$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+            if (isset($totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]))
+                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] += $item['suma'];
+            else
+                $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['votos'] = $item['suma'];
+            $totales[$item['nombre_partido'] . "-" . $item['id_lista'] . "-" . $item['nombre_lista']]['id'] = $item['plid'];
+        }
+        
         return(array('votos' => $resultado, 'totales' => $totales));
     }
 
@@ -78,6 +133,7 @@ class Senador {
         $totales_porcentajes['EMITIDOS'] = 0;
         $general = 0;
         $resultado = $this->getResultados();
+        //print_r($resultado);
         foreach ($resultado['votos'] as $clave => $valor) {
             if ($_SESSION['tiporeporte'] == 'VALIDOS')
                 $suma = sumavalidos($valor);
@@ -107,7 +163,7 @@ class Senador {
     }
 
     function getPorcentajeponderado() {
-        $seccionales = $this->getDepartamentos();
+        $seccionales = $this->getSeccionales();
         $resultado = $this->getPorcentajes();
         $resultado = $resultado['porcentajes'];
         $porcentajes_peso = array();
@@ -173,7 +229,7 @@ class Senador {
     function getSeccionales() {
         $total = 0;
         $resultado = array();
-         if ($this->id == 9)
+        if ($this->id == 9)
             $criterio = "2021";
         if ($this->id == 13)
             $criterio = "2069";
@@ -184,21 +240,41 @@ class Senador {
             $total += $item['electores_provincia'];
         }
         foreach ($seccionales as $item) {
-            $sql2 = "select count(distinct numero) as cuenta from mesa, renglon where renglon.mesa_id=mesa.id and mesa.seccionales_id=? and renglon.intendente>0 ";
+            $sql2 = "select count(distinct numero) as cuenta from mesa, renglon where renglon.mesa_id=mesa.id and mesa.seccionales_id=? and renglon.senador>0 ";
             $cargadas = $this->app['db']->fetchAssoc($sql2, array((int) $item['id']));
             $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
                 'mesas_cargadas' => $cargadas['cuenta'],
                 'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 200));
         }
-
+        if ($this->id == 9)
+            $criterio = "10";
+        if ($this->id == 13)
+            $criterio = "15";
+        $sql = "SELECT * FROM circuito WHERE seccion_id=? and id in (select circuito_id from mesa,renglon "
+                . "where mesa.id=renglon.mesa_id and  mesa.senador>0 and renglon.senador>0)";
+        $seccionales = $this->app['db']->fetchAll($sql, array((int) $criterio));
+        foreach ($seccionales as $item) {
+            $total += $item['electores_provincia'];
+        }
+        foreach ($seccionales as $item) {
+            $sql2 = "select count(distinct numero) as cuenta from mesa,renglon,circuito "
+                    . "where renglon.mesa_id=mesa.id and mesa.circuito_id=circuito.id and circuito.id=? and renglon.senador>0 ";
+            $cargadas = $this->app['db']->fetchAssoc($sql2, array((int) $item['id']));
+            $resultado[$item['id']] = array('id' => $item['id'], 'nombre' => $item['nombre'],
+                'mesas_cargadas' => $cargadas['cuenta'],
+                'electores' => $item['electores_provincia'], 'peso' => round($item['electores_provincia'] / $total * 100, 200));
+        }
+        foreach($resultado as $clave=>$valor){
+            $resultado[$clave]['peso']=round($resultado[$clave]['electores']/$total*100);
+        }
 
         return($resultado);
     }
 
     function getPartidos() {
-        $sql = "SELECT partido_lista.* FROM partido_lista pl,cargo_departamental cd,seccion s"
+        $sql = "SELECT pl.* FROM partido_lista pl,cargo_departamental cd "
                 . "where pl.id=cd.lista_id "
-                . "and cd.seccion_id=s.id and s.provincia_id=?";
+                . "and cd.seccion_id=?";
         $partidos = $this->app['db']->fetchAll($sql, array((int) $this->id));
         $resultado = array();
         foreach ($partidos as $item) {

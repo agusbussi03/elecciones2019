@@ -173,8 +173,14 @@ class Mesa {
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);
             $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["cargos"][] = $item['tipo'];
         }
-        $cargo_sql = "SELECT * FROM cargo_departamental c,partido_lista p WHERE seccion_id=? and c.lista_id=p.id ";
-        $cargos = $this->app['db']->fetchAll($cargo_sql, array($this->seccion));
+        $criterio=$this->seccion;
+        if ($criterio==9) $criterio="9,10";
+        if ($criterio==10) $criterio="13,14,15";
+        if ($criterio==13) $criterio="13,14,15";
+        if ($criterio==15) $criterio="13,14,15";
+        $cargo_sql = "SELECT * FROM cargo_departamental c,partido_lista p WHERE seccion_id in (?) and c.lista_id=p.id ";
+        //echo $cargo_sql;
+        $cargos = $this->app['db']->fetchAll($cargo_sql, array($criterio));
         foreach ($cargos as $item) {
             $mascara[str_pad($item['id_partido'], 4, "0", STR_PAD_LEFT) . '-' . str_pad($item['id_lista'], 4, "0", STR_PAD_LEFT)]["datos"] = array("id" => $item['id'], "id_partido" => $item['id_partido'],
                 'nombre_partido' => $item['nombre_partido'], "id_lista" => $item['id_lista'], 'nombre_lista' => $item['nombre_lista']);

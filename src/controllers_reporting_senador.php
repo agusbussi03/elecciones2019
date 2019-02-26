@@ -75,19 +75,21 @@ $app->get('/rep_senador/{tipo}/{id}', function ($tipo, $id) use ($app) {
 
     if ($tipo == 'votos') {
         $resultado = $senador->getResultados();
-        print_r($resultado);
+        //print_r($resultado);
+        //print_r($senador->getSeccionales());
         return $app['twig']->render('reporting/res_senador_votos.html.twig', array('votos' => $resultado['votos'], 'seccion' => $seccion, 'totales' => $resultado['totales'], 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'porcentajes') {
         $resultado = $senador->getPorcentajes();
+        //print_r($resultado);
         //$resultado=ajustar($resultado);
-        return $app['twig']->render('reporting/res_senador_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+        return $app['twig']->render('reporting/res_senador_porcentaje.html.twig', array('votos' => $resultado['porcentajes'], 'seccion' => $seccion,
                     'totales' => $resultado['totales_porcentajes'], 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'porcentajes_ponderado') {
         $total_ponderado = $senador->getPorcentajeponderado();
         $resultado = $senador->getPorcentajes();
-        return $app['twig']->render('reporting/res_senador_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'circuito' => $circuito,
+        return $app['twig']->render('reporting/res_senador_porcentaje_ponderado.html.twig', array('votos' => $resultado['porcentajes'], 'seccion' => $seccion,
                     'totales' => $total_ponderado, 'seccionales' => $senador->getSeccionales()));
     }
     if ($tipo == 'mapa') {
@@ -137,9 +139,11 @@ $app->get('/rep_senador/{tipo}/{id}', function ($tipo, $id) use ($app) {
                     'colores_seccional' => $colores_seccional));
     }
     if ($tipo == 'graficos') {
+        
         $resultado = $senador->getPorcentajeponderado();
         $partidos = $senador->getPartidos();
         uasort($resultado, 'ordena');
+        
         $otros = $blancos = $nulos = array();
         $resultado_limpio = $resultado_partido = array();
         foreach ($resultado as $clave => $item) {
@@ -166,7 +170,7 @@ $app->get('/rep_senador/{tipo}/{id}', function ($tipo, $id) use ($app) {
         $resultado_limpio['OTROS'] = $otros;
         $resultado_limpio['BLANCOS'] = $blancos;
         $resultado_limpio['NULOS'] = $nulos;
-        return $app['twig']->render('reporting/res_senador_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'circuito' => $circuito, 'partidos' => $partidos));
+        return $app['twig']->render('reporting/res_senador_grafico.html.twig', array('totales' => $resultado_limpio, 'totales_partido' => $resultado_partido, 'seccion' => $seccion, 'partidos' => $partidos));
     }
     if ($tipo == 'distribucion') {
 

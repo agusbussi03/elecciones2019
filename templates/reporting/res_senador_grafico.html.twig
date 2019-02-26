@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="refresh" content="120">
+        <style>
+
+            .container{
+                width:100%;
+                font-family: Arial;
+            }
+
+            .record{
+                float: left;
+                width: 100%;
+                border: 1px solid #ccc;
+                background-color: #f0f0f0;
+                margin-bottom: 2px;
+                -moz-border-radius: 0px 10px 10px 0px;
+                -moz-border-radius: 0px 10px 10px 0px;
+            }
+
+            .bar {
+                background-color: red;
+                float: left;
+                clear: left;
+                height: 30px;
+            }
+
+            .bar span{
+                font-size: 18px;
+                font-weight: bold;
+                color: #fff;
+                float: left;
+                margin-left: 5px;
+                margin-top: 7px;
+            }
+
+            .p{
+                padding-top: 3px;
+                float: right;
+                color: #6D8591;
+                clear: right;
+                font-size: 12px;
+                font-weight: bold;
+                height: 25px;
+            }
+
+            .p span{
+                font-size: 18px;
+                font-weight: bold;
+                float: left;
+                margin-right: 5px;
+                margin-top: 5px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="container" style="margin-bottom:20px;">
+            <div style='width: 55%;float: left'>
+                <h2 style="margin-top:0;margin-bottom: 0">Senador {{seccion.nombre}}- PORCENTAJES ({{session.tiporeporte}})</h2>
+                <b>Ultima actualizaci&oacute;n: {{config.ultimaactualizacion('S',0)}}
+                    - Avance: {{config.avancesenador(seccion.id)}} %</b>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=EMITIDOS';">Emitidos</button>
+                <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=VALIDOS';">Validos</button>
+                 <button type="button" class="btn btn-sm btn-default" onclick="window.location.href = '?tiporeporte=AFIRMATIVOS';">Afirmativos</button>
+
+            </div>
+            {% include "reporting/res_senador_menu.html.twig" %}
+        </div>
+        <div style="clear: both;height:0px;"></div>
+        
+        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">
+                {% if config.tipo==0%}Listas{% else %}Partidos{% endif %}</h2>
+            {% for clave,item in totales %}
+                {%if loop.index>0%}
+                    {%if (clave|trim!="BLANCOS" and clave!="NULOS") or 
+                                (clave|trim=="BLANCOS" and session.tiporeporte in ["VALIDOS","EMITIDOS"]) or
+                                (clave|trim=="NULOS" and session.tiporeporte in ["EMITIDOS"])
+                    %} 
+                    <div class="container">   
+                        <div style="width:45%;float:left;text-align:right;">
+                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:75%;">
+                                {{config.obtienesenador(clave)|slice(0, 20)}}</p></span>
+                                {%if item.id is defined and partidos[item.id] is defined%}
+                                <img src="{{path('logo_candidato_senador',{nombre:clave})}}" width="30px" style="float:right;"/>
+                            {%endif%}
+                            {%if item.id is defined and partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                <img src="{{path('logo_partido',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>{%endif%}
+
+                            </div>
+                            <div style="width:45%;float:left;text-align:left;">
+                               {%if item.porcentaje is defined%} 
+                                   {%set color='red'%}
+                                   {%if item.id is defined and partidos[item.id] is defined%}
+                                       {%set color=config.colorpartido(partidos[item.id].id_partido)%}
+                                   {%endif%}    
+                                   <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;background-color:{{color}}"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                {%endif%}   
+                            </div>
+                        </div> 
+                        <div style="clear: both;height:5px;"></div>
+                    {%endif%}
+                {%endif%}
+            {%endfor%}
+        </div>
+        {% if config.tipo==0%}
+        <div style="width:49%;float:left;"><h2 style="margin:2;text-align: center;">Partido</h2>
+            {% for clave,item in totales_partido %}
+                {%if loop.index>0%}
+                    <div class="container">   
+                        <div style="width:45%;float:left;text-align:right;">
+                            <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 5px; margin-top: 1px;width:85%;">
+                                {{clave|slice(0, 20)}}</p></span>
+                                {%if partidos[item.id] is defined and partidos[item.id].logo!=""%}
+                                <img src="{{path('logo_partido',{id:partidos[item.id].id})}}" width="30px" style="float:right;"/>{%endif%}
+
+                            </div>
+                            <div style="width:45%;float:left;text-align:left;">
+                                {%set color='red'%}
+                                   {%if item.id is defined and partidos[item.id] is defined%}
+                                       {%set color=config.colorpartido(partidos[item.id].id_partido)%}
+                                   {%endif%}   
+                                <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;background-color:{{color}}"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                            </div>
+                        </div> 
+                        <div style="clear: both;height:5px;"></div>
+                    {%endif%}
+                    {%endfor%}
+                        <!-- muestoro blancos y nulos-->
+                        {% for clave,item in totales %}
+                            {%if loop.index>0  and (clave=="OTROS" or clave=="BLANCOS" or clave=="NULOS") %} 
+                                {%if (session.tiporeporte=='EMITIDOS' and  (clave=="OTROS" or clave=="BLANCOS" or clave=="NULOS"))
+                                or (session.tiporeporte=='VALIDOS' and  (clave=="OTROS" or clave=="BLANCOS")) 
+                                 or (session.tiporeporte=='AFIRMATIVOS' and  (clave=="OTROS" ))  %}
+                                <div class="container">   
+                                    <div style="width:45%;float:left;text-align:right;">
+                                        <p style="float:left;font-size: 15px; font-weight: bold;margin-right: 0px; margin-top: 1px;width:85%;">
+                                            {{clave}}</p>
+                                    </div>
+                                    <div style="width:45%;float:left;text-align:left;">
+                                        {%if item.porcentaje is defined%}
+                                        <div class="record"><div class="bar" style="width:{{item.porcentaje}}%;"><span></span></div><div class="p"><span>{{item.porcentaje|number_format(2, '.', ',')}}%</span></div></div>
+                                        {%endif%}
+                                    </div>
+                                </div> 
+                                <div style="clear: both;height:5px;"></div>
+                            {%endif%}
+                            {%endif%}
+                        {%endfor%}        
+
+                    </div>
+                    {% endif %}
+                   
+                </body>
+            </html>

@@ -1,18 +1,17 @@
 <div style='float: right;width:35%'>
     {%if session.admin==1%}
         <button type="button" class="btn btn-sm btn-default"
-                onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'votos'}) }}';">Votos</button>
+                onclick="window.location.href = '{{ path('rep_senador_seccional',{'id':seccion.id,tipo:'votos'}) }}';">Votos</button>
         <button type="button" class="btn btn-sm btn-default"
-                onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes'}) }}';">Porcentaje</button>
+                onclick="window.location.href = '{{ path('rep_senador_seccional',{'id':seccion.id,tipo:'porcentajes'}) }}';">Porcentaje</button>
         <button type="button" class="btn btn-sm btn-default"
-                onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
+                onclick="window.location.href = '{{ path('rep_senador_seccional',{'id':seccion.id,tipo:'porcentajes_ponderado'}) }}';">Porc. Ponderado</button>
     {%endif%}
     <button type="button" class="btn btn-sm btn-default"
-            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+            onclick="window.location.href = '{{ path('rep_senador_seccional',{'id':seccion.id,tipo:'graficos'}) }}';">Gr&aacute;fico</button>
+    
     <button type="button" class="btn btn-sm btn-default"
-            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'distribucion'}) }}';">Distribución</button>
-    <button type="button" class="btn btn-sm btn-default"
-            onclick="window.location.href = '{{ path('rep_dipnac_seccion',{'id':1,tipo:'avance'}) }}';">Avance</button>
+            onclick="window.location.href = '{{ path('rep_senador_seccional',{'id':seccion.id,tipo:'avance'}) }}';">Avance</button>
     <button type="button" class="btn btn-sm btn-default"
             onclick="window.location.href = '{{ path('rep_nacional') }}';">Home</button>
 </div>
